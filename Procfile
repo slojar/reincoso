@@ -1,2 +1,3 @@
-web: gunicorn reincoso.wsgi
-release: python manage.py migrate
+web: gunicorn reincoso.wsgi:application --log-file - --log-level debug
+python manage.py collectstatic --noinput
+manage.py migrate
