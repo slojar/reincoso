@@ -9,7 +9,6 @@ def signup(request):
     first_name = data.get('first_name')
     last_name = data.get('last_name')
     email = data.get('email')
-    password = data.get('password')
     phone_number = data.get('phone_number')
     bvn = data.get('bvn')
     gender = data.get('gender')
@@ -37,13 +36,8 @@ def signup(request):
     if Profile.objects.filter(bvn=bvn).exists():
         detail = 'Another user has registered with this BVN'
         return success, detail, response
-    if not password:
-        detail = 'Password not provided'
-        return success, detail, response
-    if len(password) < 8:
-        detail = 'Password length should be 8 or more characters'
-        return success, detail, response
 
+    password = phone_number
     user, created = User.objects.get_or_create(username=phone_number)
     if created:
         user.first_name = first_name
