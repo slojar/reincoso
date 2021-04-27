@@ -36,9 +36,9 @@ class SavingsView(APIView):
         saving, created = Saving.objects.get_or_create(user=request.user.profile)
         saving.duration = payment_duration_id
         saving.last_payment = amount
-        saving.fixed_payment = fixed_payment
+        saving.amount = fixed_payment
         saving.last_payment_date = datetime.now()
-        saving.balance = saving.balance + amount
+        saving.total_savings = saving.total_savings + amount
         saving.repayment_day = repayment_day
 
         # Calculate next repayment date
