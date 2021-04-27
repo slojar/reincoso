@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializers import *
 from .utils import *
@@ -37,18 +38,13 @@ class LoginView(APIView):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
         user = authenticate(username=phone_number, password=phone_number)
-
-        token = Token.objects.get(user__username=phone_number)
-        token.delete()
-        token = Token.objects.create(user=user)
-
         if not user:
             data['detail'] = 'Wrong phone number provided'
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
         data['success'] = True
         data['detail'] = 'Login successful'
-        data['token'] = token.key
+        data['token'] = str(RefreshToken.for_user(user).access_token)
         return Response(data, status=status.HTTP_200_OK)
 
 
