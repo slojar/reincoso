@@ -1,7 +1,13 @@
+import requests
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from .models import *
 from django.contrib.auth.hashers import make_password
+from django.conf import settings
+import logging
+import json
+
+log = logging.getLogger(__name__)
 
 
 def signup(request):
@@ -60,5 +66,40 @@ def signup(request):
     response = status.HTTP_201_CREATED
 
     return success, detail, response
+
+
+def get_paystack_link(email, amount, **kwargs):
+    metadata = kwargs.get('metadata')
+    currency = kwargs.get('currency')
+    callback_url = kwargs.get('callback_url')
+    url = settings.PAYSTACK_BASE_URL + "/transaction/initialize"
+    success = True
+    amount = round(float(amount))
+    payload = {
+        "email": email,
+        "amount": f"{amount}00",
+        "callback_url": callback_url,
+        "currency": currency,
+        "metadata": metadata
+    }
+    payload = json.dumps(payload)
+    headers = {
+        'Authorization': 'Bearer {}'.format(settings.PAYSTACK_SECRET_KEY),
+    }
+    response = requests.post(url, headers=headers, data=payload)
+    json_response = response.json()
+
+    log.info(f"url: {url}")
+    log.info(f"headers: {headers}")
+    log.info(f"payloads: {payload}")
+    log.info(f"response: {response.text}")
+
+    if json_response.get('status') is True:
+        response = json_response['data']['authorization_url']
+    else:
+        success = False
+        response = json_response
+
+    return success, response
 
 

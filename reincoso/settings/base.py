@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     'bot.apps.BotConfig',
+    'transaction.apps.TransactionConfig',
 ]
 
 MIDDLEWARE = [
