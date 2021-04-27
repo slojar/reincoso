@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import *
 
 
@@ -14,7 +15,3 @@ class FeedbackMessageSerializer(serializers.ModelSerializer):
         exclude = []
 
 
-class SavingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Saving
-        exclude = []

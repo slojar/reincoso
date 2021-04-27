@@ -10,11 +10,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
-
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Application definition
 
@@ -30,6 +27,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     'bot.apps.BotConfig',
+    'savings.apps.SavingsConfig',
+    'loan.apps.LoanConfig',
+    'investment.apps.InvestmentConfig',
     'transaction.apps.TransactionConfig',
 ]
 

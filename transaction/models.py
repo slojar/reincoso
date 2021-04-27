@@ -1,9 +1,6 @@
 from django.db import models
-<<<<<<< HEAD
-
-# Create your models here.
-=======
-from bot.models import Profile, Saving
+from bot.models import Profile
+from savings.models import Saving
 from .choices import PAYMENT_GATEWAYS, TRANSACTION_STATUS
 
 
@@ -20,4 +17,3 @@ class SavingTransaction(models.Model):
 
     def __str__(self):
         return f"id: {self.pk}, user: {self.user}, amount: {self.amount}, status: {self.status}"
->>>>>>> 03f88d27a63d2a66a01613416163144a214affa4
