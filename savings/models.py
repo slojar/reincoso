@@ -22,6 +22,7 @@ class Saving(models.Model):
     payment_day = models.CharField(max_length=20, choices=DAYS_OF_THE_MONTH_CHOICES, default='25')
     last_payment_date = models.DateTimeField(null=True, blank=True)
     next_payment_date = models.DateTimeField(null=True, blank=True)
+    auto_save = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
