@@ -1,6 +1,9 @@
 from pathlib import Path
 from datetime import timedelta
+from django.contrib import admin
 
+admin.AdminSite.site_title = "Reincoso Admin Panel"
+admin.AdminSite.site_header = "Reincoso Admin Panel"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

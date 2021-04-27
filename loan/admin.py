@@ -1,3 +1,24 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+
+class LoanDurationAdmin(admin.ModelAdmin):
+    list_display = ['id', 'duration', 'number_of_days', 'percentage', 'created_on', 'updated_on']
+    list_filter = ['created_on', 'updated_on']
+
+
+class LoanTransctionInline(admin.TabularInline):
+    model = LoanTransaction
+    extra = 0
+
+
+class LoanAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'amount', 'number_of_days', 'status', 'created_on', 'updated_on']
+    list_filter = ['status', 'duration', 'start_date', 'end_date', 'last_repayment_date', 'next_repayment_date',
+                   'created_on', 'updated_on']
+    inlines = [LoanTransctionInline]
+
+
+admin.site.register(LoanDuration, LoanDurationAdmin)
+admin.site.register(Loan, LoanAdmin)
+
