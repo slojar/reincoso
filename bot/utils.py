@@ -18,30 +18,28 @@ def signup(request):
     phone_number = data.get('phone_number')
     bvn = data.get('bvn')
     gender = data.get('gender')
-
     success = False
-    response = status.HTTP_400_BAD_REQUEST
 
     if not email:
         detail = 'Email address not provided'
-        return success, detail, response
+        return success, detail
     if User.objects.filter(email=email).exists():
         detail = 'Email already exist'
-        return success, detail, response
+        return success, detail
     if not phone_number:
         detail = 'Phone number not provided'
-        return success, detail, response
+        return success, detail
     else:
         phone_number = f"234{phone_number[-10:]}"
     if User.objects.filter(username=phone_number).exists():
         detail = 'Phone number taken'
-        return success, detail, response
+        return success, detail
     if not bvn:
         detail = 'BVN number not provided'
-        return success, detail, response
+        return success, detail
     if Profile.objects.filter(bvn=bvn).exists():
         detail = 'Another user has registered with this BVN'
-        return success, detail, response
+        return success, detail
 
     password = phone_number
     user, created = User.objects.get_or_create(username=phone_number)
@@ -53,7 +51,6 @@ def signup(request):
         user.save()
 
     Token.objects.create(user=user)
-
     profile, created = Profile.objects.get_or_create(user=user)
     if created:
         profile.phone_number = phone_number
@@ -63,9 +60,7 @@ def signup(request):
 
     success = True
     detail = 'Account created successfully'
-    response = status.HTTP_201_CREATED
-
-    return success, detail, response
+    return success, detail
 
 
 def get_paystack_link(email, amount, **kwargs):

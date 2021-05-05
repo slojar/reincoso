@@ -4,6 +4,7 @@ from django.contrib import admin
 
 admin.AdminSite.site_title = "Reincoso Admin Panel"
 admin.AdminSite.site_header = "Reincoso Admin Panel"
+SITE_ID = 1
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     'rest_framework',
     'rest_framework.authtoken',

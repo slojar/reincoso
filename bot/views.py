@@ -14,10 +14,12 @@ class SignupView(APIView):
 
     def post(self, request):
         data = dict()
-        success, detail, response = signup(request)
-        data['success'] = success
+        success, detail = signup(request)
+        if not success:
+            data['detail'] = detail
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
         data['detail'] = detail
-        return Response(data, status=response)
+        return Response(data)
 
 
 class LoginView(APIView):
