@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from bot.utils import get_paystack_link
+from account.utils import get_paystack_link
 from savings.models import Duration, Saving, SavingTransaction
 
 
@@ -37,7 +37,7 @@ class SavingsView(APIView):
         saving.last_payment = amount
         saving.amount = fixed_payment
         saving.last_payment_date = datetime.now()
-        saving.total_savings = saving.total_savings + amount
+        saving.total = saving.total + amount
         saving.repayment_day = repayment_day
 
         # Calculate next repayment date

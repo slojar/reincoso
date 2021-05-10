@@ -1,8 +1,8 @@
 from django.db import models
 
 # Create your models here.
-from bot.choices import DAYS_OF_THE_MONTH_CHOICES
-from bot.models import Profile
+from account.choices import DAYS_OF_THE_MONTH_CHOICES
+from account.models import Profile
 from transaction.choices import PAYMENT_GATEWAYS, TRANSACTION_STATUS
 
 

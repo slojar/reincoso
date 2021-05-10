@@ -1,4 +1,4 @@
-from bot.models import Profile
+from account.models import Profile
 from savings.models import Saving
 
 

@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
 
-    'bot.apps.BotConfig',
+    'account.apps.AccountConfig',
     'savings.apps.SavingsConfig',
     'loan.apps.LoanConfig',
     'investment.apps.InvestmentConfig',
@@ -106,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Lagos'
 
 USE_I18N = True
 

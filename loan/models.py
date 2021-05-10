@@ -1,5 +1,5 @@
 from django.db import models
-from bot.models import Profile
+from account.models import Profile
 from .choices import *
 from django.contrib.sites.models import Site
 
@@ -33,10 +33,6 @@ class LoanDuration(models.Model):
 
     def __str__(self):
         return f"{self.title}: {self.number_of_days} day(s)"
-
-
-# class LoanOffer(models.Model):
-#     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
 
 class Loan(models.Model):
