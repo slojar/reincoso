@@ -9,7 +9,6 @@ def get_loan_offer(profile):
     success = False
     response = ""
     loan_settings, created = LoanSetup.objects.get_or_create(site=Site.objects.get_current())
-    last_six_month = timezone.now() - timezone.timedelta(days=loan_settings.eligibility_days)
     savings_transaction = SavingTransaction.objects.filter(user=profile, status='success').last()
 
     if not savings_transaction:
@@ -17,6 +16,7 @@ def get_loan_offer(profile):
                          "6 months before applying for loan."
         return success, response
 
+    last_six_month = timezone.now() - timezone.timedelta(days=loan_settings.eligibility_days)
     eligible = last_six_month >= savings_transaction.created_on
 
     if not eligible:
