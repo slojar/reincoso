@@ -8,6 +8,16 @@ class SavingTransactionAdmin(admin.ModelAdmin):
     search_fields = ['reference']
 
 
+class SavingTransactionInline(admin.TabularInline):
+    model = SavingTransaction
+    extra = 0
+
+
+class SavingAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'amount']
+    inlines = [SavingTransactionInline]
+
+
 admin.site.register(Duration)
-admin.site.register(Saving)
+admin.site.register(Saving, SavingAdmin)
 admin.site.register(SavingTransaction, SavingTransactionAdmin)
