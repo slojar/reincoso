@@ -28,7 +28,7 @@ class Saving(models.Model):
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.user} - {None or self.duration.name}'
+        return f'{self.user} - {self.duration.name if self.duration else None}'
 
 
 class SavingTransaction(models.Model):
