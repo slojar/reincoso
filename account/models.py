@@ -60,24 +60,11 @@ class FeedbackMessage(models.Model):
     def __str__(self):
         return f'{self.name} - {self.subject}'
 
-# class LoanGuarantor(models.Model):
-#     name = models.CharField(max_length=100)
-#     email = models.EmailField()
-#     phone_number = models.CharField(max_length=20)
-#
-#
-# class Loan(models.Model):
-#     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
-#     duration = models.ForeignKey(Duration, on_delete=models.SET_NULL, null=True, blank=True)
-#     amount = models.FloatField(default=0)
-#     # interest
-#     # guarantor = models.ForeignKey(LoanGuarantor, on_delete=models.SET_NULL, null=True, blank=True)
-#     status = models.CharField(max_length=50, choices=APPROVAL_STATUS_CHOICES, default='pending')
-#     # start_date
-#     # end_date
-#     repaid = models.BooleanField(default=False)
-#
-#
-# class LoanRepayment(models.Model):
-#     loan = models.ForeignKey()
+
+class LoanGuarantor(models.Model):
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
+    guarantor = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, related_name='guarantor')
+
+    def __str__(self):
+        return f"{self.user}: {self.guarantor}"
 
