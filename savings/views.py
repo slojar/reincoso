@@ -2,9 +2,16 @@ from datetime import datetime, timedelta
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 
 from account.utils import get_paystack_link
 from savings.models import Duration, Saving, SavingTransaction
+from .serializers import *
+
+
+class SavingDurationView(ListAPIView):
+    serializer_class = SavingDurationSerializer
+    queryset = Duration.objects.all()
 
 
 class SavingsView(APIView):

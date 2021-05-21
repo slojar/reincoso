@@ -7,3 +7,9 @@ class SavingSerializer(serializers.ModelSerializer):
         model = Saving
         exclude = []
 
+
+class SavingDurationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Duration
+        exclude = []
+
