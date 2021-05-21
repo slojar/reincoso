@@ -2,7 +2,7 @@ import decimal
 from django.shortcuts import get_object_or_404, render
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import generics
+from rest_framework.generics import ListAPIView
 from savings.models import Saving, SavingTransaction
 from rest_framework import status
 from django.utils import timezone
@@ -87,6 +87,12 @@ class ApplyForLoanView(APIView):
 
         data['detail'] = response
         return Response(data)
+
+
+class LoanDurationView(ListAPIView):
+    permission_classes = []
+    serializer_class = LoanDurationSerializer
+    queryset = LoanDuration.objects.all()
 
 
 
