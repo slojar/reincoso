@@ -46,7 +46,13 @@ class SavingsView(APIView):
         saving, created = Saving.objects.get_or_create(user=request.user.profile)
         saving.title = payment_duration_id
         saving.last_payment = amount
-        saving.amount = fixed_payment
+
+        if not fixed_payment:
+            saving.amount = amount
+
+        if saving.amount <= 0 and fixed_payment:
+            saving.amount = fixed_payment
+
         saving.last_payment_date = datetime.now()
         saving.total = saving.total + amount
         saving.repayment_day = repayment_day
