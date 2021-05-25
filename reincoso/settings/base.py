@@ -1,6 +1,8 @@
 from pathlib import Path
 from datetime import timedelta
 from django.contrib import admin
+import cloudinary
+
 
 admin.AdminSite.site_title = "Reincoso Admin Panel"
 admin.AdminSite.site_header = "Reincoso Admin Panel"

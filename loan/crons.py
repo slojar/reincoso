@@ -25,7 +25,3 @@ def loan_repayment_cron():
                 # create transaction for user
                 # notify user for transaction and auto-debit of loan payment
 
-
-
-
-
