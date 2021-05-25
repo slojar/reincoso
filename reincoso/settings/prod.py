@@ -12,8 +12,12 @@ ALLOWED_HOSTS = []
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / config('DB_NAME', 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'reincoso',
+        'USER': 'reincoso',
+        'PASSWORD': 'pxqldpt429q6xc5f',
+        'HOST': 'app-f3c7dec2-f193-48a4-9245-3ce25e1d7754-do-user-7022694-0.b.db.ondigitalocean.com',
+        'PORT': '25060',
     }
 }
 
