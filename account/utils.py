@@ -10,6 +10,10 @@ import json
 log = logging.getLogger(__name__)
 
 
+def reformat_phone_number(phone_number):
+    return f"234{phone_number[-10:]}"
+
+
 def signup(request):
     data = request.data
     first_name = data.get('first_name')
@@ -30,7 +34,7 @@ def signup(request):
         detail = 'Phone number not provided'
         return success, detail
     else:
-        phone_number = f"234{phone_number[-10:]}"
+        phone_number = reformat_phone_number(phone_number)
     if User.objects.filter(username=phone_number).exists():
         detail = 'Phone number taken'
         return success, detail
@@ -63,38 +67,33 @@ def signup(request):
     return success, detail
 
 
-def get_paystack_link(email, amount, **kwargs):
-    metadata = kwargs.get('metadata')
-    currency = kwargs.get('currency')
-    callback_url = kwargs.get('callback_url')
-    url = settings.PAYSTACK_BASE_URL + "/transaction/initialize"
-    success = True
-    amount = round(float(amount))
-    payload = {
-        "email": email,
-        "amount": f"{amount}00",
-        "callback_url": callback_url,
-        "currency": currency,
-        "metadata": metadata
-    }
-    payload = json.dumps(payload)
-    headers = {
-        'Authorization': 'Bearer {}'.format(settings.PAYSTACK_SECRET_KEY),
-    }
-    response = requests.post(url, headers=headers, data=payload)
-    json_response = response.json()
+def tokenize_user_card(data):
+    data = data['payload']
+    authorization = data['data']['authorization']
+    email = data['data']['customer']['email']
+    bank = authorization['bank']
+    card_type = authorization['card_type']
+    bin = authorization['bin']
+    last4 = authorization['last4']
+    exp_month = authorization['exp_month']
+    exp_year = authorization['exp_year']
+    signature = authorization['signature']
+    authorization_code = authorization['authorization_code']
 
-    log.info(f"url: {url}")
-    log.info(f"headers: {headers}")
-    log.info(f"payloads: {payload}")
-    log.info(f"response: {response.text}")
+    profile = Profile.objects.get(user__email=email)
+    card, created = UserCard.objects.get_or_create(user=profile, email=email, bank=bank, signature=signature)
+    card.card_type = str(card_type).strip()
+    card.bin = bin
+    card.last4 = last4
+    card.exp_month = exp_month
+    card.exp_year = exp_year
+    card.last4 = last4
+    card.authorization_code = authorization_code
+    card.payload = authorization
+    card.save()
 
-    if json_response.get('status') is True:
-        response = json_response['data']['authorization_url']
-    else:
-        success = False
-        response = json_response
+    if UserCard.objects.filter(user=profile).count() <= 1:
+        UserCard.objects.filter(user=profile).update(default=True)
 
-    return success, response
 
 

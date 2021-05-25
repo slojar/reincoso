@@ -3,12 +3,15 @@ import decimal
 from loan.models import *
 from django.utils import timezone
 from savings.models import SavingTransaction
+from settings.models import LoanSetting
+from account.models import UserCard, Guarantor
+from django.db.models import Q
 
 
 def get_loan_offer(profile):
     success = False
     response = ""
-    loan_settings, created = LoanSetup.objects.get_or_create(site=Site.objects.get_current())
+    loan_settings, created = LoanSetting.objects.get_or_create(site=Site.objects.get_current())
     savings_transaction = SavingTransaction.objects.filter(user=profile, status='success').last()
 
     if not savings_transaction:
@@ -73,5 +76,48 @@ def create_loan(profile, amount, duration):
     loan.save()
 
     return success, response
+
+
+def can_get_loan(profile):
+    success = False
+    loan_settings = LoanSetting.objects.get(site=Site.objects.get_current())
+
+    # check if user paid member fee
+    if profile.paid_membership_fee is False:
+        response = 'You have not paid the one-time membership fee, please pay'
+        requirement = 'pay_membership_fee'
+        return success, response, requirement
+
+    # check if user account is active
+    if profile.status != 'active':
+        response = f'Your account is {profile.status}, please contact admin'
+        requirement = 'activate_account'
+        return success, response, requirement
+
+    # Check if user have valid card
+    if not UserCard.objects.filter(user=profile).exists():
+        response = 'No valid card in your account, please add a card to qualify for loan'
+        requirement = 'add_card'
+        return success, response, requirement
+
+    # Check if user meets guarantors requirement
+    if Guarantor.objects.filter(user=profile, confirmed=True).exclude(guarantor=profile).count() < loan_settings.number_of_guarantor:
+        response = f"You must have {loan_settings.number_of_guarantor} guarantor(s) before you can apply for loan"
+        requirement = 'add_guarantor'
+        return success, response, requirement
+
+    # check if user still have a pending loan
+    query = Q(user=profile)
+    exclude = Q(status='unapproved') | Q(status='repaid')
+    if Loan.objects.filter(query).exclude(exclude).exists():
+        response = f"You cannot apply for a loan at the moment because you still have a loan running on your account."
+        requirement = 'active_loan'
+        return success, response, requirement
+
+    success = True
+    response = "Eligible for loan"
+    requirement = 'fulfilled'
+    return success, response, requirement
+
 
 

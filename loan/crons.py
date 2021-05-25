@@ -27,9 +27,5 @@ def loan_repayment_cron():
 
 
 
-loan_repayment_cron()
-
-
-
 
 

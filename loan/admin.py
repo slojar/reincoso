@@ -19,11 +19,6 @@ class LoanAdmin(admin.ModelAdmin):
     inlines = [LoanTransactionInline]
 
 
-class LoanSetupAdmin(admin.ModelAdmin):
-    list_display = ['id', 'site']
-
-
 admin.site.register(LoanDuration, LoanDurationAdmin)
 admin.site.register(Loan, LoanAdmin)
-admin.site.register(LoanSetup, LoanSetupAdmin)
 
