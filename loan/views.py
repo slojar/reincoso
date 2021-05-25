@@ -66,24 +66,27 @@ class ApplyForLoanView(APIView):
             return Response({"detail": "Invalid duration selected"}, status=status.HTTP_404_NOT_FOUND)
 
         success, loan_offer = get_loan_offer(request.user.profile)
+        if success is False:
+            return Response({"detail": loan_offer}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not amount:
             amount = loan_offer
 
-        if decimal.Decimal(amount) > loan_offer:
+        if decimal.Decimal(amount) > float(loan_offer):
             data['detail'] = f"You cannot get loan more than the offered amount of {loan_offer}"
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
-        query = Q(user=request.user.profile)
-        exclude = Q(status='unapproved') | Q(status='repaid')
-        if Loan.objects.filter(query).exclude(exclude).exists():
-            data['detail'] = f"You cannot apply for a loan at the moment because you still have a loan running on your account."
-            return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+        success, response, requirement = can_get_loan(request.user.profile)
+        if not success:
+            if not success:
+                data['detail'] = response
+                data['requirement'] = requirement
+                return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
         success, response = create_loan(profile=request.user.profile, amount=amount, duration=duration)
         if not success:
             data['detail'] = response
-            return Response(data, status=status.HTTP_404_NOT_FOUND)
+            return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
         data['detail'] = response
         return Response(data)

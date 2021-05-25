@@ -3,18 +3,22 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
-
-from account.utils import get_paystack_link
 from savings.models import Duration, Saving, SavingTransaction
 from .serializers import *
-
-
-class SavingDurationView(ListAPIView):
-    serializer_class = SavingDurationSerializer
-    queryset = Duration.objects.all()
+from settings.models import PaymentGateway
+from modules.paystack import verify_paystack_transaction
+from modules.paystack import get_paystack_link
+from account.utils import tokenize_user_card
 
 
 class SavingsView(APIView):
+    def get(self, request):
+        data = dict()
+        queryset = Duration.objects.all()
+        data['durations'] = SavingDurationSerializer(queryset, many=True).data
+        data['gateways'] = PaymentGateway.objects.all().values('id', 'name', 'slug')
+        return Response(data)
+
     def post(self, request):
         data = dict()
         amount = request.data.get('amount')
@@ -73,4 +77,34 @@ class SavingsView(APIView):
                 data['detail'] = response
 
         return Response(data)
+
+
+class VerifyPaymentView(APIView):
+
+    def get(self, request):
+        data = dict()
+        gateway = request.GET.get('gateway')
+        reference = request.GET.get('reference')
+
+        if gateway == 'paystack':
+            success, response = verify_paystack_transaction(reference)
+            data['detail'] = response
+
+            if success is False:
+                return Response(data, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+            email = response['email']
+            transaction_id = response['payload']['data']['metadata']['transaction_id']
+            trans = SavingTransaction.objects.get(id=transaction_id, user__user__email__iexact=email)
+            trans.reference = reference
+            trans.status = 'success'
+            trans.response = response
+            trans.save()
+
+            # tokenize card
+            tokenize_user_card(response)
+
+        data['detail'] = "Transaction successful"
+        return Response(data)
+
 

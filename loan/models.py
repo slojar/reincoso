@@ -8,19 +8,6 @@ basis_type_choices = (
 )
 
 
-class LoanSetup(models.Model):
-    site = models.OneToOneField(Site, on_delete=models.SET_NULL, null=True)
-    eligibility_days = models.IntegerField(default=180, help_text='This is the number of days user must have saved '
-                                                                  'before eligible for loan')
-    maximum_loan = models.IntegerField(default=1, help_text='This is the maximum time a user can apply for loan when '
-                                                            'one is still active')
-    offer = models.DecimalField(max_digits=20, decimal_places=2, default=3, help_text='This will be multiplied by user '
-                                                                                      'savings amount')
-
-    def __str__(self):
-        return f"{self.site}"
-
-
 class LoanDuration(models.Model):
     title = models.CharField(max_length=50, default='')
     basis = models.CharField(max_length=50, choices=basis_type_choices, default="month")
