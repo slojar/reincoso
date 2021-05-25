@@ -1,11 +1,12 @@
 import django_heroku
 from .base import *
 from decouple import config
+import dj_database_url
 
 
 SECRET_KEY = 'hFvHxrcgvkliePY0t+rkmklmPdZn29wv5aLF0t0WW/2w'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
