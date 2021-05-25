@@ -4,9 +4,9 @@ from decouple import config
 import dj_database_url
 
 
-SECRET_KEY = 'hFvHxrcgvkliePY0t+rkmklmPdZn29wv5aLF0t0WW/2w'
+SECRET_KEY = 'hjdj7=4rjhwo7-=1_())1!FvHxrcgvkliePY0t+rkmklmPdZn29wv5aLF0t0WW/2w'
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
