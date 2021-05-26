@@ -98,4 +98,34 @@ class LoanDurationView(ListAPIView):
     queryset = LoanDuration.objects.all()
 
 
+class LoanView(APIView):
+
+    def get(self, request, pk=None):
+        if not pk:
+            data = LoanSerializer(Loan.objects.filter(user=request.user.profile), many=True).data
+        else:
+            data = LoanSerializer(get_object_or_404(Loan, pk=pk, user=request.user.profile)).data
+        return Response(data)
+
+
+class RepayLoanView(APIView):
+
+    def post(self, request):
+        data = dict()
+        action = request.data.get('action')
+        amount = request.data.get('amount')
+        loan_id = request.data.get('loan_id')
+        card_id = request.data.get('card_id')
+
+        if not amount or float(amount) <= 0:
+            data['detail'] = 'amount is required'
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+        success, response = process_loan_repayment(request.user.profile, loan_id, amount, card_id=card_id)
+        data['detail'] = response
+        if success is False:
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(data)
+
 

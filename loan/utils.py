@@ -120,4 +120,32 @@ def can_get_loan(profile):
     return success, response, requirement
 
 
+def process_loan_repayment(profile, loan_id, amount, **kwargs):
+    success = True
+    response = 'Loan processed successfully'
+    card_id = kwargs.get('card_id')
+
+    try:
+        loan = Loan.objects.get(user=profile, id=loan_id)
+    except Exception as ex:
+        return False, f"{ex}"
+
+    amt_to_repay = loan.amount_to_repay
+    amt_repaid = loan.amount_repaid
+    amt_left = amt_to_repay - amt_repaid
+
+    if amt_repaid >= amt_to_repay:
+        return False, f"Loan payment already completed"
+
+    if card_id:
+        try:
+            card = UserCard.objects.get(user=profile, id=card_id)
+        except Exception as ex:
+            card = None
+            return False, f"{ex}"
+
+
+
+    return success, response
+
 
