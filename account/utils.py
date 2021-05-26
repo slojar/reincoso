@@ -67,23 +67,28 @@ def signup(request):
     return success, detail
 
 
-def tokenize_user_card(data):
+def tokenize_user_card(data, gateway=None):
+    if not data:
+        return False
     data = data['payload']
     authorization = data['data']['authorization']
     email = data['data']['customer']['email']
     bank = authorization['bank']
     card_type = authorization['card_type']
-    bin = authorization['bin']
+    bin_ = authorization['bin']
     last4 = authorization['last4']
     exp_month = authorization['exp_month']
     exp_year = authorization['exp_year']
     signature = authorization['signature']
     authorization_code = authorization['authorization_code']
+    name = authorization.get('account_name')
 
     profile = Profile.objects.get(user__email=email)
     card, created = UserCard.objects.get_or_create(user=profile, email=email, bank=bank, signature=signature)
+    card.name = name
+    card.gateway = gateway or 'paystack'
     card.card_type = str(card_type).strip()
-    card.bin = bin
+    card.bin = bin_
     card.last4 = last4
     card.exp_month = exp_month
     card.exp_year = exp_year

@@ -6,6 +6,8 @@ from savings.models import SavingTransaction
 from settings.models import LoanSetting
 from account.models import UserCard, Guarantor
 from django.db.models import Q
+from modules.paystack import get_paystack_link, paystack_auto_charge, verify_paystack_transaction
+from account.utils import tokenize_user_card
 
 
 def get_loan_offer(profile):
@@ -120,10 +122,71 @@ def can_get_loan(profile):
     return success, response, requirement
 
 
-def process_loan_repayment(profile, loan_id, amount, **kwargs):
+def verify_loan_repayment(gateway, reference):
+    success = True
+    response = None
+    transaction_id = loan_id = None
+    amount = 0
+
+    if gateway == 'paystack':
+        success, response = verify_paystack_transaction(reference)
+        if success is False:
+            return success, response
+
+        email = response['email']
+        amount = response['amount']
+        transaction_id = response['payload']['data']['metadata']['transaction_id']
+        payment_type = response['payload']['data']['metadata']['payment_type']
+        loan_id = response['payload']['data']['metadata']['loan_id']
+
+    try:
+        trans = LoanTransaction.objects.get(id=transaction_id, user__user__email__iexact=email)
+    except Exception as ex:
+        return False, str(ex)
+
+    if trans.status == 'success':
+        return success, 'This transaction is already processed'
+
+    trans.reference = reference
+    trans.status = 'success'
+    trans.response = response
+    trans.save()
+
+    # tokenize card
+    tokenize_user_card(response)
+
+    # update loan data
+    try:
+        loan = Loan.objects.get(id=loan_id)
+    except Exception as ex:
+        return False, str(ex)
+
+    loan.amount_repaid += decimal.Decimal(amount)
+    loan.last_repayment_date = timezone.now()
+    loan.next_repayment_date = loan.start_date + timezone.timedelta(days=get_loan_repayment_count(loan.duration))
+    if loan.amount_repaid >= loan.amount_to_repay:
+        loan.status = 'repaid'
+    loan.save()
+
+    return True, "Loan repayment verified and processed"
+
+
+def do_loan_repayment(profile, loan_id, amount, **kwargs):
+    request = kwargs.get('request')
+    callback_url = kwargs.get('callback_url')
     success = True
     response = 'Loan processed successfully'
     card_id = kwargs.get('card_id')
+    gateway = None
+
+    if request:
+        gateway = request.data.get('payment_gateway')
+
+    if not callback_url:
+        callback_url = None
+        if request:
+            callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
+            callback_url = callback_url + f"?gateway={gateway}"
 
     try:
         loan = Loan.objects.get(user=profile, id=loan_id)
@@ -132,19 +195,59 @@ def process_loan_repayment(profile, loan_id, amount, **kwargs):
 
     amt_to_repay = loan.amount_to_repay
     amt_repaid = loan.amount_repaid
-    amt_left = amt_to_repay - amt_repaid
+    amt_left_to_repay = loan.get_amount_left_to_repay()
 
     if amt_repaid >= amt_to_repay:
         return False, f"Loan payment already completed"
+
+    if float(amount) > float(amt_left_to_repay):
+        amount = amt_left_to_repay
+
+    transaction, created = LoanTransaction.objects.get_or_create(
+        user=profile, loan=loan, transaction_type='repayment', amount=amount, status='pending'
+    )
+
+    metadata = {
+        'payment_type': 'loan_repayment',
+        'loan_id': loan.id,
+        'transaction_id': transaction.id,
+    }
+
+    if not card_id:
+        if not gateway:
+            return False, "payment gateway is required"
+
+        transaction.payment_method = gateway
+        transaction.save()
+
+        success, response = get_paystack_link(
+            email=profile.user.email,
+            amount=amount,
+            metadata=metadata,
+            callback_url=callback_url
+        )
+        return success, response
 
     if card_id:
         try:
             card = UserCard.objects.get(user=profile, id=card_id)
         except Exception as ex:
-            card = None
             return False, f"{ex}"
 
+        transaction.payment_method = card.gateway
+        transaction.save()
 
+        authorization_code = card.authorization_code
+        email = profile.user.email
+
+        success, response = paystack_auto_charge(
+            authorization_code=authorization_code, email=email, amount=amount, metadata=metadata
+        )
+        if success is False:
+            return success, response.get('message')
+
+        reference = response['data']['reference']
+        success, response = verify_loan_repayment(card.gateway, reference)
 
     return success, response
 

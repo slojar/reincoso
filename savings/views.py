@@ -75,8 +75,7 @@ class SavingsView(APIView):
             metadata = {
                 "transaction_id": transaction.id,
             }
-            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url,
-                                                  metadata=metadata)
+            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
             if success:
                 data['payment_link'] = response
             else:

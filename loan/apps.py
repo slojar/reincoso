@@ -7,3 +7,4 @@ class LoanConfig(AppConfig):
 
     def ready(self):
         from . import crons
+        from . import signals

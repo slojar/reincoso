@@ -13,18 +13,13 @@ class LoanTransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LoanTransaction
-        exclude = ['loan', 'user']
+        exclude = ['loan', 'user', 'response']
 
 
 class LoanSerializer(serializers.ModelSerializer):
     duration = LoanDurationSerializer()
     transactions = serializers.SerializerMethodField()
-    amount_left_to_repay = serializers.SerializerMethodField()
-
-    def get_amount_left_to_repay(self, obj):
-        amt_to_repay = obj.amount_to_repay
-        amt_repaid = obj.amount_repaid
-        return amt_to_repay - amt_repaid
+    amount_left_to_repay = serializers.DecimalField(source='get_amount_left_to_repay', max_digits=20, decimal_places=2)
 
     def get_transactions(self, obj):
         return LoanTransactionSerializer(LoanTransaction.objects.filter(loan=obj), many=True).data

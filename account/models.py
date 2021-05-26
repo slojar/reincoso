@@ -82,6 +82,7 @@ class Guarantor(models.Model):
 class UserCard(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     email = models.EmailField()
+    name = models.CharField(max_length=200, null=True, blank=True)
     bank = models.CharField(max_length=50, null=True)
     card_type = models.CharField(max_length=50, null=True)
     bin = models.CharField(max_length=50, null=True)
@@ -90,13 +91,14 @@ class UserCard(models.Model):
     exp_year = models.CharField(max_length=4, null=True)
     signature = models.CharField(max_length=200, null=True)
     authorization_code = models.CharField(max_length=200, null=True)
+    gateway = models.CharField(max_length=50, null=True, default='paystack')
     payload = models.TextField(null=True)
     default = models.BooleanField(default=False, null=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user}"
+        return f"{self.id}. {self.user}"
 
 
 
