@@ -9,6 +9,8 @@ from settings.models import PaymentGateway
 from modules.paystack import verify_paystack_transaction
 from modules.paystack import get_paystack_link
 from account.utils import tokenize_user_card
+from account.models import UserCard
+from modules.paystack import paystack_auto_charge
 
 
 class SavingsView(APIView):
@@ -27,6 +29,7 @@ class SavingsView(APIView):
         gateway = request.data.get('gateway')
         callback_url = request.data.get('callback_url')
         payment_duration_id = request.data.get('payment_duration_id')
+        card_id = request.data.get('card_id')
 
         if not Duration.objects.filter(id=payment_duration_id).exists():
             data['detail'] = 'Invalid payment duration'
@@ -35,9 +38,25 @@ class SavingsView(APIView):
         email = request.user.email
         payment_duration_id = Duration.objects.get(id=payment_duration_id)
 
-        if not callback_url:
-            callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
-        callback_url = callback_url + f"?gateway={gateway}"
+        if card_id:
+            try:
+                card = UserCard.objects.get(id=card_id)
+                success = False
+                response_status = status.HTTP_400_BAD_REQUEST
+                json_response = None
+                authorization_code = card.authorization_code
+                paystack_auto_charge(authorization_code, email, amount)
+                return success, json_response, response_status
+
+            except Exception as ex:
+                return Response({'success': False,
+                                 'detail': 'Invalid card selected',
+                                 'error': str(ex)},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            if not callback_url:
+                callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
+            callback_url = callback_url + f"?gateway={gateway}"
 
         if fixed_payment:
             amount = fixed_payment
