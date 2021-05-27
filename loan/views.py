@@ -148,6 +148,10 @@ class VerifyLoanPaymentView(APIView):
         gateway = request.GET.get('gateway')
         reference = request.GET.get('reference')
 
+        if not gateway or reference:
+            data['detail'] = 'Error in request, please specify a gateway and a reference number'
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
         success, response = verify_loan_repayment(gateway, reference)
         data['detail'] = response
 

@@ -125,13 +125,17 @@ def can_get_loan(profile):
 def verify_loan_repayment(gateway, reference):
     success = True
     response = None
-    transaction_id = loan_id = None
+    transaction_id = loan_id = email = None
     amount = 0
 
     if gateway == 'paystack':
         success, response = verify_paystack_transaction(reference)
+
         if success is False:
             return success, response
+
+        # tokenize/save user card
+        tokenize_user_card(response)
 
         email = response['email']
         amount = response['amount']
@@ -151,9 +155,6 @@ def verify_loan_repayment(gateway, reference):
     trans.status = 'success'
     trans.response = response
     trans.save()
-
-    # tokenize card
-    tokenize_user_card(response)
 
     # update loan data
     try:
@@ -213,6 +214,7 @@ def do_loan_repayment(profile, loan_id, amount, **kwargs):
         'transaction_id': transaction.id,
     }
 
+    # when card is not selected by user
     if not card_id:
         if not gateway:
             return False, "payment gateway is required"
@@ -228,6 +230,7 @@ def do_loan_repayment(profile, loan_id, amount, **kwargs):
         )
         return success, response
 
+    # when card is selected by user
     if card_id:
         try:
             card = UserCard.objects.get(user=profile, id=card_id)
