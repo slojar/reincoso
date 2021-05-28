@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="42fe075e-7124-453a-8080-bac4070f3eb2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.DS_Store~7e136e5d5ef44fbd162f586b02770179f588a0c5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/reincoso.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/reincoso.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loan/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/loan/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loan/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/loan/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/account/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/account/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings/models.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,6 +34,7 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
+  <component name="JupyterTrust" id="85783dc1-4567-4cff-8769-6c344bcb23f0" />
   <component name="ProjectId" id="1rRYYOZxIOS6k2XsTuT0A6V9foq" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -146,10 +147,34 @@
       <workItem from="1622102832415" duration="77000" />
       <workItem from="1622102922697" duration="81000" />
       <workItem from="1622103068973" duration="148000" />
+      <workItem from="1622103252602" duration="72000" />
+      <workItem from="1622195036647" duration="301000" />
+      <workItem from="1622195344455" duration="266000" />
+      <workItem from="1622195934860" duration="558000" />
+      <workItem from="1622196713580" duration="58000" />
+      <workItem from="1622197690864" duration="1087000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state width="1398" height="228" key="GridCell.Tab.0.bottom" timestamp="1622198457715">
+      <screen x="0" y="25" width="1440" height="875" />
+    </state>
+    <state width="1398" height="228" key="GridCell.Tab.0.bottom/0.25.1440.875@0.25.1440.875" timestamp="1622198457715" />
+    <state width="1398" height="228" key="GridCell.Tab.0.center" timestamp="1622198457714">
+      <screen x="0" y="25" width="1440" height="875" />
+    </state>
+    <state width="1398" height="228" key="GridCell.Tab.0.center/0.25.1440.875@0.25.1440.875" timestamp="1622198457714" />
+    <state width="1398" height="228" key="GridCell.Tab.0.left" timestamp="1622198457714">
+      <screen x="0" y="25" width="1440" height="875" />
+    </state>
+    <state width="1398" height="228" key="GridCell.Tab.0.left/0.25.1440.875@0.25.1440.875" timestamp="1622198457714" />
+    <state width="1398" height="228" key="GridCell.Tab.0.right" timestamp="1622198457715">
+      <screen x="0" y="25" width="1440" height="875" />
+    </state>
+    <state width="1398" height="228" key="GridCell.Tab.0.right/0.25.1440.875@0.25.1440.875" timestamp="1622198457715" />
   </component>
 </project>

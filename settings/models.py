@@ -6,6 +6,7 @@ class GeneralSettings(models.Model):
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
     site_name = models.CharField(max_length=200)
     site_link = models.URLField(null=True, blank=True)
+    membership_fee = models.DecimalField(decimal_places=2, max_digits=20, default=1000)
 
     def __str__(self):
         return f"{self.site}"

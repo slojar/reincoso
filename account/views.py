@@ -7,6 +7,7 @@ from modules.paystack import get_paystack_link
 from .serializers import *
 from .utils import *
 from django.contrib.auth import authenticate
+from settings.utils import general_settings
 
 
 class SignupView(APIView):
@@ -81,8 +82,10 @@ class FeedbackMessageDetailView(RetrieveAPIView):
 
 
 class PayMembershipView(APIView):
+
     def post(self, request):
         data = dict()
+        settings = general_settings()
         gateway = request.data.get('gateway')
         callback_url = request.data.get('callback_url')
 
@@ -92,7 +95,7 @@ class PayMembershipView(APIView):
 
         email = request.user.email
         profile = request.user.profile
-        amount = 1000000
+        amount = settings.membership_fee
 
         if gateway == 'paystack':
             success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url)
