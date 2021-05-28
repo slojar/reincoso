@@ -85,7 +85,7 @@ class PayMembershipView(APIView):
 
     def post(self, request):
         data = dict()
-        settings = general_settings()
+        site_settings = general_settings()
         gateway = request.data.get('gateway')
         callback_url = request.data.get('callback_url')
 
@@ -95,7 +95,7 @@ class PayMembershipView(APIView):
 
         email = request.user.email
         profile = request.user.profile
-        amount = settings.membership_fee
+        amount = site_settings.membership_fee
 
         if gateway == 'paystack':
             success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url)
