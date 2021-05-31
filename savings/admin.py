@@ -6,6 +6,7 @@ class SavingTransactionAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'saving', 'amount', 'status', 'reference', 'created_on', 'updated_on']
     list_filter = ['status', 'payment_method']
     search_fields = ['reference']
+    ordering = ['-id']
 
 
 class SavingTransactionInline(admin.TabularInline):

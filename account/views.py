@@ -8,6 +8,8 @@ from modules.paystack import get_paystack_link
 from .serializers import *
 from .utils import *
 from django.contrib.auth import authenticate
+from settings.utils import general_settings
+from transaction.models import Transaction
 
 
 class Homepage(APIView):
@@ -88,9 +90,11 @@ class FeedbackMessageDetailView(RetrieveAPIView):
     lookup_field = 'id'
 
 
-class PayMembershipView(APIView):
+class PayMembershipFeeView(APIView):
+
     def post(self, request):
         data = dict()
+        site_settings = general_settings()
         gateway = request.data.get('gateway')
         callback_url = request.data.get('callback_url')
 
@@ -100,10 +104,21 @@ class PayMembershipView(APIView):
 
         email = request.user.email
         profile = request.user.profile
-        amount = 1000000
+        amount = site_settings.membership_fee
+
+        # create transaction for membership payment
+        trans, created = Transaction.objects.get_or_create(user=request.user.profile, transaction_type='membership fee', status='pending')
+        trans.payment_method = gateway
+        trans.amount = amount
+        trans.save()
+
+        metadata = {
+            'transaction_id': trans.id,
+            'payment_for': 'membership fee',
+        }
 
         if gateway == 'paystack':
-            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url)
+            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
             if success:
                 data['payment_link'] = response
                 data['membership_id'] = profile.member_id
