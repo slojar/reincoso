@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
@@ -9,6 +10,13 @@ from .utils import *
 from django.contrib.auth import authenticate
 from settings.utils import general_settings
 from transaction.models import Transaction
+
+
+class Homepage(APIView):
+    permission_classes = []
+
+    def get(self, request):
+        return HttpResponse('<h1>Reincoso Homepage!!!</h1>')
 
 
 class SignupView(APIView):
