@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
@@ -7,6 +8,13 @@ from modules.paystack import get_paystack_link
 from .serializers import *
 from .utils import *
 from django.contrib.auth import authenticate
+
+
+class Homepage(APIView):
+    permission_classes = []
+
+    def get(self, request):
+        return HttpResponse('<h1>Reincoso Homepage!!!</h1>')
 
 
 class SignupView(APIView):
