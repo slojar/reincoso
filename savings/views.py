@@ -11,6 +11,7 @@ from modules.paystack import get_paystack_link
 from account.utils import tokenize_user_card
 from account.models import UserCard
 from modules.paystack import paystack_auto_charge
+from transaction.models import Transaction
 
 
 class SavingsView(APIView):
@@ -27,9 +28,13 @@ class SavingsView(APIView):
         fixed_payment = request.data.get('fixed_payment')
         repayment_day = request.data.get('repayment_day')
         gateway = request.data.get('gateway')
-        callback_url = request.data.get('callback_url')
         payment_duration_id = request.data.get('payment_duration_id')
         card_id = request.data.get('card_id')
+
+        callback_url = request.data.get('callback_url')
+        if not callback_url:
+            callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
+        callback_url = callback_url + f"?gateway={gateway}"
 
         if not Duration.objects.filter(id=payment_duration_id).exists():
             data['detail'] = 'Invalid payment duration'
@@ -37,26 +42,6 @@ class SavingsView(APIView):
 
         email = request.user.email
         payment_duration_id = Duration.objects.get(id=payment_duration_id)
-
-        if card_id:
-            try:
-                card = UserCard.objects.get(id=card_id)
-                success = False
-                response_status = status.HTTP_400_BAD_REQUEST
-                json_response = None
-                authorization_code = card.authorization_code
-                paystack_auto_charge(authorization_code, email, amount)
-                return success, json_response, response_status
-
-            except Exception as ex:
-                return Response({'success': False,
-                                 'detail': 'Invalid card selected',
-                                 'error': str(ex)},
-                                status=status.HTTP_400_BAD_REQUEST)
-        else:
-            if not callback_url:
-                callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
-            callback_url = callback_url + f"?gateway={gateway}"
 
         if fixed_payment:
             amount = fixed_payment
@@ -90,10 +75,28 @@ class SavingsView(APIView):
         transaction.amount = amount
         transaction.save()
 
+        metadata = {
+            'transaction_id': transaction.id,
+            'payment_for': 'savings',
+        }
+
+        if card_id:
+            try:
+                card = UserCard.objects.get(id=card_id)
+                success = False
+                response_status = status.HTTP_400_BAD_REQUEST
+                json_response = None
+                authorization_code = card.authorization_code
+                paystack_auto_charge(authorization_code, email, amount, metadata=metadata)
+                return success, json_response, response_status
+
+            except Exception as ex:
+                return Response({'success': False,
+                                 'detail': 'Invalid card selected',
+                                 'error': str(ex)},
+                                status=status.HTTP_400_BAD_REQUEST)
+
         if gateway == 'paystack':
-            metadata = {
-                "transaction_id": transaction.id,
-            }
             success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
             if success:
                 data['payment_link'] = response
@@ -119,11 +122,22 @@ class VerifyPaymentView(APIView):
 
             email = response['email']
             transaction_id = int(response['payload']['data']['metadata']['transaction_id'])
-            trans = SavingTransaction.objects.get(id=transaction_id, user__user__email__iexact=email)
-            trans.reference = reference
-            trans.status = 'success'
-            trans.response = response
-            trans.save()
+
+            payment_for = response['payload']['data']['metadata'].get('payment_for', None)
+
+            if payment_for == 'membership fee':
+                trans = Transaction.objects.get(id=transaction_id, transaction_type=payment_for)
+                trans.reference = reference
+                trans.status = 'success'
+                trans.response = response
+                trans.save()
+
+            if payment_for == 'savings':
+                trans = SavingTransaction.objects.get(id=transaction_id, user__user__email__iexact=email)
+                trans.reference = reference
+                trans.status = 'success'
+                trans.response = response
+                trans.save()
 
             # tokenize card
             tokenize_user_card(response)

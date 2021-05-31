@@ -101,4 +101,3 @@ class UserCard(models.Model):
         return f"{self.id}. {self.user}"
 
 
-
