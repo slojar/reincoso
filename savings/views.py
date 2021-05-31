@@ -118,7 +118,7 @@ class VerifyPaymentView(APIView):
                 return Response(data, status=status.HTTP_406_NOT_ACCEPTABLE)
 
             email = response['email']
-            transaction_id = response['payload']['data']['metadata']['transaction_id']
+            transaction_id = int(response['payload']['data']['metadata']['transaction_id'])
             trans = SavingTransaction.objects.get(id=transaction_id, user__user__email__iexact=email)
             trans.reference = reference
             trans.status = 'success'
