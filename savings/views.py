@@ -114,6 +114,7 @@ class VerifyPaymentView(APIView):
         gateway = request.GET.get('gateway')
         reference = request.GET.get('reference')
         phone_number = None
+        success = False
 
         if gateway == 'paystack':
             success, response = verify_paystack_transaction(reference)
@@ -124,11 +125,10 @@ class VerifyPaymentView(APIView):
 
             email = response['email']
             transaction_id = int(response['payload']['data']['metadata']['transaction_id'])
+            payment_for = response['payload']['data']['metadata'].get('payment_for', None)
 
             profile = Profile.objects.get(user__email=email)
             phone_number = profile.phone_number
-
-            payment_for = response['payload']['data']['metadata'].get('payment_for', None)
 
             if payment_for == 'membership fee':
                 trans = Transaction.objects.get(id=transaction_id, transaction_type=payment_for)
@@ -147,7 +147,10 @@ class VerifyPaymentView(APIView):
             # tokenize card
             tokenize_user_card(response)
 
-        data['detail'] = "Transaction successful"
+        if success is False:
+            data['detail'] = "Transaction could not be verified at the moment"
+        else:
+            data['detail'] = "Transaction successful"
         data['msisdn'] = phone_number
         return Response(data)
 
