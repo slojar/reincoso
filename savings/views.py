@@ -148,7 +148,7 @@ class VerifyPaymentView(APIView):
             tokenize_user_card(response)
 
         data['detail'] = "Transaction successful"
-        data['phone_number'] = phone_number
+        data['msisdn'] = phone_number
         return Response(data)
 
 
