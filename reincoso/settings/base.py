@@ -124,7 +124,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-a = open("logs.log", "a+")
 LOGGING_OLD = {
     'version': 1,
     'disable_existing_loggers': False,
