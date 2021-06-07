@@ -9,3 +9,8 @@ TRANSACTION_STATUS = (
     ('success', 'Success'),
     ('failed', 'Failed')
 )
+
+TRANSACTION_TYPE = (
+    ('membership fee', 'Membership Fee'),
+)
+

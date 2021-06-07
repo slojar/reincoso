@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
@@ -7,6 +8,21 @@ from modules.paystack import get_paystack_link
 from .serializers import *
 from .utils import *
 from django.contrib.auth import authenticate
+from settings.utils import general_settings
+from transaction.models import Transaction
+import logging
+
+
+log = logging.getLogger(__name__)
+
+
+class Homepage(APIView):
+    permission_classes = []
+
+    def get(self, request):
+        log.info("Homepage")
+        print("Homepage")
+        return HttpResponse('<h1>Reincoso Homepage!!!</h1>')
 
 
 class SignupView(APIView):
@@ -15,10 +31,10 @@ class SignupView(APIView):
     def post(self, request):
         data = dict()
         success, detail = signup(request)
-        if not success:
-            data['detail'] = detail
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        data['success'] = success
         data['detail'] = detail
+        if not success:
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
         return Response(data)
 
 
@@ -80,9 +96,11 @@ class FeedbackMessageDetailView(RetrieveAPIView):
     lookup_field = 'id'
 
 
-class PayMembershipView(APIView):
+class PayMembershipFeeView(APIView):
+
     def post(self, request):
         data = dict()
+        site_settings = general_settings()
         gateway = request.data.get('gateway')
         callback_url = request.data.get('callback_url')
 
@@ -92,10 +110,21 @@ class PayMembershipView(APIView):
 
         email = request.user.email
         profile = request.user.profile
-        amount = 1000000
+        amount = site_settings.membership_fee
+
+        # create transaction for membership payment
+        trans, created = Transaction.objects.get_or_create(user=request.user.profile, transaction_type='membership fee', status='pending')
+        trans.payment_method = gateway
+        trans.amount = amount
+        trans.save()
+
+        metadata = {
+            'transaction_id': trans.id,
+            'payment_for': 'membership fee',
+        }
 
         if gateway == 'paystack':
-            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url)
+            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
             if success:
                 data['payment_link'] = response
                 data['membership_id'] = profile.member_id

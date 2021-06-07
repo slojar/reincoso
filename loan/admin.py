@@ -10,6 +10,7 @@ class LoanDurationAdmin(admin.ModelAdmin):
 class LoanTransactionInline(admin.TabularInline):
     model = LoanTransaction
     extra = 0
+    ordering = ['-id']
 
 
 class LoanAdmin(admin.ModelAdmin):
@@ -19,6 +20,12 @@ class LoanAdmin(admin.ModelAdmin):
     inlines = [LoanTransactionInline]
 
 
+class LoanTransactionAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'transaction_type', 'amount', 'status', 'payment_method', 'created_on', 'updated_on']
+    list_display_links = ['id', 'user']
+
+
+admin.site.register(LoanTransaction, LoanTransactionAdmin)
 admin.site.register(LoanDuration, LoanDurationAdmin)
 admin.site.register(Loan, LoanAdmin)
 

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="75e3d317-bc76-4efb-983f-dae85e134fff" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/reincoso.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/reincoso.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/loan/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/loan/views.py" afterDir="false" />
+=======
+>>>>>>> e6a5c506e891d3bc308be7cbc0ef0ab696faa1dc
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1tIxqAkvKp6dCvhmYTI8j9mqK6i" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RunManager">
+    <configuration name="reincoso" type="Python.DjangoServer" factoryName="Django server">
+      <module name="reincoso" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$PROJECT_DIR$/../venv/bin/python" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8000" />
+      <option name="host" value="localhost" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="true" />
+      <option name="customRunCommand" value="runserver" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="75e3d317-bc76-4efb-983f-dae85e134fff" name="Default Changelist" comment="" />
+      <created>1622470592821</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+<<<<<<< HEAD
+      <updated>1618940416028</updated>
+      <workItem from="1618940417762" duration="1329000" />
+      <workItem from="1619004281844" duration="6563000" />
+      <workItem from="1619183597527" duration="1717000" />
+      <workItem from="1619352397864" duration="1424000" />
+      <workItem from="1619516914879" duration="25092000" />
+      <workItem from="1619856723307" duration="596000" />
+      <workItem from="1620125015960" duration="5697000" />
+      <workItem from="1620137091791" duration="8579000" />
+      <workItem from="1620201958571" duration="5588000" />
+      <workItem from="1620207616469" duration="47000" />
+      <workItem from="1620207711021" duration="15895000" />
+      <workItem from="1620638391398" duration="12915000" />
+      <workItem from="1621259013262" duration="828000" />
+      <workItem from="1621337659803" duration="1760000" />
+      <workItem from="1621340260402" duration="3784000" />
+      <workItem from="1621422009878" duration="2166000" />
+      <workItem from="1621556179518" duration="76000" />
+      <workItem from="1621585364674" duration="1789000" />
+      <workItem from="1621734796633" duration="6624000" />
+      <workItem from="1621868491390" duration="16261000" />
+      <workItem from="1621921494735" duration="20000" />
+      <workItem from="1621930065039" duration="1196000" />
+      <workItem from="1621940474466" duration="927000" />
+      <workItem from="1622023546996" duration="28733000" />
+      <workItem from="1622102708499" duration="54000" />
+      <workItem from="1622102777177" duration="53000" />
+      <workItem from="1622102832415" duration="77000" />
+      <workItem from="1622102922697" duration="81000" />
+      <workItem from="1622103068973" duration="148000" />
+      <workItem from="1622103252602" duration="72000" />
+      <workItem from="1622195036647" duration="301000" />
+      <workItem from="1622195344455" duration="266000" />
+      <workItem from="1622195934860" duration="558000" />
+      <workItem from="1622196713580" duration="58000" />
+      <workItem from="1622197690864" duration="2478000" />
+      <workItem from="1622200636121" duration="2744000" />
+      <workItem from="1622396334417" duration="309000" />
+      <workItem from="1622451341518" duration="7731000" />
+      <workItem from="1622470369920" duration="159000" />
+      <workItem from="1622470643789" duration="26000" />
+      <workItem from="1622470730672" duration="20000" />
+      <workItem from="1622471124854" duration="539000" />
+      <workItem from="1622627977875" duration="357000" />
+=======
+      <updated>1622470592821</updated>
+      <workItem from="1622470594224" duration="148000" />
+      <workItem from="1622470749323" duration="21000" />
+      <workItem from="1622481736867" duration="72000" />
+      <workItem from="1622482298355" duration="138000" />
+>>>>>>> e6a5c506e891d3bc308be7cbc0ef0ab696faa1dc
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

@@ -1,6 +1,7 @@
 import json
 import requests
 from django.conf import settings
+from rest_framework import status
 import logging
 
 
@@ -42,12 +43,12 @@ def verify_paystack_transaction(reference):
             'amount': float(json_response.get('data').get('amount')) / 100,
             'payload': json_response
         }
-
     return success, message
 
 
 def paystack_auto_charge(authorization_code, email, amount, **kwargs):
     success = False
+    response_status = status.HTTP_400_BAD_REQUEST
     url = settings.PAYSTACK_BASE_URL + "/transaction/charge_authorization"
     amount = round(float(amount))
     payload = dict()
@@ -67,15 +68,16 @@ def paystack_auto_charge(authorization_code, email, amount, **kwargs):
         if json_response.get("status") and json_response.get("status") is True:
             if json_response['data']['status'] == 'success':
                 success = True
+                response_status = status.HTTP_200_OK
     except Exception as ex:
         log.error(f"An error occurred on auto-debit: {ex}")
-    return success, json_response
+    return success, json_response, response_status
 
 
-def get_paystack_link(email, amount, **kwargs):
-    metadata = kwargs.get('metadata')
+def get_paystack_link(email, amount, callback_url=None, metadata=None, **kwargs):
+    # metadata = kwargs.get('metadata')
+    # callback_url = kwargs.get('callback_url')
     currency = kwargs.get('currency')
-    callback_url = kwargs.get('callback_url')
     url = settings.PAYSTACK_BASE_URL + "/transaction/initialize"
     success = True
     amount = round(float(amount))

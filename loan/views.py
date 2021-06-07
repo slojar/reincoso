@@ -1,5 +1,5 @@
 import decimal
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
@@ -12,6 +12,8 @@ from .models import *
 from .serializers import *
 from .utils import *
 from django.db.models import Q
+from modules.paystack import verify_paystack_transaction
+from account.utils import tokenize_user_card
 
 
 class ApplyForLoanView(APIView):
@@ -97,5 +99,71 @@ class LoanDurationView(ListAPIView):
     serializer_class = LoanDurationSerializer
     queryset = LoanDuration.objects.all()
 
+
+class LoanView(APIView):
+
+    def get(self, request, pk=None):
+        if not pk:
+            data = LoanSerializer(Loan.objects.filter(user=request.user.profile), many=True).data
+        else:
+            data = LoanSerializer(get_object_or_404(Loan, pk=pk, user=request.user.profile)).data
+        if not data:
+            data = {
+                'success': False,
+                'detail': "No loan available"
+            }
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
+        return Response(data)
+
+
+class RepayLoanView(APIView):
+
+    def post(self, request):
+        data = dict()
+        action = request.data.get('action')
+        amount = request.data.get('amount')
+        loan_id = request.data.get('loan_id')
+        card_id = request.data.get('card_id')
+        callback_url = request.data.get('callback_url')
+        gateway = request.data.get('payment_gateway')
+
+        if not callback_url:
+            url = reverse("loan:verify-payment")
+            callback_url = f"{request.scheme}://{request.get_host()}{url}?gateway={gateway}"
+
+        if not amount or float(amount) <= 0:
+            data['detail'] = 'amount is required'
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+        success, response = do_loan_repayment(request.user.profile, loan_id, amount, card_id=card_id,
+                                              request=request, callback_url=callback_url)
+        data['detail'] = response
+        if not card_id:
+            data['redirect'] = True
+        if success is False:
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(data)
+
+
+class VerifyLoanPaymentView(APIView):
+    permission_classes = []
+
+    def get(self, request):
+        data = dict()
+        gateway = request.GET.get('gateway')
+        reference = request.GET.get('reference')
+
+        if not gateway or reference:
+            data['detail'] = 'Error in request, please specify a gateway and a reference number'
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+        success, response = verify_loan_repayment(gateway, reference)
+        data['detail'] = response
+
+        if success is False:
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(data)
 
 

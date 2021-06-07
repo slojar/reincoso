@@ -5,3 +5,7 @@
 reincoso/db.sqlite3
 __pycache__/
 *.pyc
+.idea
+.idea/
+*.idea
+.DS_Store

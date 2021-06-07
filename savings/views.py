@@ -9,6 +9,9 @@ from settings.models import PaymentGateway
 from modules.paystack import verify_paystack_transaction
 from modules.paystack import get_paystack_link
 from account.utils import tokenize_user_card
+from account.models import UserCard
+from modules.paystack import paystack_auto_charge
+from transaction.models import Transaction
 
 
 class SavingsView(APIView):
@@ -25,8 +28,13 @@ class SavingsView(APIView):
         fixed_payment = request.data.get('fixed_payment')
         repayment_day = request.data.get('repayment_day')
         gateway = request.data.get('gateway')
-        callback_url = request.data.get('callback_url')
         payment_duration_id = request.data.get('payment_duration_id')
+        card_id = request.data.get('card_id')
+
+        callback_url = request.data.get('callback_url')
+        if not callback_url:
+            callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
+        callback_url = callback_url + f"?gateway={gateway}"
 
         if not Duration.objects.filter(id=payment_duration_id).exists():
             data['detail'] = 'Invalid payment duration'
@@ -35,10 +43,6 @@ class SavingsView(APIView):
         email = request.user.email
         payment_duration_id = Duration.objects.get(id=payment_duration_id)
 
-        if not callback_url:
-            callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
-        callback_url = callback_url + f"?gateway={gateway}"
-
         if fixed_payment:
             amount = fixed_payment
 
@@ -46,7 +50,13 @@ class SavingsView(APIView):
         saving, created = Saving.objects.get_or_create(user=request.user.profile)
         saving.title = payment_duration_id
         saving.last_payment = amount
-        saving.amount = fixed_payment
+
+        if not fixed_payment:
+            saving.amount = amount
+
+        if saving.amount <= 0 and fixed_payment:
+            saving.amount = fixed_payment
+
         saving.last_payment_date = datetime.now()
         saving.total = saving.total + amount
         saving.repayment_day = repayment_day
@@ -65,12 +75,29 @@ class SavingsView(APIView):
         transaction.amount = amount
         transaction.save()
 
+        metadata = {
+            'transaction_id': transaction.id,
+            'payment_for': 'savings',
+        }
+
+        if card_id:
+            try:
+                card = UserCard.objects.get(id=card_id)
+                success = False
+                response_status = status.HTTP_400_BAD_REQUEST
+                json_response = None
+                authorization_code = card.authorization_code
+                paystack_auto_charge(authorization_code, email, amount, metadata=metadata)
+                return success, json_response, response_status
+
+            except Exception as ex:
+                return Response({'success': False,
+                                 'detail': 'Invalid card selected',
+                                 'error': str(ex)},
+                                status=status.HTTP_400_BAD_REQUEST)
+
         if gateway == 'paystack':
-            metadata = {
-                "transaction_id": transaction.id,
-            }
-            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url,
-                                                  metadata=metadata)
+            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
             if success:
                 data['payment_link'] = response
             else:
@@ -80,11 +107,14 @@ class SavingsView(APIView):
 
 
 class VerifyPaymentView(APIView):
+    permission_classes = []
 
     def get(self, request):
         data = dict()
         gateway = request.GET.get('gateway')
         reference = request.GET.get('reference')
+        phone_number = None
+        success = False
 
         if gateway == 'paystack':
             success, response = verify_paystack_transaction(reference)
@@ -94,17 +124,34 @@ class VerifyPaymentView(APIView):
                 return Response(data, status=status.HTTP_406_NOT_ACCEPTABLE)
 
             email = response['email']
-            transaction_id = response['payload']['data']['metadata']['transaction_id']
-            trans = SavingTransaction.objects.get(id=transaction_id, user__user__email__iexact=email)
-            trans.reference = reference
-            trans.status = 'success'
-            trans.response = response
-            trans.save()
+            transaction_id = int(response['payload']['data']['metadata']['transaction_id'])
+            payment_for = response['payload']['data']['metadata'].get('payment_for', None)
+
+            profile = Profile.objects.get(user__email=email)
+            phone_number = profile.phone_number
+
+            if payment_for == 'membership fee':
+                trans = Transaction.objects.get(id=transaction_id, transaction_type=payment_for)
+                trans.reference = reference
+                trans.status = 'success'
+                trans.response = response
+                trans.save()
+
+            if payment_for == 'savings':
+                trans = SavingTransaction.objects.get(id=transaction_id, user__user__email__iexact=email)
+                trans.reference = reference
+                trans.status = 'success'
+                trans.response = response
+                trans.save()
 
             # tokenize card
             tokenize_user_card(response)
 
-        data['detail'] = "Transaction successful"
+        if success is False:
+            data['detail'] = "Transaction could not be verified at the moment"
+        else:
+            data['detail'] = "Transaction successful"
+        data['msisdn'] = phone_number
         return Response(data)
 
 
