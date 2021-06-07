@@ -107,11 +107,13 @@ class SavingsView(APIView):
 
 
 class VerifyPaymentView(APIView):
+    permission_classes = []
 
     def get(self, request):
         data = dict()
         gateway = request.GET.get('gateway')
         reference = request.GET.get('reference')
+        phone_number = None
 
         if gateway == 'paystack':
             success, response = verify_paystack_transaction(reference)
@@ -122,6 +124,9 @@ class VerifyPaymentView(APIView):
 
             email = response['email']
             transaction_id = int(response['payload']['data']['metadata']['transaction_id'])
+
+            profile = Profile.objects.get(user__email=email)
+            phone_number = profile.phone_number
 
             payment_for = response['payload']['data']['metadata'].get('payment_for', None)
 
@@ -143,6 +148,7 @@ class VerifyPaymentView(APIView):
             tokenize_user_card(response)
 
         data['detail'] = "Transaction successful"
+        data['phone_number'] = phone_number
         return Response(data)
 
 
