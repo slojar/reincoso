@@ -126,8 +126,7 @@ class VerifyPaymentView(APIView):
             email = response['email']
             transaction_id = int(response['payload']['data']['metadata']['transaction_id'])
             payment_for = response['payload']['data']['metadata'].get('payment_for', None)
-
-            profile = Profile.objects.get(user__email=email)
+            profile = Profile.objects.get(user__email__iexact=email)
             phone_number = profile.phone_number
 
             if payment_for == 'membership fee':

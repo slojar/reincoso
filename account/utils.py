@@ -83,7 +83,7 @@ def tokenize_user_card(data, gateway=None):
     authorization_code = authorization['authorization_code']
     name = authorization.get('account_name')
 
-    profile = Profile.objects.get(user__email=email)
+    profile = Profile.objects.get(user__email__iexact=email)
     card, created = UserCard.objects.get_or_create(user=profile, email=email, bank=bank, signature=signature)
     card.name = name
     card.gateway = gateway or 'paystack'
