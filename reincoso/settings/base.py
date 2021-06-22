@@ -124,6 +124,15 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+logging.basicConfig(
+    filename='log.log',
+    filemode='a',
+    level=logging.DEBUG,
+    format='[{asctime}] {levelname} {module} {thread:d} - {message}',
+    datefmt='%d-%m-%Y %H:%M:%S',
+    style='{',
+)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
