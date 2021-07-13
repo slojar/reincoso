@@ -2,6 +2,7 @@ import django_heroku
 from .base import *
 from decouple import config
 import dj_database_url
+import logging
 
 
 SECRET_KEY = 'hjdj7=4rjhwo7-=1_())1!FvHxrcgvkliePY0t+rkmklmPdZn29wv5aLF0t0WW/2w'

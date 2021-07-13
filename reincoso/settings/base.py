@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.contrib import admin
 import cloudinary
 import os
+import logging
 
 
 admin.AdminSite.site_title = "Reincoso Admin Panel"
