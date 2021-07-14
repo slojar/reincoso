@@ -2,13 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ed004173-2808-42d3-8e95-f81f7b1e5d37" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/reincoso.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/reincoso.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loan/crons.py" beforeDir="false" afterPath="$PROJECT_DIR$/loan/crons.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reincoso/settings/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/reincoso/settings/base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reincoso/settings/dev.py" beforeDir="false" afterPath="$PROJECT_DIR$/reincoso/settings/dev.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reincoso/settings/prod.py" beforeDir="false" afterPath="$PROJECT_DIR$/reincoso/settings/prod.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/loan/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/loan/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,7 +71,8 @@
       <workItem from="1624386195296" duration="1294000" />
       <workItem from="1624891440448" duration="67000" />
       <workItem from="1624912916336" duration="117000" />
-      <workItem from="1626193094252" duration="200000" />
+      <workItem from="1626193094252" duration="427000" />
+      <workItem from="1626255996131" duration="824000" />
     </task>
     <servers />
   </component>
