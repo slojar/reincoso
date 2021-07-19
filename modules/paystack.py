@@ -43,7 +43,6 @@ def verify_paystack_transaction(reference):
             'amount': float(json_response.get('data').get('amount')) / 100,
             'payload': json_response
         }
-
     return success, message
 
 

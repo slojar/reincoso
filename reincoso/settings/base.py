@@ -2,6 +2,8 @@ from pathlib import Path
 from datetime import timedelta
 from django.contrib import admin
 import cloudinary
+import os
+import logging
 
 
 admin.AdminSite.site_title = "Reincoso Admin Panel"
@@ -122,3 +124,49 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+logging.basicConfig(
+    filename='log.log',
+    filemode='a',
+    level=logging.DEBUG,
+    format='[{asctime}] {levelname} {module} {thread:d} - {message}',
+    datefmt='%d-%m-%Y %H:%M:%S',
+    style='{',
+)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} {module} {thread:d} - {message}',
+            'style': '{',
+            'datefmt': '%d-%m-%Y %H:%M:%S'
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'logs.log',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['file'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django.server': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+

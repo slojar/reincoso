@@ -1,5 +1,6 @@
 from .models import Loan, LoanTransaction
 from django.utils import timezone
+from modules.paystack import paystack_auto_charge
 
 
 def loan_repayment_cron():
@@ -19,6 +20,7 @@ def loan_repayment_cron():
             if repay is True:
                 print("Auto debit user card")
                 # Charge user's card automatically
+                paystack_auto_charge(authorization_code='', email='', amount='')
                 # update last repayment date field to now
                 # update next repayment date field to next payment
                 # update amount repaid

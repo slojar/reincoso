@@ -10,12 +10,18 @@ from .utils import *
 from django.contrib.auth import authenticate
 from settings.utils import general_settings
 from transaction.models import Transaction
+import logging
+
+
+log = logging.getLogger(__name__)
 
 
 class Homepage(APIView):
     permission_classes = []
 
     def get(self, request):
+        log.info("Homepage")
+        print("Homepage")
         return HttpResponse('<h1>Reincoso Homepage!!!</h1>')
 
 

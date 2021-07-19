@@ -14,7 +14,7 @@ def get_loan_offer(profile):
     success = False
     response = ""
     loan_settings, created = LoanSetting.objects.get_or_create(site=Site.objects.get_current())
-    savings_transaction = SavingTransaction.objects.filter(user=profile, status='success').last()
+    savings_transaction = SavingTransaction.objects.filter(user=profile, status='success').first()
 
     if not savings_transaction:
         response = "Sorry, you are unable to get a loan right now. make sure you have saved for at least " \

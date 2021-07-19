@@ -1,6 +1,7 @@
 import django_heroku
 from .base import *
 from decouple import config
+import logging
 
 
 SECRET_KEY = 'reincoso'

@@ -107,6 +107,12 @@ class LoanView(APIView):
             data = LoanSerializer(Loan.objects.filter(user=request.user.profile), many=True).data
         else:
             data = LoanSerializer(get_object_or_404(Loan, pk=pk, user=request.user.profile)).data
+        if not data:
+            data = {
+                'success': False,
+                'detail': "No loan available"
+            }
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
         return Response(data)
 
 
