@@ -1424,3 +1424,8 @@ django.db.utils.OperationalError: no such table: investment_availableinvestment
 [22-07-2021 02:21:24] INFO core 4527156736 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
 [22-07-2021 02:21:24] INFO core 4527156736 - Applying Heroku logging configuration to Django settings.
 [22-07-2021 08:21:25] INFO autoreload 4527156736 - Watching for file changes with StatReloader
+[22-07-2021 02:24:26] INFO core 4541238784 - $DATABASE_URL not found, falling back to previous settings!
+[22-07-2021 02:24:26] INFO core 4541238784 - Applying Heroku Staticfiles configuration to Django settings.
+[22-07-2021 02:24:26] INFO core 4541238784 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[22-07-2021 02:24:26] INFO core 4541238784 - Applying Heroku logging configuration to Django settings.
+[22-07-2021 08:24:26] INFO autoreload 4541238784 - Watching for file changes with StatReloader
