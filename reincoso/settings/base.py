@@ -40,9 +40,9 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'savings.apps.SavingsConfig',
     'loan.apps.LoanConfig',
-    'investment.apps.InvestmentConfig',
     'transaction.apps.TransactionConfig',
     'settings.apps.SettingsConfig',
+    'investment.apps.InvestmentConfig',
 ]
 
 MIDDLEWARE = [

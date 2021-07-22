@@ -5,4 +5,5 @@ from . import views
 
 urlpatterns = [
     path('', views.InvestmentsView.as_view()),
+    path('apply/', views.InvestView.as_view()),
 ]

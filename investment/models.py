@@ -47,8 +47,9 @@ class AvailableInvestment(models.Model):
 
 
 class InvestmentOption(models.Model):
-    investment = models.ForeignKey(AvailableInvestment, on_delete=models.CASCADE)
+    available_investment = models.ForeignKey(AvailableInvestment, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    duration = models.ForeignKey(InvestmentDuration, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=100, choices=AVAILABLE_INVESTMENT_STATUS_CHOICES, default='active')
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
@@ -59,7 +60,7 @@ class InvestmentOption(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['investment', 'name'], name='investment_option_constraint'
+                fields=['available_investment', 'name'], name='investment_option_constraint'
             )
         ]
 
@@ -79,7 +80,7 @@ class InvestmentSpecification(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['investment_option', 'key', 'value'], name='investment_spec_constraint'
+                fields=['investment_option', 'key'], name='investment_spec_constraint'
             )
         ]
 
@@ -90,6 +91,7 @@ class Investment(models.Model):
     option = models.ForeignKey(InvestmentOption, on_delete=models.CASCADE, related_name='option')
     duration = models.ForeignKey(InvestmentDuration, on_delete=models.CASCADE, related_name='investment_duration')
     amount_invested = models.DecimalField(decimal_places=2, max_digits=20, default=0)
+    percentage = models.DecimalField(decimal_places=2, max_digits=20, default=0)
     return_on_invested = models.DecimalField(decimal_places=2, max_digits=20, default=0)
     number_of_month = models.IntegerField(default=1)
     number_of_days = models.IntegerField(default=1)
