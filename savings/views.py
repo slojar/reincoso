@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from rest_framework import status
 from rest_framework.response import Response
@@ -103,10 +104,13 @@ class SavingsView(APIView):
                 return Response(data)
 
             except Exception as ex:
-                return Response({'success': False,
-                                 'detail': 'Invalid card selected',
-                                 'error': str(ex)},
-                                status=status.HTTP_400_BAD_REQUEST)
+                logging.exception(f"{ex}")
+                data = {
+                    'success': False,
+                    'detail': 'Invalid card selected',
+                    'error': str(ex)
+                }
+                return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
         if not card_id:
             callback_url = request.data.get('callback_url')
