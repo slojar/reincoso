@@ -48,6 +48,7 @@ class InvestmentSerializer(serializers.ModelSerializer):
     duration = serializers.CharField(source='duration.title')
 
     class Meta:
+        depth = 1
         model = Investment
         exclude = []
 

@@ -106,7 +106,6 @@ class PayMembershipFeeView(APIView):
 
         if not callback_url:
             callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
-        callback_url = callback_url + f"?gateway={gateway}"
 
         email = request.user.email
         profile = request.user.profile

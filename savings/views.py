@@ -12,6 +12,7 @@ from account.utils import tokenize_user_card
 from account.models import UserCard
 from modules.paystack import paystack_auto_charge
 from transaction.models import Transaction
+from investment.utils import approve_investment
 
 
 class SavingsView(APIView):
@@ -30,11 +31,6 @@ class SavingsView(APIView):
         gateway = request.data.get('gateway')
         payment_duration_id = request.data.get('payment_duration_id')
         card_id = request.data.get('card_id')
-
-        callback_url = request.data.get('callback_url')
-        if not callback_url:
-            callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
-        callback_url = callback_url + f"?gateway={gateway}"
 
         if not Duration.objects.filter(id=payment_duration_id).exists():
             data['detail'] = 'Invalid payment duration'
@@ -96,12 +92,17 @@ class SavingsView(APIView):
                                  'error': str(ex)},
                                 status=status.HTTP_400_BAD_REQUEST)
 
-        if gateway == 'paystack':
-            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
-            if success:
-                data['payment_link'] = response
-            else:
-                data['detail'] = response
+        if not card_id:
+            callback_url = request.data.get('callback_url')
+            if not callback_url:
+                callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
+
+            if gateway == 'paystack':
+                success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
+                if success:
+                    data['payment_link'] = response
+                else:
+                    data['detail'] = response
 
         return Response(data)
 
@@ -115,6 +116,7 @@ class VerifyPaymentView(APIView):
         reference = request.GET.get('reference')
         phone_number = None
         success = False
+        response = dict()
 
         if gateway == 'paystack':
             success, response = verify_paystack_transaction(reference)
@@ -124,7 +126,7 @@ class VerifyPaymentView(APIView):
                 return Response(data, status=status.HTTP_406_NOT_ACCEPTABLE)
 
             email = response['email']
-            transaction_id = int(response['payload']['data']['metadata']['transaction_id'])
+            transaction_id = response['payload']['data']['metadata'].get('transaction_id', None)
             payment_for = response['payload']['data']['metadata'].get('payment_for', None)
             profile = Profile.objects.get(user__email__iexact=email)
             phone_number = profile.phone_number
@@ -143,8 +145,16 @@ class VerifyPaymentView(APIView):
                 trans.response = response
                 trans.save()
 
+            if payment_for == 'investment':
+                investment_id = response['payload']['data']['metadata'].get('investment_id', None)
+                success, response = approve_investment(investment_id, gateway, reference)
+                data['detail'] = response
+                if success is False:
+                    return Response(data, status.HTTP_400_BAD_REQUEST)
+                return Response(data)
+
             # tokenize card
-            tokenize_user_card(response)
+            tokenize_user_card(response, gateway)
 
         if success is False:
             data['detail'] = "Transaction could not be verified at the moment"

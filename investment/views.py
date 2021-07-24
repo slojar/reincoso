@@ -13,16 +13,62 @@ class InvestmentsView(generics.ListAPIView):
     serializer_class = AvailableInvestmentSerializer
 
 
+class InvestmentDetailView(generics.RetrieveAPIView):
+    queryset = AvailableInvestment.objects.all()
+    serializer_class = AvailableInvestmentSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        data = dict()
+        id_ = self.kwargs.get('id')
+        try:
+            avail_investment = AvailableInvestment.objects.get(id=id_)
+        except Exception as ex:
+            try:
+                avail_investment = AvailableInvestment.objects.get(name__iexact=id_)
+            except Exception as ex:
+                data['detail'] = str(ex)
+                return Response(data, status.HTTP_404_NOT_FOUND)
+        data = AvailableInvestmentSerializer(avail_investment).data
+        return Response(data)
+
+
+
+
+
 class InvestView(APIView):
 
     def post(self, request):
         data = dict()
-        success, response = create_investment(request)
+        success, response = create_investment(request.user.profile, request.data)
         if success is False:
-            data['detail'] = response
+            data['detail'] = "There is an error in request sent"
+            data['data'] = response
             return Response(data, status.HTTP_400_BAD_REQUEST)
 
         data['detail'] = "Investment created successfully"
         data['data'] = InvestmentSerializer(response).data
         return Response(data)
+
+
+class InvestPaymentView(APIView):
+
+    def post(self, request):
+        data = dict()
+        investment_id = request.data.get('investment_id')
+        card_id = request.data.get('card_id')
+        user = request.user.profile
+
+        success, response = investment_payment(request.user.profile, request.data)
+
+        if success is False:
+            data['detail'] = "There is an error with request sent"
+            data['data'] = response
+            return Response(data, status.HTTP_400_BAD_REQUEST)
+
+        data['detail'] = response
+        if card_id:
+            data['data'] = InvestmentSerializer(Investment.objects.get(id=investment_id, user=user)).data
+        return Response(data)
+
+
 

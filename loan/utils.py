@@ -187,7 +187,6 @@ def do_loan_repayment(profile, loan_id, amount, **kwargs):
         callback_url = None
         if request:
             callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
-            callback_url = callback_url + f"?gateway={gateway}"
 
     try:
         loan = Loan.objects.get(user=profile, id=loan_id)
