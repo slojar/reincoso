@@ -79,12 +79,28 @@ class SavingsView(APIView):
         if card_id:
             try:
                 card = UserCard.objects.get(id=card_id)
-                success = False
-                response_status = status.HTTP_400_BAD_REQUEST
-                json_response = None
                 authorization_code = card.authorization_code
-                paystack_auto_charge(authorization_code, email, amount, metadata=metadata)
-                return success, json_response, response_status
+                success, response = paystack_auto_charge(authorization_code, email, amount, metadata=metadata)
+                if not success:
+                    data['detail'] = "There is an error in request sent"
+                    data['data'] = response
+                    return Response(data, status.HTTP_400_BAD_REQUEST)
+
+                reference = response['data']['reference']
+
+                success, response = verify_paystack_transaction(reference)
+                if not success:
+                    data['detail'] = "There is an error in request sent"
+                    data['data'] = response
+                    return Response(data, status.HTTP_400_BAD_REQUEST)
+
+                transaction.reference = reference
+                transaction.status = 'success'
+                transaction.response = response
+                transaction.save()
+
+                data['detail'] = "Payment successful"
+                return Response(data)
 
             except Exception as ex:
                 return Response({'success': False,
@@ -103,6 +119,7 @@ class SavingsView(APIView):
                     data['payment_link'] = response
                 else:
                     data['detail'] = response
+            return Response(data)
 
         return Response(data)
 
