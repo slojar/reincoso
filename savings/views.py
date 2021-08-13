@@ -146,6 +146,9 @@ class VerifyPaymentView(APIView):
             if success is False:
                 return Response(data, status=status.HTTP_406_NOT_ACCEPTABLE)
 
+            # tokenize card
+            tokenize_user_card(response, gateway)
+
             email = response['email']
             transaction_id = response['payload']['data']['metadata'].get('transaction_id', None)
             payment_for = response['payload']['data']['metadata'].get('payment_for', None)
@@ -173,9 +176,6 @@ class VerifyPaymentView(APIView):
                 if success is False:
                     return Response(data, status.HTTP_400_BAD_REQUEST)
                 # return Response(data)
-
-            # tokenize card
-            tokenize_user_card(response, gateway)
 
         if success is False:
             data['detail'] = "Transaction could not be verified at the moment"
