@@ -58,7 +58,7 @@ class AvailableInvestment(models.Model):
 class InvestmentOption(models.Model):
     available_investment = models.ForeignKey(AvailableInvestment, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    duration = models.ManyToManyField(InvestmentDuration, null=True, blank=True)
+    duration = models.ManyToManyField(InvestmentDuration, blank=True)
     status = models.CharField(max_length=100, choices=AVAILABLE_INVESTMENT_STATUS_CHOICES, default='active')
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)

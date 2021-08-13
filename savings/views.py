@@ -172,7 +172,7 @@ class VerifyPaymentView(APIView):
                 data['detail'] = response
                 if success is False:
                     return Response(data, status.HTTP_400_BAD_REQUEST)
-                return Response(data)
+                # return Response(data)
 
             # tokenize card
             tokenize_user_card(response, gateway)
@@ -181,6 +181,7 @@ class VerifyPaymentView(APIView):
             data['detail'] = "Transaction could not be verified at the moment"
         else:
             data['detail'] = "Transaction successful"
+
         data['msisdn'] = phone_number
         return Response(data)
 
