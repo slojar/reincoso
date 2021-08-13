@@ -6,7 +6,6 @@ from . import views
 urlpatterns = [
     path('apply/', views.InvestView.as_view()),
     path('pay/', views.InvestPaymentView.as_view()),
-
     path('', views.InvestmentsView.as_view()),
     path('<str:id>/', views.InvestmentDetailView.as_view()),
 ]

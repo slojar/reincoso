@@ -12,7 +12,7 @@ class InvestmentDurationSerializer(serializers.ModelSerializer):
 class InvestmentOptionSerializer(serializers.ModelSerializer):
 
     specification = serializers.SerializerMethodField()
-    duration = InvestmentDurationSerializer()
+    # duration = InvestmentDurationSerializer()
 
     def get_specification(self, obj):
         query = InvestmentSpecification.objects.filter(investment_option=obj, visible=True, status='active')
@@ -21,6 +21,7 @@ class InvestmentOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvestmentOption
         exclude = ['status']
+        depth = 2
 
 
 class AvailableInvestmentSerializer(serializers.ModelSerializer):
