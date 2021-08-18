@@ -1,9 +1,13 @@
 import logging
 from datetime import datetime, timedelta
+
+from django.db.models import Sum
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+
+from loan.paginations import CustomPagination
 from savings.models import Duration, Saving, SavingTransaction
 from .serializers import *
 from settings.models import PaymentGateway
@@ -14,13 +18,71 @@ from account.models import UserCard
 from modules.paystack import paystack_auto_charge
 from transaction.models import Transaction
 from investment.utils import approve_investment
+from django.shortcuts import get_object_or_404
+
+from .utils import get_savings_analysis
+
+
+class MySavingsView(ListAPIView):
+    serializer_class = SavingSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        profile = self.request.user.profile
+        query = Saving.objects.filter(user=profile)
+        return query
+
+    def list(self, request, *args, **kwargs):
+        profile = self.request.user.profile
+        data = super(MySavingsView, self).list(request, *args, **kwargs).data
+        data['user'] = get_savings_analysis(profile)
+        return Response(data)
+
+
+class MySavingsDetailView(RetrieveAPIView):
+    serializer_class = SavingSerializer
+
+    def get(self, request, pk):
+        profile = request.user.profile
+        savings = get_object_or_404(Saving, pk=pk, user=profile)
+        data = SavingSerializer(savings).data
+        data['user'] = get_savings_analysis(profile)
+        return Response(data)
+
+
+class SavingTransactionView(ListAPIView):
+    serializer_class = SavingsTransactionSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        savings_id = self.kwargs.get('savings_id')
+        return SavingTransaction.objects.filter(saving_id=savings_id)
+
+    def list(self, request, *args, **kwargs):
+        profile = request.user.profile
+        data = super(SavingTransactionView, self).list(request, *args, **kwargs).data
+        data['user'] = get_savings_analysis(profile)
+        return Response(data)
+
+
+class SavingTransactionDetailView(RetrieveAPIView):
+    serializer_class = SavingsTransactionSerializer
+    lookup_field = 'pk'
+    queryset = SavingTransaction.objects.all()
+
+    def get(self, request, pk):
+        profile = request.user.profile
+        data = super(SavingTransactionDetailView, self).get(request).data
+        data['user'] = get_savings_analysis(profile)
+        return Response(data)
 
 
 class SavingsView(APIView):
     def get(self, request):
         data = dict()
-        queryset = Duration.objects.all()
-        data['durations'] = SavingDurationSerializer(queryset, many=True).data
+        profile = request.user.profile
+        data['user'] = get_savings_analysis(profile)
+        data['durations'] = SavingDurationSerializer(Duration.objects.all(), many=True).data
         data['gateways'] = PaymentGateway.objects.all().values('id', 'name', 'slug')
         return Response(data)
 

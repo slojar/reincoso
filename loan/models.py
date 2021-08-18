@@ -66,6 +66,9 @@ class LoanTransaction(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self):
         return f"id: {self.id}:{self.user}: {self.transaction_type} - {self.amount}"
 

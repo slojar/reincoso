@@ -2,16 +2,17 @@ import decimal
 from django.shortcuts import get_object_or_404, reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from savings.models import Saving, SavingTransaction
 from rest_framework import status
 from django.utils import timezone
 from django.utils.timezone import timedelta
 from django.contrib.sites.models import Site
 from .models import *
+from .paginations import CustomPagination
 from .serializers import *
 from .utils import *
-from django.db.models import Q
+from django.db.models import Q, Sum
 from modules.paystack import verify_paystack_transaction
 from account.utils import tokenize_user_card
 
@@ -100,20 +101,48 @@ class LoanDurationView(ListAPIView):
     queryset = LoanDuration.objects.all()
 
 
-class LoanView(APIView):
+class LoanView(ListAPIView):
+    serializer_class = LoanSerializer
+    pagination_class = CustomPagination
 
-    def get(self, request, pk=None):
-        if not pk:
-            data = LoanSerializer(Loan.objects.filter(user=request.user.profile), many=True).data
-        else:
-            data = LoanSerializer(get_object_or_404(Loan, pk=pk, user=request.user.profile)).data
-        if not data:
-            data = {
-                'success': False,
-                'detail': "No loan available"
-            }
-            return Response(data, status=status.HTTP_404_NOT_FOUND)
+    def get_queryset(self):
+        query = Loan.objects.filter(user=self.request.user.profile)
+        return query
+
+    def list(self, request, *args, **kwargs):
+        data = super(LoanView, self).list(request, *args, **kwargs).data
+        profile = request.user.profile
+        user_info = dict()
+        user_info['total_loan'] = Loan.objects.filter(user=profile).count()
+
+        total = LoanTransaction.objects.filter(user=profile, status='success')
+        total = total.aggregate(Sum('amount'))['amount__sum']
+        user_info['total_loan_amount'] = total
+
+        data['user'] = user_info
+
         return Response(data)
+
+
+class LoanDetailView(RetrieveAPIView):
+    serializer_class = LoanSerializer
+    lookup_field = 'pk'
+    queryset = Loan.objects.all()
+
+
+class LoanTransactionView(ListAPIView):
+    serializer_class = LoanTransactionSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        loan_id = self.kwargs.get('loan_id')
+        return LoanTransaction.objects.filter(loan_id=loan_id)
+
+
+class LoanTransactionDetailView(RetrieveAPIView):
+    serializer_class = LoanTransactionSerializer
+    lookup_field = 'pk'
+    queryset = LoanTransaction.objects.all()
 
 
 class RepayLoanView(APIView):
