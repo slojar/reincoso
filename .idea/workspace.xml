@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
+<<<<<<< HEAD
+    <list default="true" id="ed004173-2808-42d3-8e95-f81f7b1e5d37" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/investment/serializers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/investment/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/investment/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/investment/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/investment/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/investment/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/investment/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/investment/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/log.log" beforeDir="false" afterPath="$PROJECT_DIR$/log.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reincoso/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/reincoso/urls.py" afterDir="false" />
+=======
     <list default="true" id="75e3d317-bc76-4efb-983f-dae85e134fff" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/reincoso.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/reincoso.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/account/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/account/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/account/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/account/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/log.log" beforeDir="false" afterPath="$PROJECT_DIR$/log.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reincoso/settings/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/reincoso/settings/base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reincoso/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/reincoso/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/savings/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/savings/serializers.py" afterDir="false" />
+>>>>>>> 31f4909b6c274826bb3065f93eaacc93d5b247db
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,11 +26,25 @@
   <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
     <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+<<<<<<< HEAD
+  <component name="ProjectId" id="1uJaYSc3RCEl0rZh5dKx8W1MEqJ" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+=======
   <component name="ProjectId" id="1tIxqAkvKp6dCvhmYTI8j9mqK6i" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+>>>>>>> 31f4909b6c274826bb3065f93eaacc93d5b247db
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -34,7 +54,6 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunManager">
@@ -44,7 +63,6 @@
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
-        <env name="DJANGO_SETTINGS_MODULE" value="reincoso.settings.dev" />
       </envs>
       <option name="SDK_HOME" value="$PROJECT_DIR$/../venv/bin/python" />
       <option name="WORKING_DIRECTORY" value="" />
@@ -70,31 +88,25 @@
       <created>1622470592821</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
+<<<<<<< HEAD
+      <updated>1624386193672</updated>
+      <workItem from="1624386195296" duration="1294000" />
+      <workItem from="1624891440448" duration="67000" />
+      <workItem from="1624912916336" duration="117000" />
+      <workItem from="1626193094252" duration="427000" />
+      <workItem from="1626255996131" duration="1047000" />
+      <workItem from="1626767463408" duration="13868000" />
+=======
       <updated>1622470592821</updated>
       <workItem from="1622470594224" duration="148000" />
       <workItem from="1622470749323" duration="21000" />
       <workItem from="1622481736867" duration="72000" />
       <workItem from="1622482298355" duration="138000" />
-      <workItem from="1626705008582" duration="151000" />
-      <workItem from="1626705246393" duration="1947000" />
-      <workItem from="1626789370262" duration="252000" />
-      <workItem from="1627430873822" duration="422000" />
+>>>>>>> 31f4909b6c274826bb3065f93eaacc93d5b247db
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
 </project>
