@@ -2,6 +2,12 @@ from rest_framework import serializers
 from .models import *
 
 
+class FaqCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FaqCategory
+        exclude = []
+
+
 class FaqSerializer(serializers.ModelSerializer):
     class Meta:
         model = Faq

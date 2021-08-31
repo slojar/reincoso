@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     'rest_framework',
-    'rest_framework.authtoken',
 
     'account.apps.AccountConfig',
     'savings.apps.SavingsConfig',
@@ -43,6 +42,7 @@ INSTALLED_APPS = [
     'investment.apps.InvestmentConfig',
     'transaction.apps.TransactionConfig',
     'settings.apps.SettingsConfig',
+    'superadmin.apps.SuperadminConfig',
 ]
 
 MIDDLEWARE = [

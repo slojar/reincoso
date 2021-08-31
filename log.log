@@ -52,3 +52,340 @@
 [22-06-2021 19:30:08] INFO autoreload 4625026560 - Watching for file changes with StatReloader
 [22-06-2021 19:46:25] DEBUG selector_events 4625026560 - Using selector: KqueueSelector
 [22-06-2021 19:46:25] DEBUG selector_events 4593835520 - Using selector: KqueueSelector
+[19-07-2021 08:03:23] INFO core 4550307328 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:03:23] INFO core 4550307328 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:03:23] INFO core 4550307328 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:03:23] INFO core 4550307328 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 14:03:24] DEBUG selector_events 4550307328 - Using selector: KqueueSelector
+[19-07-2021 08:03:26] INFO core 4648689152 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:03:26] INFO core 4648689152 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:03:26] INFO core 4648689152 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:03:26] INFO core 4648689152 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 08:03:27] INFO core 4508872192 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:03:27] INFO core 4508872192 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:03:27] INFO core 4508872192 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:03:27] INFO core 4508872192 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 14:03:28] INFO autoreload 4508872192 - Watching for file changes with StatReloader
+[19-07-2021 08:04:05] INFO core 4785139200 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:04:05] INFO core 4785139200 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:04:05] INFO core 4785139200 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:04:05] INFO core 4785139200 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 14:04:05] DEBUG selector_events 4785139200 - Using selector: KqueueSelector
+[19-07-2021 14:06:45] DEBUG selector_events 4508872192 - Using selector: KqueueSelector
+[19-07-2021 14:06:45] DEBUG selector_events 4648689152 - Using selector: KqueueSelector
+[19-07-2021 08:06:47] INFO core 4491226624 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:06:47] INFO core 4491226624 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:06:47] INFO core 4491226624 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:06:47] INFO core 4491226624 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 08:06:49] INFO core 4500180480 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:06:49] INFO core 4500180480 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:06:49] INFO core 4500180480 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:06:49] INFO core 4500180480 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 14:06:49] INFO autoreload 4500180480 - Watching for file changes with StatReloader
+[19-07-2021 08:41:28] INFO core 4485815808 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:41:28] INFO core 4485815808 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:41:28] INFO core 4485815808 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:41:28] INFO core 4485815808 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 14:41:29] DEBUG selector_events 4485815808 - Using selector: KqueueSelector
+[19-07-2021 14:43:55] INFO autoreload 4500180480 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/reincoso/settings/base.py changed, reloading.
+[19-07-2021 14:43:56] DEBUG selector_events 4500180480 - Using selector: KqueueSelector
+[19-07-2021 08:43:57] INFO core 4638289408 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:43:57] INFO core 4638289408 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:43:57] INFO core 4638289408 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:43:57] INFO core 4638289408 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 14:43:58] INFO autoreload 4638289408 - Watching for file changes with StatReloader
+[19-07-2021 14:46:07] INFO autoreload 4638289408 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/reincoso/urls.py changed, reloading.
+[19-07-2021 14:46:07] DEBUG selector_events 4638289408 - Using selector: KqueueSelector
+[19-07-2021 08:46:10] INFO core 4419358208 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:46:10] INFO core 4419358208 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:46:10] INFO core 4419358208 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:46:10] INFO core 4419358208 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 14:46:11] INFO autoreload 4419358208 - Watching for file changes with StatReloader
+[19-07-2021 14:51:08] DEBUG selector_events 4419358208 - Using selector: KqueueSelector
+[19-07-2021 14:51:09] DEBUG selector_events 4491226624 - Using selector: KqueueSelector
+[19-07-2021 08:51:11] INFO core 4613737984 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:51:11] INFO core 4613737984 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:51:11] INFO core 4613737984 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:51:11] INFO core 4613737984 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 08:51:14] INFO core 4559801856 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:51:14] INFO core 4559801856 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:51:14] INFO core 4559801856 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:51:14] INFO core 4559801856 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 14:51:15] INFO autoreload 4559801856 - Watching for file changes with StatReloader
+[19-07-2021 08:51:59] INFO core 4695186944 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:51:59] INFO core 4695186944 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:51:59] INFO core 4695186944 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:51:59] INFO core 4695186944 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 14:52:00] DEBUG selector_events 4695186944 - Using selector: KqueueSelector
+[19-07-2021 14:53:47] INFO autoreload 4559801856 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/superadmin/urls.py changed, reloading.
+[19-07-2021 14:53:47] DEBUG selector_events 4559801856 - Using selector: KqueueSelector
+[19-07-2021 08:53:49] INFO core 4460961280 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:53:49] INFO core 4460961280 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:53:49] INFO core 4460961280 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:53:49] INFO core 4460961280 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 14:53:49] INFO autoreload 4460961280 - Watching for file changes with StatReloader
+[19-07-2021 08:53:57] INFO core 4563594752 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:53:57] INFO core 4563594752 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:53:57] INFO core 4563594752 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:53:57] INFO core 4563594752 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 14:53:58] DEBUG selector_events 4563594752 - Using selector: KqueueSelector
+[19-07-2021 08:54:08] INFO core 4730498560 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 08:54:08] INFO core 4730498560 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 08:54:08] INFO core 4730498560 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 08:54:08] INFO core 4730498560 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 14:54:09] DEBUG selector_events 4730498560 - Using selector: KqueueSelector
+[19-07-2021 14:55:56] INFO views 123145483599872 - Homepage
+[19-07-2021 14:55:56] INFO views 123145483599872 - Homepage
+[19-07-2021 14:55:59] WARNING log 123145483599872 - Not Found: /favicon.ico
+[19-07-2021 15:06:15] INFO autoreload 4460961280 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/account/serializers.py changed, reloading.
+[19-07-2021 15:06:15] DEBUG selector_events 4460961280 - Using selector: KqueueSelector
+[19-07-2021 09:06:19] INFO core 4587994624 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:06:19] INFO core 4587994624 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:06:19] INFO core 4587994624 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:06:19] INFO core 4587994624 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:06:19] INFO autoreload 4587994624 - Watching for file changes with StatReloader
+[19-07-2021 15:16:58] INFO autoreload 4587994624 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/savings/serializers.py changed, reloading.
+[19-07-2021 15:16:59] DEBUG selector_events 4587994624 - Using selector: KqueueSelector
+[19-07-2021 09:17:01] INFO core 4549742080 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:17:01] INFO core 4549742080 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:17:01] INFO core 4549742080 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:17:01] INFO core 4549742080 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:17:01] INFO autoreload 4549742080 - Watching for file changes with StatReloader
+[19-07-2021 15:27:32] INFO autoreload 4549742080 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/superadmin/urls.py changed, reloading.
+[19-07-2021 15:27:32] DEBUG selector_events 4549742080 - Using selector: KqueueSelector
+[19-07-2021 09:27:35] INFO core 4551622144 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:27:35] INFO core 4551622144 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:27:35] INFO core 4551622144 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:27:35] INFO core 4551622144 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:27:36] INFO autoreload 4551622144 - Watching for file changes with StatReloader
+[19-07-2021 15:29:06] WARNING log 123145561559040 - Not Found: /superadmin/faq/
+[19-07-2021 15:29:12] WARNING log 123145561559040 - Not Found: /superadmin/faq
+[19-07-2021 15:29:20] DEBUG selector_events 4551622144 - Using selector: KqueueSelector
+[19-07-2021 15:29:20] DEBUG selector_events 4613737984 - Using selector: KqueueSelector
+[19-07-2021 09:30:11] INFO core 4503092736 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:30:11] INFO core 4503092736 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:30:11] INFO core 4503092736 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:30:11] INFO core 4503092736 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 09:30:14] INFO core 4583751168 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:30:14] INFO core 4583751168 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:30:14] INFO core 4583751168 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:30:14] INFO core 4583751168 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:30:15] INFO autoreload 4583751168 - Watching for file changes with StatReloader
+[19-07-2021 15:30:23] DEBUG selector_events 4583751168 - Using selector: KqueueSelector
+[19-07-2021 15:30:23] DEBUG selector_events 4503092736 - Using selector: KqueueSelector
+[19-07-2021 09:30:25] INFO core 4758756864 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:30:25] INFO core 4758756864 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:30:25] INFO core 4758756864 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:30:25] INFO core 4758756864 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 09:30:26] INFO core 4490132992 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:30:26] INFO core 4490132992 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:30:26] INFO core 4490132992 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:30:26] INFO core 4490132992 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:30:26] INFO autoreload 4490132992 - Watching for file changes with StatReloader
+[19-07-2021 15:30:31] WARNING log 123145565806592 - Not Found: /superadmin/faq
+[19-07-2021 15:30:43] WARNING log 123145565806592 - Not Found: /superadmin/faq/
+[19-07-2021 15:31:25] INFO autoreload 4490132992 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/superadmin/urls.py changed, reloading.
+[19-07-2021 15:31:25] DEBUG selector_events 4490132992 - Using selector: KqueueSelector
+[19-07-2021 09:31:28] INFO core 4455124480 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:31:28] INFO core 4455124480 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:31:28] INFO core 4455124480 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:31:28] INFO core 4455124480 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:31:28] INFO autoreload 4455124480 - Watching for file changes with StatReloader
+[19-07-2021 15:31:53] INFO autoreload 4455124480 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/superadmin/urls.py changed, reloading.
+[19-07-2021 15:31:53] DEBUG selector_events 4455124480 - Using selector: KqueueSelector
+[19-07-2021 09:31:56] INFO core 4624014848 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:31:56] INFO core 4624014848 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:31:56] INFO core 4624014848 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:31:56] INFO core 4624014848 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:31:56] INFO autoreload 4624014848 - Watching for file changes with StatReloader
+[19-07-2021 15:32:44] DEBUG selector_events 4624014848 - Using selector: KqueueSelector
+[19-07-2021 15:32:44] DEBUG selector_events 4758756864 - Using selector: KqueueSelector
+[19-07-2021 09:34:46] INFO core 4480806400 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:34:46] INFO core 4480806400 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:34:46] INFO core 4480806400 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:34:46] INFO core 4480806400 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 09:34:47] INFO core 4576652800 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:34:47] INFO core 4576652800 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:34:47] INFO core 4576652800 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:34:47] INFO core 4576652800 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:34:47] INFO autoreload 4576652800 - Watching for file changes with StatReloader
+[19-07-2021 15:34:53] WARNING log 123145472507904 - Unauthorized: /superadmin/faq/
+[19-07-2021 15:35:40] WARNING log 123145472507904 - Unauthorized: /superadmin/faq/
+[19-07-2021 15:38:20] WARNING log 123145472507904 - Bad Request: /login/
+[19-07-2021 15:41:44] INFO autoreload 4576652800 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/reincoso/settings/base.py changed, reloading.
+[19-07-2021 15:41:44] DEBUG selector_events 4576652800 - Using selector: KqueueSelector
+[19-07-2021 09:41:47] INFO core 4591820288 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:41:47] INFO core 4591820288 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:41:47] INFO core 4591820288 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:41:47] INFO core 4591820288 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:41:48] INFO autoreload 4591820288 - Watching for file changes with StatReloader
+[19-07-2021 09:41:58] INFO core 4579728896 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:41:58] INFO core 4579728896 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:41:58] INFO core 4579728896 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:41:58] INFO core 4579728896 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:41:58] DEBUG selector_events 4579728896 - Using selector: KqueueSelector
+[19-07-2021 09:42:06] INFO core 4587826688 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:42:06] INFO core 4587826688 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:42:06] INFO core 4587826688 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:42:06] INFO core 4587826688 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:42:07] DEBUG selector_events 4587826688 - Using selector: KqueueSelector
+[19-07-2021 15:43:19] INFO autoreload 4591820288 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/superadmin/views.py changed, reloading.
+[19-07-2021 15:43:19] DEBUG selector_events 4591820288 - Using selector: KqueueSelector
+[19-07-2021 09:43:22] INFO core 4370271744 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:43:22] INFO core 4370271744 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:43:22] INFO core 4370271744 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:43:22] INFO core 4370271744 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:43:22] INFO autoreload 4370271744 - Watching for file changes with StatReloader
+[19-07-2021 15:43:26] WARNING log 123145544437760 - Unauthorized: /superadmin/faq/
+[19-07-2021 15:55:08] INFO autoreload 4370271744 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/account/views.py changed, reloading.
+[19-07-2021 15:55:08] DEBUG selector_events 4370271744 - Using selector: KqueueSelector
+[19-07-2021 09:55:10] INFO core 4686843392 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:55:10] INFO core 4686843392 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:55:10] INFO core 4686843392 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:55:10] INFO core 4686843392 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:55:11] INFO autoreload 4686843392 - Watching for file changes with StatReloader
+[19-07-2021 15:55:12] DEBUG selector_events 4686843392 - Using selector: KqueueSelector
+[19-07-2021 15:55:12] DEBUG selector_events 4480806400 - Using selector: KqueueSelector
+[19-07-2021 09:55:13] INFO core 4590939648 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:55:13] INFO core 4590939648 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:55:13] INFO core 4590939648 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:55:13] INFO core 4590939648 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 09:55:14] INFO core 4617821696 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:55:14] INFO core 4617821696 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:55:14] INFO core 4617821696 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:55:14] INFO core 4617821696 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:55:14] INFO autoreload 4617821696 - Watching for file changes with StatReloader
+[19-07-2021 15:55:40] WARNING log 123145410056192 - Bad Request: /login/
+[19-07-2021 15:56:28] INFO autoreload 4617821696 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/account/views.py changed, reloading.
+[19-07-2021 15:56:28] DEBUG selector_events 4617821696 - Using selector: KqueueSelector
+[19-07-2021 09:56:31] INFO core 4392205824 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:56:31] INFO core 4392205824 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:56:31] INFO core 4392205824 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:56:31] INFO core 4392205824 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:56:31] INFO autoreload 4392205824 - Watching for file changes with StatReloader
+[19-07-2021 15:56:37] WARNING log 123145463394304 - Bad Request: /login/
+[19-07-2021 15:57:05] INFO autoreload 4392205824 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/account/views.py changed, reloading.
+[19-07-2021 15:57:05] DEBUG selector_events 4392205824 - Using selector: KqueueSelector
+[19-07-2021 09:57:07] INFO core 4591488512 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:57:07] INFO core 4591488512 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:57:07] INFO core 4591488512 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:57:07] INFO core 4591488512 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:57:08] INFO autoreload 4591488512 - Watching for file changes with StatReloader
+[19-07-2021 15:57:10] ERROR log 123145473159168 - Internal Server Error: /login/
+Traceback (most recent call last):
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/django/core/handlers/exception.py", line 47, in inner
+    response = get_response(request)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/django/core/handlers/base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/django/views/decorators/csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/django/views/generic/base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/reincoso/account/views.py", line 70, in post
+    data['data'] = UserDetailSerializer(user.profile).data
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/django/db/models/fields/related_descriptors.py", line 421, in __get__
+    raise self.RelatedObjectDoesNotExist(
+django.contrib.auth.models.User.profile.RelatedObjectDoesNotExist: User has no profile.
+[19-07-2021 15:58:01] DEBUG selector_events 4591488512 - Using selector: KqueueSelector
+[19-07-2021 15:58:01] DEBUG selector_events 4590939648 - Using selector: KqueueSelector
+[19-07-2021 09:58:04] INFO core 4533116416 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:58:04] INFO core 4533116416 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:58:04] INFO core 4533116416 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:58:04] INFO core 4533116416 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 09:58:05] INFO core 4637601280 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 09:58:05] INFO core 4637601280 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 09:58:05] INFO core 4637601280 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 09:58:05] INFO core 4637601280 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 15:58:05] INFO autoreload 4637601280 - Watching for file changes with StatReloader
+[19-07-2021 15:59:34] WARNING log 123145403523072 - Unauthorized: /superadmin/faq/
+[19-07-2021 15:59:37] WARNING log 123145403523072 - Unauthorized: /superadmin/faq/
+[19-07-2021 15:59:39] WARNING log 123145403523072 - Unauthorized: /superadmin/faq/
+[19-07-2021 16:00:31] DEBUG selector_events 4637601280 - Using selector: KqueueSelector
+[19-07-2021 16:00:31] DEBUG selector_events 4533116416 - Using selector: KqueueSelector
+[19-07-2021 10:00:33] INFO core 4323462656 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 10:00:33] INFO core 4323462656 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 10:00:33] INFO core 4323462656 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 10:00:33] INFO core 4323462656 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 10:00:34] INFO core 4729236992 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 10:00:34] INFO core 4729236992 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 10:00:34] INFO core 4729236992 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 10:00:34] INFO core 4729236992 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 16:00:34] INFO autoreload 4729236992 - Watching for file changes with StatReloader
+[19-07-2021 16:00:52] ERROR log 123145413001216 - Internal Server Error: /login/
+Traceback (most recent call last):
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/django/core/handlers/exception.py", line 47, in inner
+    response = get_response(request)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/django/core/handlers/base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/django/views/decorators/csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/django/views/generic/base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/Olaofe/Desktop/TM30/reincoso/reincoso/account/views.py", line 70, in post
+    data['data'] = UserDetailSerializer(user.profile).data
+  File "/Users/Olaofe/Desktop/TM30/reincoso/venv/lib/python3.9/site-packages/django/db/models/fields/related_descriptors.py", line 421, in __get__
+    raise self.RelatedObjectDoesNotExist(
+django.contrib.auth.models.User.profile.RelatedObjectDoesNotExist: User has no profile.
+[19-07-2021 16:05:03] INFO autoreload 4729236992 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/account/views.py changed, reloading.
+[19-07-2021 16:05:03] DEBUG selector_events 4729236992 - Using selector: KqueueSelector
+[19-07-2021 10:05:04] INFO core 4575075840 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 10:05:04] INFO core 4575075840 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 10:05:04] INFO core 4575075840 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 10:05:04] INFO core 4575075840 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 16:05:05] INFO autoreload 4575075840 - Watching for file changes with StatReloader
+[19-07-2021 16:05:11] DEBUG selector_events 4575075840 - Using selector: KqueueSelector
+[19-07-2021 16:05:12] DEBUG selector_events 4323462656 - Using selector: KqueueSelector
+[19-07-2021 10:05:13] INFO core 4450008576 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 10:05:13] INFO core 4450008576 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 10:05:13] INFO core 4450008576 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 10:05:13] INFO core 4450008576 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 10:05:14] INFO core 4703989248 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 10:05:14] INFO core 4703989248 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 10:05:14] INFO core 4703989248 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 10:05:14] INFO core 4703989248 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 16:05:14] INFO autoreload 4703989248 - Watching for file changes with StatReloader
+[19-07-2021 16:06:21] INFO autoreload 4703989248 - /Users/Olaofe/Desktop/TM30/reincoso/reincoso/account/views.py changed, reloading.
+[19-07-2021 16:06:21] DEBUG selector_events 4703989248 - Using selector: KqueueSelector
+[19-07-2021 10:06:23] INFO core 4561448448 - $DATABASE_URL not found, falling back to previous settings!
+[19-07-2021 10:06:23] INFO core 4561448448 - Applying Heroku Staticfiles configuration to Django settings.
+[19-07-2021 10:06:23] INFO core 4561448448 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[19-07-2021 10:06:23] INFO core 4561448448 - Applying Heroku logging configuration to Django settings.
+[19-07-2021 16:06:24] INFO autoreload 4561448448 - Watching for file changes with StatReloader
+[20-07-2021 10:04:28] DEBUG selector_events 4561448448 - Using selector: KqueueSelector
+[20-07-2021 10:04:28] DEBUG selector_events 4450008576 - Using selector: KqueueSelector
+[28-07-2021 02:16:09] INFO core 4555247104 - $DATABASE_URL not found, falling back to previous settings!
+[28-07-2021 02:16:09] INFO core 4555247104 - Applying Heroku Staticfiles configuration to Django settings.
+[28-07-2021 02:16:09] INFO core 4555247104 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[28-07-2021 02:16:09] INFO core 4555247104 - Applying Heroku logging configuration to Django settings.
+[28-07-2021 02:16:13] INFO core 4483636736 - $DATABASE_URL not found, falling back to previous settings!
+[28-07-2021 02:16:13] INFO core 4483636736 - Applying Heroku Staticfiles configuration to Django settings.
+[28-07-2021 02:16:13] INFO core 4483636736 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[28-07-2021 02:16:13] INFO core 4483636736 - Applying Heroku logging configuration to Django settings.
+[28-07-2021 08:16:14] INFO autoreload 4483636736 - Watching for file changes with StatReloader
+[28-07-2021 08:16:21] DEBUG selector_events 4483636736 - Using selector: KqueueSelector
+[28-07-2021 08:16:21] DEBUG selector_events 4555247104 - Using selector: KqueueSelector
+[31-08-2021 07:38:14] INFO core 4518268416 - $DATABASE_URL not found, falling back to previous settings!
+[31-08-2021 07:38:14] INFO core 4518268416 - Applying Heroku Staticfiles configuration to Django settings.
+[31-08-2021 07:38:14] INFO core 4518268416 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[31-08-2021 07:38:14] INFO core 4518268416 - Applying Heroku logging configuration to Django settings.
+[31-08-2021 07:38:16] INFO core 4345855488 - $DATABASE_URL not found, falling back to previous settings!
+[31-08-2021 07:38:16] INFO core 4345855488 - Applying Heroku Staticfiles configuration to Django settings.
+[31-08-2021 07:38:16] INFO core 4345855488 - Applying Heroku ALLOWED_HOSTS configuration to Django settings.
+[31-08-2021 07:38:16] INFO core 4345855488 - Applying Heroku logging configuration to Django settings.
+[31-08-2021 13:38:17] INFO autoreload 4345855488 - Watching for file changes with StatReloader
