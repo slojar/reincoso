@@ -10,6 +10,10 @@ class SavingsTransactionSerializer(serializers.ModelSerializer):
 
 class SavingSerializer(serializers.ModelSerializer):
     transactions = serializers.SerializerMethodField()
+    successful_transaction = serializers.SerializerMethodField()
+
+    def get_successful_transaction(self, obj):
+        return SavingTransaction.objects.filter(saving=obj, status='success').count()
 
     def get_transactions(self, obj):
         trans = SavingTransaction.objects.filter(saving=obj)[:10]

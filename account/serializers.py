@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import *
+from .utils import get_user_analytics
 
 
 class FaqSerializer(serializers.ModelSerializer):
@@ -20,6 +21,10 @@ class UserDetailSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField()
     cards = serializers.SerializerMethodField()
     guarantors = serializers.SerializerMethodField()
+    analytics = serializers.SerializerMethodField()
+
+    def get_analytics(self, obj):
+        return get_user_analytics(obj)
 
     def get_first_name(self, obj):
         return obj.first_name()

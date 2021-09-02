@@ -32,9 +32,6 @@ class InvestmentDetailView(generics.RetrieveAPIView):
         return Response(data)
 
 
-
-
-
 class InvestView(APIView):
 
     def post(self, request):

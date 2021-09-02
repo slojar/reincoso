@@ -1,6 +1,14 @@
 import requests
+from django.db.models import Sum, Q
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+
+from investment.models import Investment
+from investment.serializers import InvestmentSerializer
+from loan.models import LoanTransaction, Loan
+from loan.serializers import LoanSerializer
+from savings.models import SavingTransaction, Saving
+from savings.serializers import SavingSerializer
 from .models import *
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
@@ -99,6 +107,55 @@ def tokenize_user_card(data, gateway=None):
 
     if UserCard.objects.filter(user=profile).count() <= 1:
         UserCard.objects.filter(user=profile).update(default=True)
+
+
+def get_user_analytics(profile):
+    data = dict()
+
+    savings = dict()
+    total_savings = SavingTransaction.objects.filter(user=profile, status='success')
+    savings['total_savings_amount'] = total_savings.aggregate(Sum('amount'))['amount__sum']
+    savings['current_saving'] = SavingSerializer(Saving.objects.filter(user=profile).last()).data
+
+    loan = dict()
+    loan_transactions = LoanTransaction.objects.filter(user=profile, status='success')
+    loan['loan_transaction_amount'] = loan_transactions.aggregate(Sum('amount'))['amount__sum']
+    loan['current_loans'] = LoanSerializer(Loan.objects.filter(user=profile, status='ongoing'), many=True).data
+    loan['total'] = Loan.objects.filter(user=profile).count()
+    loan['pending'] = Loan.objects.filter(user=profile, status='pending').count()
+    loan['processing'] = Loan.objects.filter(user=profile, status='processing').count()
+    loan['approved'] = Loan.objects.filter(user=profile, status='approved').count()
+    loan['unapproved'] = Loan.objects.filter(user=profile, status='unapproved').count()
+    loan['awaiting guarantor feedback'] = Loan.objects.filter(user=profile, status='awaiting guarantor feedback').count()
+    loan['ongoing'] = Loan.objects.filter(user=profile, status='ongoing').count()
+    loan['repaid'] = Loan.objects.filter(user=profile, status='repaid').count()
+
+    investment = dict()
+    investment['total'] = Investment.objects.filter(user=profile).count()
+    investment['pending'] = Investment.objects.filter(user=profile, status='pending').count()
+    investment['approved'] = Investment.objects.filter(user=profile, status='approved').count()
+    investment['ongoing'] = Investment.objects.filter(user=profile, status='ongoing').count()
+    investment['completed'] = Investment.objects.filter(user=profile, status='completed').count()
+    investment['rejected'] = Investment.objects.filter(user=profile, status='rejected').count()
+    investment['cancelled'] = Investment.objects.filter(user=profile, status='cancelled').count()
+    investment['failed'] = Investment.objects.filter(user=profile, status='failed').count()
+
+    query = Q(status='approved') | Q(status='ongoing') | Q(status='completed')
+    total_money_invested = Investment.objects.filter(user=profile).filter(query)
+    investment['total_money_invested'] = total_money_invested.aggregate(Sum('amount_invested'))['amount_invested__sum']
+
+    query = Q(status='ongoing')
+    total_money_expected = Investment.objects.filter(user=profile).filter(query)
+    investment['total_money_expected'] = total_money_expected.aggregate(Sum('return_on_invested'))['return_on_invested__sum'] or 0
+
+    current = Investment.objects.filter(user=profile, status='ongoing')
+    investment['current_investments'] = InvestmentSerializer(current, many=True).data
+
+    data['savings'] = savings
+    data['investment'] = investment
+    data['loan'] = loan
+
+    return data
 
 
 
