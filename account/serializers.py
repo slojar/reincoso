@@ -3,6 +3,12 @@ from .models import *
 from .utils import get_user_analytics
 
 
+class FaqCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FaqCategory
+        exclude = []
+
+
 class FaqSerializer(serializers.ModelSerializer):
     class Meta:
         model = Faq
