@@ -34,7 +34,7 @@ REST_FRAMEWORK = {
 PAYSTACK_BASE_URL = 'https://api.paystack.co'
 PAYSTACK_SECRET_KEY = 'sk_test_9b3d455a84aa3da9bf0a7610a80529dc524c377d'
 PAYSTACK_PUBLIC_KEY = 'pk_test_db348e565111ebfbc63e12ca0ad9f73d8eb93a98'
-
+PAYSTACK_REF = "COSO"
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),

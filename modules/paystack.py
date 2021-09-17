@@ -1,4 +1,6 @@
 import json
+import uuid
+
 import requests
 from django.conf import settings
 from rest_framework import status
@@ -56,6 +58,10 @@ def paystack_auto_charge(authorization_code, email, amount, **kwargs):
     payload['authorization_code'] = authorization_code
     payload['amount'] = f"{amount}00"
     payload['metadata'] = kwargs.get("metadata")
+    if kwargs.get("metadata"):
+        if kwargs.get('metadata').get("reference"):
+            payload['reference'] = kwargs.get('metadata').get("reference")
+
     payload = json.dumps(payload)
     headers = {
         'Authorization': 'Bearer {}'.format(settings.PAYSTACK_SECRET_KEY),
@@ -93,6 +99,10 @@ def get_paystack_link(email, amount, callback_url=None, metadata=None, **kwargs)
         "currency": currency,
         "metadata": metadata
     }
+    if metadata:
+        if metadata.get("reference"):
+            payload['reference'] = metadata.get("reference")
+
     payload = json.dumps(payload)
     headers = {
         'Authorization': 'Bearer {}'.format(settings.PAYSTACK_SECRET_KEY),
@@ -110,6 +120,14 @@ def get_paystack_link(email, amount, callback_url=None, metadata=None, **kwargs)
     else:
         success = False
         response = json_response
+        if json_response.get('message'):
+            response = json_response.get('message')
 
     return success, response
+
+
+def generate_payment_ref_with_paystack(uid):
+    if not settings.PAYSTACK_REF:
+        settings.PAYSTACK_REF = "COSO"
+    return f'{uid}-{settings.PAYSTACK_REF}-{uuid.uuid4()}'
 

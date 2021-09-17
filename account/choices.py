@@ -10,7 +10,7 @@ ACTIVE_STATUS_CHOICES = (
 
 APPROVAL_STATUS_CHOICES = (
     ('pending', 'Pending'),
-    ('approved', 'Approved')
+    ('approved', 'Approved'),
 )
 
 DAYS_OF_THE_MONTH_CHOICES = (
