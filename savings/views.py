@@ -20,7 +20,7 @@ from transaction.models import Transaction
 from investment.utils import approve_investment
 from django.shortcuts import get_object_or_404
 
-from .utils import get_savings_analysis
+from .utils import get_savings_analysis, create_instant_savings, create_auto_savings
 
 
 class MySavingsView(ListAPIView):
@@ -82,110 +82,33 @@ class SavingsView(APIView):
         data = dict()
         profile = request.user.profile
         data['user'] = get_savings_analysis(profile)
+        data['savings_types'] = SavingsTypeSerializer(SavingsType.objects.filter(active=True), many=True).data
         data['durations'] = SavingDurationSerializer(Duration.objects.all(), many=True).data
         data['gateways'] = PaymentGateway.objects.all().values('id', 'name', 'slug')
         return Response(data)
 
     def post(self, request):
+        success = False
+        response = ""
         data = dict()
-        amount = request.data.get('amount')
-        fixed_payment = request.data.get('fixed_payment')
-        repayment_day = request.data.get('repayment_day')
-        gateway = request.data.get('gateway')
-        payment_duration_id = request.data.get('payment_duration_id')
-        card_id = request.data.get('card_id')
+        savings_type = request.data.get('savings_type')
 
-        if not Duration.objects.filter(id=payment_duration_id).exists():
-            data['detail'] = 'Invalid payment duration'
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            savings_type = SavingsType.objects.get(id=savings_type)
+        except Exception as ex:
+            data['detail'] = f"{ex}"
+            return Response(data, status.HTTP_400_BAD_REQUEST)
 
-        email = request.user.email
-        payment_duration_id = Duration.objects.get(id=payment_duration_id)
+        if savings_type.slug == 'auto':
+            success, response = create_auto_savings(savings_type=savings_type, request=request)
 
-        if fixed_payment:
-            amount = fixed_payment
+        if savings_type.slug == 'instant':
+            success, response = create_instant_savings(savings_type=savings_type, request=request)
 
-        # Create/Update Saving Account
-        saving, created = Saving.objects.get_or_create(user=request.user.profile)
-        saving.title = payment_duration_id
-        saving.last_payment = amount
-
-        if not fixed_payment:
-            saving.amount = amount
-
-        if saving.amount <= 0 and fixed_payment:
-            saving.amount = fixed_payment
-
-        saving.last_payment_date = datetime.now()
-        saving.total = saving.total + amount
-        saving.repayment_day = repayment_day
-
-        # Calculate next repayment date
-        last_date = saving.last_payment_date
-        duration_interval = saving.title.interval
-        next_date = last_date + timedelta(days=duration_interval)
-        saving.next_payment_date = next_date
-        saving.save()
-
-        # Create saving transaction
-        transaction, created = SavingTransaction.objects.get_or_create(user=request.user.profile,
-                                                                       saving_id=saving.id, status='pending')
-        transaction.payment_method = gateway
-        transaction.amount = amount
-        transaction.save()
-
-        metadata = {
-            'transaction_id': transaction.id,
-            'payment_for': 'savings',
-        }
-
-        if card_id:
-            try:
-                card = UserCard.objects.get(id=card_id)
-                authorization_code = card.authorization_code
-                success, response = paystack_auto_charge(authorization_code, email, amount, metadata=metadata)
-                if not success:
-                    data['detail'] = "There is an error in request sent"
-                    data['data'] = response
-                    return Response(data, status.HTTP_400_BAD_REQUEST)
-
-                reference = response['data']['reference']
-
-                success, response = verify_paystack_transaction(reference)
-                if not success:
-                    data['detail'] = "There is an error in request sent"
-                    data['data'] = response
-                    return Response(data, status.HTTP_400_BAD_REQUEST)
-
-                transaction.reference = reference
-                transaction.status = 'success'
-                transaction.response = response
-                transaction.save()
-
-                data['detail'] = "Payment successful"
-                return Response(data)
-
-            except Exception as ex:
-                logging.exception(f"{ex}")
-                data = {
-                    'success': False,
-                    'detail': 'Invalid card selected',
-                    'error': str(ex)
-                }
-                return Response(data, status=status.HTTP_400_BAD_REQUEST)
-
-        if not card_id:
-            callback_url = request.data.get('callback_url')
-            if not callback_url:
-                callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
-
-            if gateway == 'paystack':
-                success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
-                if success:
-                    data['payment_link'] = response
-                else:
-                    data['detail'] = response
-            return Response(data)
+        data['detail'] = response
+        data['payment_link'] = response
+        if not success:
+            return Response(data, status.HTTP_400_BAD_REQUEST)
 
         return Response(data)
 
@@ -226,8 +149,12 @@ class VerifyPaymentView(APIView):
 
             if payment_for == 'savings':
                 trans = SavingTransaction.objects.get(id=transaction_id, user__user__email__iexact=email)
+
                 trans.reference = reference
-                trans.status = 'success'
+                if trans.status != 'success':
+                    trans.status = 'success'
+                    trans.saving.status = 'successful'
+                    trans.saving.save()
                 trans.response = response
                 trans.save()
 

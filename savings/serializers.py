@@ -36,3 +36,9 @@ class SavingTransactionSerializer(serializers.ModelSerializer):
         model = SavingTransaction
         exclude = []
 
+
+class SavingsTypeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SavingsType
+        exclude = []

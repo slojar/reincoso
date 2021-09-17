@@ -25,8 +25,29 @@ class Profile(models.Model):
     def email(self):
         return self.user.email or None
 
+    def get_wallet(self):
+        wallet, created = Wallet.objects.get_or_create(user=self)
+        data = {
+            'balance': wallet.balance,
+            'bonus': wallet.bonus,
+            'pending': wallet.pending,
+        }
+        return data
+
     def __str__(self):
         return f'{self.user} - {self.member_id}'
+
+
+class Wallet(models.Model):
+    user = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    balance = models.DecimalField(decimal_places=2, max_digits=20, default=0)
+    pending = models.DecimalField(decimal_places=2, max_digits=20, default=0)
+    bonus = models.DecimalField(decimal_places=2, max_digits=20, default=0)
+    created_on = models.DateField(auto_now_add=True)
+    updated_on = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.id}: {self.user} - {self.balance}"
 
 
 class FaqCategory(models.Model):
