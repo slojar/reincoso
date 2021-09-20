@@ -64,7 +64,7 @@ def create_instant_savings(savings_type, request):
 
     if card_id:
         try:
-            card = UserCard.objects.get(id=card_id)
+            card = UserCard.objects.get(id=card_id, user=request.user.profile)
             authorization_code = card.authorization_code
             success, response = paystack_auto_charge(authorization_code, email, amount, metadata=metadata)
             if not success:
@@ -149,7 +149,7 @@ def create_auto_savings(savings_type, request):
 
     if card_id:
         try:
-            card = UserCard.objects.get(id=card_id)
+            card = UserCard.objects.get(id=card_id, user=request.user.profile)
             authorization_code = card.authorization_code
             success, response = paystack_auto_charge(authorization_code, email, amount, metadata=metadata)
             if not success:
