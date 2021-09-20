@@ -8,7 +8,8 @@ SECRET_KEY = 'reincoso'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
 
 DATABASES = {
     'default': {
