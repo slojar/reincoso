@@ -21,6 +21,7 @@ router.register('loan-setting', AdminLoanSettingView)
 
 urlpatterns = [
     path('', AdminHomepage.as_view(), name='homepage'),
+    path('site/', AdminSiteView.as_view(), name='site'),
 ]
 
 urlpatterns += router.urls

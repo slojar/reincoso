@@ -3,6 +3,8 @@ from loan.serializers import *
 from savings.serializers import *
 from investment.serializers import *
 from settings.serializers import *
+
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -125,5 +127,11 @@ class AdminLoanSettingView(ModelViewSet):
     serializer_class = LoanSettingSerializer
     queryset = LoanSetting.objects.all()
     lookup_field = 'id'
+
+
+class AdminSiteView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = SiteSerializer
+    queryset = Site.objects.all()
 
 

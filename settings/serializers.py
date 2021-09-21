@@ -20,3 +20,9 @@ class LoanSettingSerializer(serializers.ModelSerializer):
         exclude = []
 
 
+class SiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Site
+        exclude = []
+
+
