@@ -123,7 +123,7 @@ class AdminPaymentGatewayView(ModelViewSet):
     
     
 class AdminLoanSettingView(ModelViewSet):
-    permission_classes = [IsAdminUser]
+    permission_classes = []
     serializer_class = LoanSettingSerializer
     queryset = LoanSetting.objects.all()
     lookup_field = 'id'

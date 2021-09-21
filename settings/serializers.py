@@ -13,7 +13,7 @@ class PaymentGatewaySerializer(serializers.ModelSerializer):
         model = PaymentGateway
         exclude = []
         
-        
+
 class LoanSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = LoanSetting
@@ -24,5 +24,4 @@ class SiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Site
         exclude = []
-
 
