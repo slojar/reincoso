@@ -37,7 +37,7 @@ class AdminHomepage(APIView):
 
 
 class AdminFaqView(ModelViewSet):
-    permission_classes = []
+    permission_classes = [IsAdminUser]
     serializer_class = FaqSerializer
     queryset = Faq.objects.all()
     lookup_field = 'id'
