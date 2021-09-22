@@ -141,7 +141,7 @@ class AdminSiteView(generics.ListAPIView):
     queryset = Site.objects.all()
 
 
-class AdminInvestmentDuration(ModelViewSet):
+class AdminInvestmentDurationView(ModelViewSet):
     permission_classes = [IsAdminUser]
     serializer_class = InvestmentDurationSerializer
     queryset = InvestmentDuration.objects.all()
@@ -202,6 +202,13 @@ class AdminProfileView(APIView, CustomPagination):
             return Response({'detail': 'profile deleted successfully'})
         except Exception as ex:
             return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminAvailableInvestmentView(ModelViewSet):
+    permission_classes = []
+    serializer_class = AvailableInvestmentSerializer
+    queryset = AvailableInvestment.objects.all()
+    lookup_field = 'id'
 
 
 
