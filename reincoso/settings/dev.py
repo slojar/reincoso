@@ -4,7 +4,8 @@ from decouple import config
 import logging
 
 
-SECRET_KEY = 'reincoso'
+# SECRET_KEY = 'reincoso'
+SECRET_KEY = 'b0e0f111-6bd2-4d10-5z24-9r462j273ge6-do-user-dfgrjiu000642'
 
 DEBUG = True
 

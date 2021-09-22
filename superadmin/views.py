@@ -1,14 +1,20 @@
 from account.serializers import *
+from account.utils import signup, reformat_phone_number
 from loan.serializers import *
+from loan.paginations import CustomPagination
 from savings.serializers import *
 from investment.serializers import *
 from settings.serializers import *
+from account.utils import encrypt_text
 
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser
+
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import make_password
 
 
 class AdminHomepage(APIView):
@@ -59,8 +65,8 @@ class AdminFeedbackMessageView(ModelViewSet):
     lookup_field = 'id'
 
 
-class AdminProfileView(ModelViewSet):
-    permission_classes = [IsAdminUser]
+class AdminProfileViewOld(ModelViewSet):
+    permission_classes = []
     serializer_class = UserDetailSerializer
     queryset = Profile.objects.all()
     lookup_field = 'id'
@@ -102,7 +108,7 @@ class AdminInvestmentOptionView(ModelViewSet):
 
 
 class AdminInvestmentSpecificationView(ModelViewSet):
-    permission_classes = [IsAdminUser]
+    permission_classes = []
     serializer_class = InvestmentSpecificationSerializer
     queryset = InvestmentSpecification.objects.all()
     lookup_field = 'id'
@@ -133,5 +139,71 @@ class AdminSiteView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = SiteSerializer
     queryset = Site.objects.all()
+
+
+class AdminInvestmentDuration(ModelViewSet):
+    permission_classes = []
+    serializer_class = InvestmentDurationSerializer
+    queryset = InvestmentDuration.objects.all()
+    lookup_field = 'id'
+
+
+class AdminProfileView(APIView, CustomPagination):
+    permission_classes = []
+
+    def get(self, request, profile_id=None):
+        if profile_id:
+            user = Profile.objects.get(id=profile_id)
+            serializer = UserDetailSerializer(user).data
+        else:
+            user = Profile.objects.all()
+            user = self.paginate_queryset(user, request)
+            user = UserDetailSerializer(user, many=True).data
+            serializer = self.get_paginated_response(user).data
+        return Response(serializer)
+
+    def post(self, request):
+        data = dict()
+        success, detail = signup(request)
+        data['success'] = success
+        data['detail'] = detail
+        if not success:
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data)
+
+    def put(self, request, profile_id):
+        try:
+            phone_number = request.data.get('phone_number')
+            bvn = request.data.get('bvn')
+
+            profile = get_object_or_404(Profile, id=profile_id)
+            profile.user.first_name = request.data.get('first_name')
+            profile.user.last_name = request.data.get('last_name')
+            profile.user.email = request.data.get('email')
+            profile.gender = request.data.get('gender')
+            profile.paid_membership_fee = request.data.get('paid_membership_fee')
+            profile.member_id = request.data.get('member_id')
+            profile.bvn = encrypt_text(bvn)
+            profile.status = request.data.get('status')
+            if phone_number:
+                profile.user.username = reformat_phone_number(phone_number)
+                profile.user.password = make_password(phone_number)
+                profile.phone_number = reformat_phone_number(phone_number)
+
+            profile.user.save()
+            profile.save()
+            data = UserDetailSerializer(profile).data
+            return Response(data)
+        except Exception as ex:
+            return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, profile_id):
+        try:
+            profile = get_object_or_404(Profile, id=profile_id)
+            profile.delete()
+            return Response({'detail': 'profile deleted successfully'})
+        except Exception as ex:
+            return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 

@@ -37,10 +37,9 @@ class AvailableInvestmentSerializer(serializers.ModelSerializer):
 
 
 class InvestmentSpecificationSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = InvestmentSpecification
-        exclude = ['visible']
+        exclude = []
 
 
 class InvestmentSerializer(serializers.ModelSerializer):
