@@ -174,7 +174,6 @@ class AdminProfileView(APIView, CustomPagination):
     def put(self, request, profile_id):
         try:
             phone_number = request.data.get('phone_number')
-            bvn = request.data.get('bvn')
 
             profile = get_object_or_404(Profile, id=profile_id)
             profile.user.first_name = request.data.get('first_name')
@@ -182,7 +181,6 @@ class AdminProfileView(APIView, CustomPagination):
             profile.user.email = request.data.get('email')
             profile.gender = request.data.get('gender')
             profile.paid_membership_fee = request.data.get('paid_membership_fee')
-            profile.bvn = encrypt_text(bvn)
             profile.status = request.data.get('status')
             if phone_number:
                 phone_number = reformat_phone_number(phone_number)
