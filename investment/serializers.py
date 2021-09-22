@@ -20,7 +20,7 @@ class InvestmentOptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InvestmentOption
-        exclude = ['status']
+        exclude = []
         depth = 2
 
 
