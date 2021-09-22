@@ -182,13 +182,13 @@ class AdminProfileView(APIView, CustomPagination):
             profile.user.email = request.data.get('email')
             profile.gender = request.data.get('gender')
             profile.paid_membership_fee = request.data.get('paid_membership_fee')
-            profile.member_id = request.data.get('member_id')
             profile.bvn = encrypt_text(bvn)
             profile.status = request.data.get('status')
             if phone_number:
-                profile.user.username = reformat_phone_number(phone_number)
+                phone_number = reformat_phone_number(phone_number)
+                profile.user.username = phone_number
                 profile.user.password = make_password(phone_number)
-                profile.phone_number = reformat_phone_number(phone_number)
+                profile.phone_number = phone_number
 
             profile.user.save()
             profile.save()
