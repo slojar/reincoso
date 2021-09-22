@@ -66,7 +66,7 @@ class AdminFeedbackMessageView(ModelViewSet):
 
 
 class AdminProfileViewOld(ModelViewSet):
-    permission_classes = []
+    permission_classes = [IsAdminUser]
     serializer_class = UserDetailSerializer
     queryset = Profile.objects.all()
     lookup_field = 'id'
@@ -108,7 +108,7 @@ class AdminInvestmentOptionView(ModelViewSet):
 
 
 class AdminInvestmentSpecificationView(ModelViewSet):
-    permission_classes = []
+    permission_classes = [IsAdminUser]
     serializer_class = InvestmentSpecificationSerializer
     queryset = InvestmentSpecification.objects.all()
     lookup_field = 'id'
@@ -129,7 +129,7 @@ class AdminPaymentGatewayView(ModelViewSet):
     
     
 class AdminLoanSettingView(ModelViewSet):
-    permission_classes = []
+    permission_classes = [IsAdminUser]
     serializer_class = LoanSettingSerializer
     queryset = LoanSetting.objects.all()
     lookup_field = 'id'
@@ -142,14 +142,14 @@ class AdminSiteView(generics.ListAPIView):
 
 
 class AdminInvestmentDuration(ModelViewSet):
-    permission_classes = []
+    permission_classes = [IsAdminUser]
     serializer_class = InvestmentDurationSerializer
     queryset = InvestmentDuration.objects.all()
     lookup_field = 'id'
 
 
 class AdminProfileView(APIView, CustomPagination):
-    permission_classes = []
+    permission_classes = [IsAdminUser]
 
     def get(self, request, profile_id=None):
         if profile_id:
