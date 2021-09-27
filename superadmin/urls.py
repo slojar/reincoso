@@ -14,7 +14,7 @@ router.register('loan-transaction', AdminLoanTransactionView)
 router.register('saving-duration', AdminSavingDurationView)
 router.register('saving-transaction', AdminSavingTransactionView)
 router.register('available-investment', AdminAvailableInvestmentView)
-router.register('investment-option', AdminInvestmentOptionView)
+# router.register('investment-option', AdminInvestmentOptionView)
 router.register('investment-duration', AdminInvestmentDurationView)
 router.register('investment-specifiication', AdminInvestmentSpecificationView)
 router.register('general-setting', AdminGeneralSettingView)
@@ -26,6 +26,8 @@ urlpatterns = [
     path('users/', AdminProfileView.as_view(), name='user'),
     path('users/<int:profile_id>/', AdminProfileView.as_view(), name='user-detail'),
     path('site/', AdminSiteView.as_view(), name='site'),
+    path('investment-option/', AdminInvestmentOptionView.as_view(), name='investment-option'),
+    path('investment-option/<int:pk>/', AdminInvestmentOptionView.as_view(), name='investment-option-detail'),
 ]
 
 urlpatterns += router.urls

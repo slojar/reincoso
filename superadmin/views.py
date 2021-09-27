@@ -100,13 +100,6 @@ class AdminSavingTransactionView(ModelViewSet):
     lookup_field = 'id'
 
 
-class AdminInvestmentOptionView(ModelViewSet):
-    permission_classes = []
-    serializer_class = InvestmentOptionSerializer
-    queryset = InvestmentOption.objects.all()
-    lookup_field = 'id'
-
-
 class AdminInvestmentSpecificationView(ModelViewSet):
     permission_classes = [IsAdminUser]
     serializer_class = InvestmentSpecificationSerializer
@@ -145,6 +138,13 @@ class AdminInvestmentDurationView(ModelViewSet):
     permission_classes = [IsAdminUser]
     serializer_class = InvestmentDurationSerializer
     queryset = InvestmentDuration.objects.all()
+    lookup_field = 'id'
+
+
+class AdminAvailableInvestmentView(ModelViewSet):
+    permission_classes = [IsAdminUser]
+    serializer_class = AvailableInvestmentSerializer
+    queryset = AvailableInvestment.objects.all()
     lookup_field = 'id'
 
 
@@ -204,11 +204,57 @@ class AdminProfileView(APIView, CustomPagination):
             return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class AdminAvailableInvestmentView(ModelViewSet):
-    permission_classes = []
-    serializer_class = AvailableInvestmentSerializer
-    queryset = AvailableInvestment.objects.all()
-    lookup_field = 'id'
+
+class AdminInvestmentOptionView(APIView, CustomPagination):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, pk=None):
+        try:
+            if pk:
+                option = InvestmentOption.objects.get(id=pk)
+                option = InvestmentOptionSerializer(option).data
+            else:
+                option = InvestmentOption.objects.all().order_by('-id')
+                option = self.paginate_queryset(option, request)
+                data = InvestmentOptionSerializer(option, many=True).data
+                option = self.get_paginated_response(data).data
+            return Response(option)
+        except Exception as ex:
+            return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        name = request.data.get('name')
+        status = request.data.get('status')
+        available_investment = request.data.get('available_investment')
+        durations = request.data.get('duration')
+
+        if not name:
+            return Response({'detail': "name is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not available_investment:
+            return Response({'detail': "available_investment is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not durations:
+            return Response({'detail': "duration is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        option, created = InvestmentOption.objects.get_or_create(name=name,
+                                                                 available_investment_id=available_investment)
+        option.status = status
+        if durations:
+            option.duration.clear()
+            for duration in durations:
+                option.duration.add(duration)
+        option.save()
+
+        data = InvestmentOptionSerializer(option).data
+        return Response(data)
+
+    def delete(self, request, pk):
+        try:
+            option = get_object_or_404(InvestmentOption, id=pk)
+            option.delete()
+        except Exception as ex:
+            return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Investment Option deleted successfully'})
+
 
 
 
