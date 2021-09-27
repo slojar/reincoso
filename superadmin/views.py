@@ -247,6 +247,24 @@ class AdminInvestmentOptionView(APIView, CustomPagination):
         data = InvestmentOptionSerializer(option).data
         return Response(data)
 
+    def put(self, request, pk):
+        durations = request.data.get('duration')
+
+        try:
+            option = get_object_or_404(InvestmentOption, id=pk)
+            option.name = request.data.get('name')
+            option.status = request.data.get('status')
+            option.available_investment_id = request.data.get('available_investment')
+            if durations:
+                option.duration.clear()
+                for duration in durations:
+                    option.duration.add(duration)
+            option.save()
+            data = InvestmentOptionSerializer(option).data
+            return Response(data)
+        except Exception as ex:
+            return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request, pk):
         try:
             option = get_object_or_404(InvestmentOption, id=pk)
