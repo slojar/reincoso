@@ -101,7 +101,7 @@ class AdminSavingTransactionView(ModelViewSet):
 
 
 class AdminInvestmentOptionView(ModelViewSet):
-    permission_classes = [IsAdminUser]
+    permission_classes = []
     serializer_class = InvestmentOptionSerializer
     queryset = InvestmentOption.objects.all()
     lookup_field = 'id'
