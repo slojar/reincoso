@@ -38,6 +38,7 @@ class Saving(models.Model):
     next_payment_date = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=50, default='pending', choices=SAVINGS_STATUS_CHOICES)
     auto_save = models.BooleanField(default=True)
+    payment_gateway = models.CharField(max_length=50, choices=PAYMENT_GATEWAYS, default='paystack')
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
@@ -48,7 +49,7 @@ class Saving(models.Model):
 class SavingTransaction(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     saving = models.ForeignKey(Saving, on_delete=models.CASCADE)
-    payment_method = models.CharField(max_length=100, choices=PAYMENT_GATEWAYS, default='paystack')
+    payment_gateway = models.CharField(max_length=100, choices=PAYMENT_GATEWAYS, default='paystack')
     amount = models.DecimalField(decimal_places=2, max_digits=20, default=0)
     reference = models.CharField(max_length=100, null=True)
     status = models.CharField(max_length=50, choices=TRANSACTION_STATUS)

@@ -19,6 +19,8 @@ from modules.paystack import paystack_auto_charge
 from transaction.models import Transaction
 from investment.utils import approve_investment
 from django.shortcuts import get_object_or_404
+from rest_framework import permissions
+
 
 from .utils import get_savings_analysis, create_instant_savings, create_auto_savings
 
@@ -78,6 +80,7 @@ class SavingTransactionDetailView(RetrieveAPIView):
 
 
 class SavingsView(APIView):
+
     def get(self, request):
         data = dict()
         profile = request.user.profile

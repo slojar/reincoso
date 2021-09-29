@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+
+from transaction.choices import PAYMENT_GATEWAYS
 from .choices import *
 from django.utils.text import slugify
 import uuid
@@ -103,7 +105,7 @@ class UserCard(models.Model):
     exp_year = models.CharField(max_length=4, null=True)
     signature = models.CharField(max_length=200, null=True)
     authorization_code = models.CharField(max_length=200, null=True)
-    gateway = models.CharField(max_length=50, null=True, default='paystack')
+    gateway = models.CharField(max_length=50, null=True, default='paystack', choices=PAYMENT_GATEWAYS)
     payload = models.TextField(null=True)
     default = models.BooleanField(default=False, null=True)
     created_on = models.DateTimeField(auto_now_add=True)

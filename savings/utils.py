@@ -6,6 +6,7 @@ from django.utils.timezone import datetime
 from django.db.models import Sum
 
 from account.models import UserCard
+from account.utils import credit_user_account
 from modules.paystack import generate_payment_ref_with_paystack, paystack_auto_charge, verify_paystack_transaction, \
     get_paystack_link
 from .models import *
@@ -49,17 +50,12 @@ def create_instant_savings(savings_type, request):
     saving.save()
 
     # Create saving transaction
-    transaction_reference = generate_payment_ref_with_paystack(uid=f"SAV-{saving.id}")
-    transaction, created = SavingTransaction.objects.get_or_create(user=profile, saving_id=saving.id, status='pending')
-    transaction.payment_method = gateway
-    transaction.reference = transaction_reference
-    transaction.amount = amount
-    transaction.save()
+    transaction = create_savings_transaction(saving=saving, amount=amount, gateway=gateway)
 
     metadata = {
         'transaction_id': transaction.id,
         'payment_for': 'savings',
-        'reference': transaction_reference
+        'reference': transaction.transaction_reference
     }
 
     if card_id:
@@ -102,6 +98,32 @@ def create_instant_savings(savings_type, request):
     return success, response
 
 
+def create_savings_transaction(saving, amount, gateway='paystack'):
+    user = saving.user
+    transaction_reference = generate_payment_ref_with_paystack(uid=f"SAV-{saving.id}")
+    transaction, created = SavingTransaction.objects.get_or_create(user=user, saving_id=saving.id, status='pending')
+    transaction.payment_method = gateway
+    transaction.reference = transaction_reference
+    transaction.amount = amount
+    transaction.save()
+    return transaction
+
+
+def update_savings_payment(saving, amount):
+    saving.last_payment = amount
+    saving.last_payment_date = timezone.now()
+    saving.total += amount
+
+    next_date = saving.last_payment_date + timedelta(days=saving.duration.number_of_day)
+    saving.next_payment_date = next_date
+    saving.auto_save = True
+    saving.save()
+
+    credit_user_account(user=saving.user.user, amount=amount)
+
+    return saving
+
+
 def create_auto_savings(savings_type, request):
     success = False
     response = ""
@@ -121,30 +143,19 @@ def create_auto_savings(savings_type, request):
     # Create/Update Saving Account
     saving, created = Saving.objects.get_or_create(user=profile, type=savings_type, amount=amount, status='pending')
     saving.duration = payment_duration
-    saving.amount = amount
-    saving.total = amount
     saving.payment_day = payment_day
-    saving.last_payment = amount
-    saving.last_payment_date = timezone.now()
-
-    # Calculate next repayment date
-    next_date = saving.last_payment_date + timedelta(days=saving.duration.number_of_day)
-    saving.next_payment_date = next_date
-    saving.auto_save = True
     saving.save()
 
+    # Update savings payment
+    saving = update_savings_payment(saving, amount)
+
     # Create saving transaction
-    transaction_reference = generate_payment_ref_with_paystack(uid=f"SAV-{saving.id}")
-    transaction, created = SavingTransaction.objects.get_or_create(user=request.user.profile, saving_id=saving.id, status='pending')
-    transaction.payment_method = gateway
-    transaction.reference = transaction_reference
-    transaction.amount = amount
-    transaction.save()
+    transaction = create_savings_transaction(saving=saving, amount=amount, gateway=gateway)
 
     metadata = {
         'transaction_id': transaction.id,
         'payment_for': 'savings',
-        'reference': transaction_reference,
+        'reference': transaction.reference,
     }
 
     if card_id:
@@ -187,8 +198,5 @@ def create_auto_savings(savings_type, request):
 
     return success, response
 
-
-def auto_save_cron():
-    ...
 
 

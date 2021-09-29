@@ -1,4 +1,7 @@
+import decimal
+
 import requests
+from django.db import transaction
 from django.db.models import Sum, Q
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -16,6 +19,28 @@ import logging
 import json
 
 log = logging.getLogger(__name__)
+
+
+def credit_user_account(user, amount):
+    user.refresh_from_db()
+    profile = user.profile
+    with transaction.atomic():
+        wallet, new_wallet = Wallet.objects.select_for_update().get_or_create(user=profile)
+        wallet.balance += decimal.Decimal(amount)
+        wallet.save()
+    user.refresh_from_db()
+    return user
+
+
+def debit_user_account(user, amount):
+    user.refresh_from_db()
+    profile = user.profile
+    with transaction.atomic():
+        wallet, new_wallet = Wallet.objects.select_for_update().get_or_create(user=profile)
+        wallet.balance -= decimal.Decimal(amount)
+        wallet.save()
+    user.refresh_from_db()
+    return user
 
 
 def reformat_phone_number(phone_number):
@@ -76,6 +101,7 @@ def signup(request):
 
 
 def tokenize_user_card(data, gateway=None):
+    print('here')
     if not data:
         return False
     data = data['payload']

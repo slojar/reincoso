@@ -9,7 +9,7 @@ class SavingsTypeAdmin(admin.ModelAdmin):
 
 class SavingTransactionAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'saving', 'amount', 'status', 'reference', 'created_on', 'updated_on']
-    list_filter = ['status', 'payment_method']
+    list_filter = ['status', 'payment_gateway']
     search_fields = ['reference']
     ordering = ['-id']
 

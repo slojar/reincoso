@@ -52,13 +52,19 @@ def paystack_auto_charge(authorization_code, email, amount, **kwargs):
     success = False
     url = settings.PAYSTACK_BASE_URL + "/transaction/charge_authorization"
     amount = round(float(amount))
+
+    reference = kwargs.get('reference')
+    metadata = kwargs.get("metadata")
+
     payload = dict()
     payload['authorization_code'] = authorization_code
     payload['email'] = email
     payload['authorization_code'] = authorization_code
     payload['amount'] = f"{amount}00"
     payload['metadata'] = kwargs.get("metadata")
-    if kwargs.get("metadata"):
+    if reference:
+        payload['reference'] = reference
+    if metadata:
         if kwargs.get('metadata').get("reference"):
             payload['reference'] = kwargs.get('metadata').get("reference")
 
