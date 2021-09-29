@@ -12,7 +12,7 @@ class FaqCategorySerializer(serializers.ModelSerializer):
 class FaqSerializer(serializers.ModelSerializer):
     class Meta:
         model = Faq
-        exclude = ['id']
+        exclude = []
 
 
 class FeedbackMessageSerializer(serializers.ModelSerializer):

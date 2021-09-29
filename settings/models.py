@@ -25,7 +25,7 @@ class PaymentGateway(models.Model):
 
 
 class LoanSetting(models.Model):
-    site = models.OneToOneField(Site, on_delete=models.SET_NULL, null=True)
+    site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True, unique=False)
     eligibility_days = models.IntegerField(default=180, help_text='This is the number of days user must have saved '
                                                                   'before eligible for loan')
     maximum_loan = models.IntegerField(default=1, help_text='This is the maximum time a user can apply for loan when '

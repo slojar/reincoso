@@ -10,7 +10,7 @@ import uuid
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20)
-    bvn = models.CharField(max_length=20)
+    bvn = models.CharField(max_length=300)
     member_id = models.CharField(max_length=200, editable=False, blank=True, null=True)
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='male')
     status = models.CharField(max_length=20, choices=ACTIVE_STATUS_CHOICES, default='active')

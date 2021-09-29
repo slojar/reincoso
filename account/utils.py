@@ -1,9 +1,14 @@
 import decimal
 
 import requests
+<<<<<<< HEAD
 from django.db import transaction
+=======
+import logging
+import json
+import base64
+>>>>>>> 668549e8d5245ea8f63e57b7e5e0d02df88b36bb
 from django.db.models import Sum, Q
-from rest_framework import status
 from rest_framework.authtoken.models import Token
 
 from investment.models import Investment
@@ -15,12 +20,13 @@ from savings.serializers import SavingSerializer
 from .models import *
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
-import logging
-import json
+
+from cryptography.fernet import Fernet
 
 log = logging.getLogger(__name__)
 
 
+<<<<<<< HEAD
 def credit_user_account(user, amount):
     user.refresh_from_db()
     profile = user.profile
@@ -41,6 +47,20 @@ def debit_user_account(user, amount):
         wallet.save()
     user.refresh_from_db()
     return user
+=======
+def encrypt_text(text: str):
+    key = base64.urlsafe_b64encode(settings.SECRET_KEY.encode()[:32])
+    fernet = Fernet(key)
+    secure = fernet.encrypt(f"{text}".encode())
+    return secure.decode()
+
+
+def decrypt_text(text: str):
+    key = base64.urlsafe_b64encode(settings.SECRET_KEY.encode()[:32])
+    fernet = Fernet(key)
+    decrypt = fernet.decrypt(text.encode())
+    return decrypt.decode()
+>>>>>>> 668549e8d5245ea8f63e57b7e5e0d02df88b36bb
 
 
 def reformat_phone_number(phone_number):
@@ -80,20 +100,18 @@ def signup(request):
 
     password = phone_number
     user, created = User.objects.get_or_create(username=phone_number)
-    if created:
-        user.first_name = first_name
-        user.last_name = last_name
-        user.email = email
-        user.password = make_password(password)
-        user.save()
+    user.first_name = first_name
+    user.last_name = last_name
+    user.email = email
+    user.password = make_password(password)
+    user.save()
 
     Token.objects.create(user=user)
     profile, created = Profile.objects.get_or_create(user=user)
-    if created:
-        profile.phone_number = phone_number
-        profile.bvn = bvn
-        profile.gender = gender
-        profile.save()
+    profile.phone_number = phone_number
+    profile.bvn = encrypt_text(bvn)
+    profile.gender = gender
+    profile.save()
 
     success = True
     detail = 'Account created successfully'

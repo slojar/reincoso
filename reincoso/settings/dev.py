@@ -4,17 +4,29 @@ from decouple import config
 import logging
 
 
-SECRET_KEY = 'reincoso'
+# SECRET_KEY = 'reincoso'
+SECRET_KEY = 'b0e0f111-6bd2-4d10-5z24-9r462j273ge6-do-user-dfgrjiu000642'
 
 DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = []
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / config('DB_NAME', 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / config('DB_NAME', 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd2g9vc9qhqk11p',
+        'USER': 'oufhmuryqtsroa',
+        'PASSWORD': '5ab865b7eeb173c123d306829d55c362c1cf18c60013d8fde5e727c89b4ff0d4',
+        'HOST': 'ec2-54-217-15-9.eu-west-1.compute.amazonaws.com',
+        'PORT': '5432',
     }
 }
 

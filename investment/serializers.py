@@ -20,7 +20,7 @@ class InvestmentOptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InvestmentOption
-        exclude = ['status']
+        exclude = []
         depth = 2
 
 
@@ -28,8 +28,10 @@ class AvailableInvestmentSerializer(serializers.ModelSerializer):
     options = serializers.SerializerMethodField()
 
     def get_options(self, obj):
-        query = InvestmentOption.objects.filter(available_investment=obj, status='active')
-        return InvestmentOptionSerializer(query, many=True).data
+        if InvestmentOption.objects.filter(available_investment=obj, status='active').exists():
+            query = InvestmentOption.objects.filter(available_investment=obj, status='active')
+            return InvestmentOptionSerializer(query, many=True).data
+        return None
 
     class Meta:
         model = AvailableInvestment
@@ -37,10 +39,9 @@ class AvailableInvestmentSerializer(serializers.ModelSerializer):
 
 
 class InvestmentSpecificationSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = InvestmentSpecification
-        exclude = ['visible']
+        exclude = []
 
 
 class InvestmentSerializer(serializers.ModelSerializer):

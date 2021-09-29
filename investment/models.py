@@ -133,5 +133,3 @@ class InvestmentTransaction(models.Model):
 
 
 
-
-
