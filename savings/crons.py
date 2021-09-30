@@ -7,7 +7,7 @@ from account.models import UserCard
 from account.utils import tokenize_user_card
 from modules.paystack import paystack_auto_charge, generate_payment_ref_with_paystack, verify_paystack_transaction
 from savings.models import Saving
-from savings.utils import create_savings_transaction, update_savings_payment
+from savings.utils import create_savings_transaction, update_savings_payment, process_savings_payment_with_card
 
 
 def auto_save_cron():
@@ -41,31 +41,7 @@ def auto_save_cron():
             # notify user of card unavailability via email
 
         if card:
-            if card.gateway == 'paystack':
-                authorization_code = card.authorization_code
-                email = card.email
-                transaction = create_savings_transaction(saving=saving, amount=amount, gateway=gateway)
-                metadata = {
-                    'reference': transaction.reference,
-                    'transaction_id': transaction.id,
-                    'payment_for': 'savings',
-                }
-                success, response = paystack_auto_charge(authorization_code=authorization_code, email=email,
-                                                         amount=amount, metadata=metadata)
-                if success is True:
-                    success, response = verify_paystack_transaction(reference=transaction.reference)
-                    transaction.response = response
-                    if success is True:
-                        Thread(target=tokenize_user_card, kwargs={'data': response, 'gateway': gateway}).start()
-                        transaction.status = 'success'
-                    transaction.save()
-
-            if success is True:
-                saving = update_savings_payment(saving, amount)
-                saving.status = 'successful'
-                saving.save()
-                # notify user of successful auto savings
-                # Thread().start()
+            process_savings_payment_with_card(saving=saving, card=card, amount=amount)
 
 
 # print(auto_save_cron())

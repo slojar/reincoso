@@ -1,12 +1,13 @@
 import logging
 from datetime import timedelta
+from threading import Thread
 
 from django.utils import timezone
 from django.utils.timezone import datetime
 from django.db.models import Sum
 
 from account.models import UserCard
-from account.utils import credit_user_account
+from account.utils import credit_user_account, tokenize_user_card
 from modules.paystack import generate_payment_ref_with_paystack, paystack_auto_charge, verify_paystack_transaction, \
     get_paystack_link
 from .models import *
@@ -18,6 +19,44 @@ def get_savings_analysis(profile):
     total_savings = total_savings.aggregate(Sum('amount'))['amount__sum']
     data['total_savings_amount'] = total_savings
     return data
+
+
+def process_savings_payment_with_card(saving, card, amount):
+    success = False
+    response = {}
+    authorization_code = card.authorization_code
+    email = card.email
+    gateway = card.gateway
+
+    # Create saving transaction
+    transaction = create_savings_transaction(saving=saving, amount=amount, gateway=gateway)
+
+    if card.gateway == 'paystack':
+        metadata = {
+            'reference': transaction.reference,
+            'transaction_id': transaction.id,
+            'payment_for': 'savings',
+        }
+        success, response = paystack_auto_charge(authorization_code=authorization_code, email=email,
+                                                 amount=amount, metadata=metadata)
+        if success is True:
+            success, response = verify_paystack_transaction(reference=transaction.reference)
+            transaction.response = response
+            if success is True:
+                Thread(target=tokenize_user_card, kwargs={'data': response, 'gateway': gateway}).start()
+                transaction.status = 'success'
+            transaction.save()
+
+    if not success:
+        return False, response
+
+    saving = update_savings_payment(saving, amount)
+    saving.status = 'successful'
+    saving.save()
+    # notify user of successful auto savings
+    # Thread().start()
+
+    return True, "Payment Successful"
 
 
 def create_instant_savings(savings_type, request):
@@ -37,7 +76,8 @@ def create_instant_savings(savings_type, request):
         return False, f"{ex}"
 
     # Create/Update Saving Account
-    saving, created = Saving.objects.get_or_create(user=profile, type=savings_type, amount=amount, status='pending')
+    saving, created = Saving.objects.get_or_create(user=profile, type=savings_type, amount=amount, auto_save=False)
+    saving.auto_save = False
     saving.type = savings_type
     saving.duration = payment_duration
     saving.amount = amount
@@ -46,40 +86,14 @@ def create_instant_savings(savings_type, request):
     saving.last_payment = amount
     saving.last_payment_date = timezone.now()
     saving.next_payment_date = timezone.now()
-    saving.auto_save = False
     saving.save()
-
-    # Create saving transaction
-    transaction = create_savings_transaction(saving=saving, amount=amount, gateway=gateway)
-
-    metadata = {
-        'transaction_id': transaction.id,
-        'payment_for': 'savings',
-        'reference': transaction.transaction_reference
-    }
 
     if card_id:
         try:
             card = UserCard.objects.get(id=card_id, user=request.user.profile)
-            authorization_code = card.authorization_code
-            success, response = paystack_auto_charge(authorization_code, email, amount, metadata=metadata)
-            if not success:
+            success, response = process_savings_payment_with_card(saving=saving, card=card, amount=amount)
+            if success is False:
                 return False, response
-
-            reference = response['data']['reference']
-
-            success, response = verify_paystack_transaction(reference)
-            if not success:
-                return False, response
-
-            saving.status = 'successful'
-            saving.save()
-
-            transaction.reference = reference
-            transaction.status = 'success'
-            transaction.response = response
-            transaction.save()
-
             return True, "Payment Successful"
 
         except Exception as ex:
@@ -87,12 +101,21 @@ def create_instant_savings(savings_type, request):
             return False, f"{ex}"
 
     if not card_id:
+        # Create saving transaction
+        transaction = create_savings_transaction(saving=saving, amount=amount, gateway=gateway)
+
         callback_url = request.data.get('callback_url')
         if not callback_url:
             callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
 
         if gateway == 'paystack':
-            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
+            metadata = {
+                'reference': transaction.reference,
+                'transaction_id': transaction.id,
+                'payment_for': 'savings',
+            }
+            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url,
+                                                  metadata=metadata)
             return success, response
 
     return success, response
@@ -141,45 +164,17 @@ def create_auto_savings(savings_type, request):
         return False, f"{ex}"
 
     # Create/Update Saving Account
-    saving, created = Saving.objects.get_or_create(user=profile, type=savings_type, amount=amount, status='pending')
+    saving, created = Saving.objects.get_or_create(user=profile, type=savings_type, amount=amount, auto_save=True)
     saving.duration = payment_duration
     saving.payment_day = payment_day
     saving.save()
 
-    # Update savings payment
-    saving = update_savings_payment(saving, amount)
-
-    # Create saving transaction
-    transaction = create_savings_transaction(saving=saving, amount=amount, gateway=gateway)
-
-    metadata = {
-        'transaction_id': transaction.id,
-        'payment_for': 'savings',
-        'reference': transaction.reference,
-    }
-
     if card_id:
         try:
             card = UserCard.objects.get(id=card_id, user=request.user.profile)
-            authorization_code = card.authorization_code
-            success, response = paystack_auto_charge(authorization_code, email, amount, metadata=metadata)
-            if not success:
+            success, response = process_savings_payment_with_card(saving=saving, card=card, amount=amount)
+            if success is False:
                 return False, response
-
-            reference = response['data']['reference']
-
-            success, response = verify_paystack_transaction(reference)
-            if not success:
-                return False, response
-
-            saving.status = 'successful'
-            saving.save()
-
-            transaction.reference = reference
-            transaction.status = 'success'
-            transaction.response = response
-            transaction.save()
-
             return True, "Payment Successful"
 
         except Exception as ex:
@@ -187,16 +182,20 @@ def create_auto_savings(savings_type, request):
             return False, f"{ex}"
 
     if not card_id:
+        # Create saving transaction
+        transaction = create_savings_transaction(saving=saving, amount=amount, gateway=gateway)
+
         callback_url = request.data.get('callback_url')
         if not callback_url:
             callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
 
         if gateway == 'paystack':
-            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url,
-                                                  metadata=metadata)
+            metadata = {
+                'transaction_id': transaction.id,
+                'payment_for': 'savings',
+                'reference': transaction.reference,
+            }
+            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
             return success, response
 
     return success, response
-
-
-
