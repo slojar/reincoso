@@ -64,7 +64,7 @@ def create_instant_savings(savings_type, request):
     response = ""
     amount = request.data.get('amount')
     gateway = request.data.get('gateway')
-    payment_duration_id = request.data.get('payment_duration_id')
+    payment_duration_id = request.data.get('payOment_duration_id')
     card_id = request.data.get('card_id')
 
     email = request.user.email
