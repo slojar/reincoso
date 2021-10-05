@@ -140,6 +140,7 @@ def update_savings_payment(saving, amount):
     next_date = saving.last_payment_date + timedelta(days=saving.duration.number_of_day)
     saving.next_payment_date = next_date
     saving.auto_save = True
+    saving.status = 'successful'
     saving.save()
 
     credit_user_account(user=saving.user.user, amount=amount)
@@ -155,6 +156,7 @@ def create_auto_savings(savings_type, request):
     gateway = request.data.get('gateway')
     payment_duration = request.data.get('payment_duration_id')
     card_id = request.data.get('card_id')
+
     email = request.user.email
     profile = request.user.profile
 
@@ -182,12 +184,13 @@ def create_auto_savings(savings_type, request):
             return False, f"{ex}"
 
     if not card_id:
-        # Create saving transaction
-        transaction = create_savings_transaction(saving=saving, amount=amount, gateway=gateway)
-
         callback_url = request.data.get('callback_url')
         if not callback_url:
-            callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
+            # callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
+            return False, f"callback_url is required"
+
+        # Create saving transaction
+        transaction = create_savings_transaction(saving=saving, amount=amount, gateway=gateway)
 
         if gateway == 'paystack':
             metadata = {

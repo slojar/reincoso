@@ -115,7 +115,6 @@ def signup(request):
 
 
 def tokenize_user_card(data, gateway=None):
-    print('here')
     if not data:
         return False
     data = data['payload']

@@ -32,7 +32,7 @@ class Saving(models.Model):
     duration = models.ForeignKey(Duration, on_delete=models.SET_NULL, null=True, blank=True)
     amount = models.DecimalField(default=0.0, decimal_places=2, max_digits=20)
     total = models.DecimalField(default=0.0, decimal_places=2, max_digits=20)
-    payment_day = models.CharField(max_length=5, choices=DAYS_OF_THE_MONTH_CHOICES, default='30')
+    payment_day = models.CharField(max_length=5, choices=DAYS_OF_THE_MONTH_CHOICES, default='30', null=True)
     last_payment = models.DecimalField(default=0.0, decimal_places=2, max_digits=20)
     last_payment_date = models.DateTimeField(null=True, blank=True)
     next_payment_date = models.DateTimeField(null=True, blank=True)

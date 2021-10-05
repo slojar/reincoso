@@ -22,7 +22,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 
 
-from .utils import get_savings_analysis, create_instant_savings, create_auto_savings
+from .utils import get_savings_analysis, create_instant_savings, create_auto_savings, update_savings_payment
 
 
 class MySavingsView(ListAPIView):
@@ -137,6 +137,7 @@ class VerifyPaymentView(APIView):
             # tokenize card
             tokenize_user_card(response, gateway)
 
+            amount = response['amount']
             email = response['email']
             transaction_id = response['payload']['data']['metadata'].get('transaction_id', None)
             payment_for = response['payload']['data']['metadata'].get('payment_for', None)
@@ -156,8 +157,8 @@ class VerifyPaymentView(APIView):
                 trans.reference = reference
                 if trans.status != 'success':
                     trans.status = 'success'
-                    trans.saving.status = 'successful'
-                    trans.saving.save()
+                    saving = update_savings_payment(saving=trans.saving, amount=amount)
+
                 trans.response = response
                 trans.save()
 
