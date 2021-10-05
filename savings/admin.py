@@ -17,14 +17,16 @@ class SavingTransactionAdmin(admin.ModelAdmin):
 class SavingTransactionInline(admin.TabularInline):
     model = SavingTransaction
     extra = 0
+    raw_id_fields = ['user']
 
 
 class SavingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'type', 'amount', 'status', 'auto_save']
+    list_display = ['id', 'user', 'type', 'amount', 'status', 'auto_save', 'created_on', 'updated_on']
     list_filter = ['auto_save', 'type', 'duration', 'last_payment_date', 'payment_gateway', 'status', 'created_on', 'updated_on']
     search_fields = [
         'savingtransaction__reference', 'user__user__first_name', 'user__user__last_name', 'user__user__email'
     ]
+    raw_id_fields = ['user']
     inlines = [SavingTransactionInline]
 
 

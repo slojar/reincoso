@@ -132,7 +132,7 @@ class VerifyPaymentView(APIView):
             data['detail'] = response
 
             if success is False:
-                return Response(data, status=status.HTTP_406_NOT_ACCEPTABLE)
+                return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
             # tokenize card
             tokenize_user_card(response, gateway)

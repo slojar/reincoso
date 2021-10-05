@@ -1,3 +1,4 @@
+import decimal
 import logging
 from datetime import timedelta
 from threading import Thread
@@ -81,7 +82,7 @@ def create_instant_savings(savings_type, request):
     saving.type = savings_type
     saving.duration = payment_duration
     saving.amount = amount
-    saving.total = amount
+    # saving.total += amount
     saving.payment_day = timezone.now().day
     saving.last_payment = amount
     saving.last_payment_date = timezone.now()
@@ -106,7 +107,8 @@ def create_instant_savings(savings_type, request):
 
         callback_url = request.data.get('callback_url')
         if not callback_url:
-            callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
+            # callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
+            return False, "callback_url is required"
 
         if gateway == 'paystack':
             metadata = {
@@ -135,11 +137,11 @@ def create_savings_transaction(saving, amount, gateway='paystack'):
 def update_savings_payment(saving, amount):
     saving.last_payment = amount
     saving.last_payment_date = timezone.now()
-    saving.total += amount
+    saving.total = decimal.Decimal(saving.total) + decimal.Decimal(amount)
 
     next_date = saving.last_payment_date + timedelta(days=saving.duration.number_of_day)
     saving.next_payment_date = next_date
-    saving.auto_save = True
+    # saving.auto_save = True
     saving.status = 'successful'
     saving.save()
 
@@ -167,6 +169,7 @@ def create_auto_savings(savings_type, request):
 
     # Create/Update Saving Account
     saving, created = Saving.objects.get_or_create(user=profile, type=savings_type, amount=amount, auto_save=True)
+    saving.auto_save = True
     saving.duration = payment_duration
     saving.payment_day = payment_day
     saving.save()
