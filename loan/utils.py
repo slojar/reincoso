@@ -14,15 +14,16 @@ def get_loan_offer(profile):
     success = False
     response = ""
     loan_settings, created = LoanSetting.objects.get_or_create(site=Site.objects.get_current())
-    savings_transaction = SavingTransaction.objects.filter(user=profile, status='success').last()
+    savings_transaction = SavingTransaction.objects.filter(user=profile, status='success').first()
 
     if not savings_transaction:
         response = "Sorry, you are unable to get a loan right now. make sure you have saved for at least " \
                          "6 months before applying for loan."
         return success, response
 
+    first_savings_date = savings_transaction.created_on
     last_six_month = timezone.now() - timezone.timedelta(days=loan_settings.eligibility_days)
-    eligible = last_six_month >= savings_transaction.created_on
+    eligible = last_six_month >= first_savings_date
 
     if not eligible:
         response = "Sorry, you are unable to get a loan right now. make sure you have saved for at least " \
@@ -30,7 +31,9 @@ def get_loan_offer(profile):
         return success, response
 
     success = True
-    response = round(savings_transaction.saving.total * loan_settings.offer, 2)
+    balance = profile.wallet.balance
+    response = round(balance * loan_settings.offer, 2)
+    # response = round(savings_transaction.saving.total * loan_settings.offer, 2)
     return success, response
 
 

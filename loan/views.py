@@ -75,6 +75,7 @@ class ApplyForLoanView(APIView):
         if not amount:
             amount = loan_offer
 
+        # check if amount is not greater than loan offer amount
         if decimal.Decimal(amount) > float(loan_offer):
             data['detail'] = f"You cannot get loan more than the offered amount of {loan_offer}"
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)
@@ -83,7 +84,7 @@ class ApplyForLoanView(APIView):
         if not success:
             if not success:
                 data['detail'] = response
-                data['requirement'] = requirement
+                data['code'] = requirement
                 return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
         success, response = create_loan(profile=request.user.profile, amount=amount, duration=duration)

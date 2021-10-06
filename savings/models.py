@@ -60,6 +60,3 @@ class SavingTransaction(models.Model):
     def __str__(self):
         return f"id: {self.pk}, user: {self.user}, amount: {self.amount}, status: {self.status}"
 
-    class Meta:
-        ordering = ['-id']
-
