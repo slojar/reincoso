@@ -21,7 +21,7 @@ class SavingTransactionInline(admin.TabularInline):
 
 
 class SavingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'type', 'amount', 'status', 'auto_save', 'created_on', 'updated_on']
+    list_display = ['id', 'user', 'type', 'auto_save', 'amount', 'last_payment', 'total', 'status', 'created_on', 'updated_on']
     list_filter = ['auto_save', 'type', 'duration', 'last_payment_date', 'payment_gateway', 'status', 'created_on', 'updated_on']
     search_fields = [
         'savingtransaction__reference', 'user__user__first_name', 'user__user__last_name', 'user__user__email'
