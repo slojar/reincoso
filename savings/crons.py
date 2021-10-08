@@ -41,7 +41,7 @@ def auto_save_cron():
             # notify user of card unavailability via email
 
         if card:
-            process_savings_payment_with_card(saving=saving, card=card, amount=amount)
+            process_savings_payment_with_card(saving=saving, card=card, amount=amount, do_test_charge=False)
 
 
 # print(auto_save_cron())

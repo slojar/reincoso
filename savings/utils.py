@@ -29,10 +29,12 @@ def process_savings_payment_with_card(saving, card, amount, **kwargs):
     authorization_code = card.authorization_code
     email = card.email
     gateway = card.gateway
-    new_auto_savings = kwargs.get('new_auto_savings', True)
+
+    # charge user little amount so as to verify and tokenize card
+    do_test_charge = kwargs.get('do_test_charge', True)
 
     amount_to_charge_card = amount
-    if new_auto_savings:
+    if do_test_charge:
         amount_to_charge_card = settings.PAYSTACK_TEST_CHARGE
 
     # Create saving transaction
