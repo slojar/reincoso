@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import generics
+
+from loan.paginations import CustomPagination
 from .models import *
 from .serializers import *
 from .utils import *
@@ -32,14 +34,27 @@ class InvestmentDetailView(generics.RetrieveAPIView):
         return Response(data)
 
 
+class MyInvestmentView(generics.ListAPIView):
+    serializer_class = InvestmentSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        return Investment.objects.filter(user=self.request.user.profile)
+
+
+class MyInvestmentDetailView(generics.RetrieveUpdateAPIView):
+    serializer_class = InvestmentSerializer
+    queryset = Investment.objects.all()
+    lookup_field = 'id'
+
+
 class InvestView(APIView):
 
     def post(self, request):
         data = dict()
-        success, response = create_investment(request.user.profile, request.data)
+        success, response = create_investment(profile=request.user.profile, data=request.data)
         if success is False:
-            data['detail'] = "There is an error in request sent"
-            data['data'] = response
+            data['detail'] = response
             return Response(data, status.HTTP_400_BAD_REQUEST)
 
         data['detail'] = "Investment created successfully"

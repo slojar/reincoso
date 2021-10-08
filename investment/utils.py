@@ -1,6 +1,6 @@
 from .models import *
-from account.models import UserCard
-from account.utils import tokenize_user_card
+from account.models import UserCard, Wallet
+from account.utils import tokenize_user_card, debit_user_account
 from modules.paystack import paystack_auto_charge, get_paystack_link, verify_paystack_transaction
 import logging
 from django.utils import timezone
@@ -31,32 +31,58 @@ def create_or_update_investment_transaction(investment, amount, **kwargs):
     transaction.reference = reference
     transaction.response = response
     transaction.save()
+    return transaction
 
 
-def create_investment(user, data):
+def create_investment(profile, data):
     success = True
     response = "Investment created successfully"
-    investment = data.get('investment_id')
-    option = data.get('option_id')
+    investment_id = data.get('investment_id')
+    option_id = data.get('option_id')
     duration = data.get('duration_id')
     amount = data.get('amount')
+    user = profile.user
+
+    wallet, new_wallet = Wallet.objects.get_or_create(user=profile)
+    if float(wallet.balance) < float(amount):
+        return False, "Insufficient balance for this investment, please top-up your account"
 
     try:
-        investment = AvailableInvestment.objects.get(id=investment)
-        option = InvestmentOption.objects.get(id=option)
+        available_investment = AvailableInvestment.objects.get(id=investment_id)
+        option = InvestmentOption.objects.get(id=option_id, available_investment=available_investment)
         duration = InvestmentDuration.objects.get(id=duration)
     except Exception as ex:
         return False, str(ex)
 
     investment, created = Investment.objects.get_or_create(
-        user=user, investment=investment, option=option, duration=duration, amount_invested=amount, status='pending'
+        user=profile, investment=available_investment, option=option, duration=duration, amount_invested=amount,
     )
+
+    # check if user can pay for investment
+    if can_pay_for_investment(investment) is False:
+        return True, f"This investment is already {investment.status}"
+
     calc_roi = (amount * duration.percentage) / 100
     investment.return_on_invested = amount + calc_roi
     investment.number_of_month = duration.duration
     investment.number_of_days = duration.number_of_days
     investment.percentage = duration.percentage
     investment.save()
+
+    reference = f"INV{investment.id}-{profile.id}"
+    transaction = create_or_update_investment_transaction(
+        investment=investment, amount=amount, reference=reference, response=response
+    )
+
+    user = debit_user_account(user=user, amount=amount)
+
+    investment.start_date = timezone.now()
+    investment.end_date = investment.start_date + timezone.timedelta(days=investment.number_of_days)
+    investment.status = 'approved'
+    investment.save()
+
+    transaction.status = 'success'
+    transaction.save()
 
     return success, investment
 

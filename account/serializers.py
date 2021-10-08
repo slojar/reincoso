@@ -28,6 +28,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     cards = serializers.SerializerMethodField()
     guarantors = serializers.SerializerMethodField()
     analytics = serializers.SerializerMethodField()
+    wallet = serializers.DictField(source='get_wallet', read_only=True)
 
     def get_analytics(self, obj):
         return get_user_analytics(obj)

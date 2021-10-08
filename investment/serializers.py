@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import *
 
 
@@ -48,6 +49,11 @@ class InvestmentSerializer(serializers.ModelSerializer):
     investment = serializers.CharField(source='investment.name')
     option = serializers.CharField(source='option.name')
     duration = serializers.CharField(source='duration.title')
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        from account.serializers import UserDetailSerializer
+        return UserDetailSerializer(obj.user).data
 
     class Meta:
         depth = 1
