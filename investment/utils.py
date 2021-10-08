@@ -60,7 +60,7 @@ def create_investment(profile, data):
 
     # check if user can pay for investment
     if can_pay_for_investment(investment) is False:
-        return True, f"This investment is already {investment.status}"
+        return False, f"This investment is already {investment.status}"
 
     calc_roi = (amount * duration.percentage) / 100
     investment.return_on_invested = amount + calc_roi
