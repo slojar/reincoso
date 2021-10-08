@@ -35,6 +35,8 @@ REST_FRAMEWORK = {
 PAYSTACK_BASE_URL = 'https://api.paystack.co'
 PAYSTACK_SECRET_KEY = 'sk_test_ac99347fc9b6c4deddc5aa6e2555b14ac1476fc4'
 PAYSTACK_PUBLIC_KEY = 'pk_test_0d5259af2ab3bdac3f21f5a2dbc5903742aa0c62'
+PAYSTACK_REF = "COSO"
+PAYSTACK_TEST_CHARGE = 10
 
 CORS_ALLOWED_ORIGINS = [
     "https://rent4less.herokuapp.com",

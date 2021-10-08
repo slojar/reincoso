@@ -3,6 +3,7 @@ import logging
 from datetime import timedelta
 from threading import Thread
 
+from django.conf import settings
 from django.utils import timezone
 from django.utils.timezone import datetime
 from django.db.models import Sum
@@ -22,15 +23,20 @@ def get_savings_analysis(profile):
     return data
 
 
-def process_savings_payment_with_card(saving, card, amount):
+def process_savings_payment_with_card(saving, card, amount, **kwargs):
     success = False
     response = {}
     authorization_code = card.authorization_code
     email = card.email
     gateway = card.gateway
+    new_auto_savings = kwargs.get('new_auto_savings', True)
+
+    amount_to_charge_card = amount
+    if new_auto_savings:
+        amount_to_charge_card = settings.PAYSTACK_TEST_CHARGE
 
     # Create saving transaction
-    transaction = create_savings_transaction(saving=saving, amount=amount, gateway=gateway)
+    transaction = create_savings_transaction(saving=saving, amount=amount_to_charge_card, gateway=gateway)
 
     if card.gateway == 'paystack':
         metadata = {
@@ -38,8 +44,9 @@ def process_savings_payment_with_card(saving, card, amount):
             'transaction_id': transaction.id,
             'payment_for': 'savings',
         }
+
         success, response = paystack_auto_charge(authorization_code=authorization_code, email=email,
-                                                 amount=amount, metadata=metadata)
+                                                 amount=amount_to_charge_card, metadata=metadata)
         if success is True:
             success, response = verify_paystack_transaction(reference=transaction.reference)
             transaction.response = response
@@ -192,8 +199,10 @@ def create_auto_savings(savings_type, request):
             # callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
             return False, f"callback_url is required"
 
+        amount_to_charge_card = settings.PAYSTACK_TEST_CHARGE
+
         # Create saving transaction
-        transaction = create_savings_transaction(saving=saving, amount=amount, gateway=gateway)
+        transaction = create_savings_transaction(saving=saving, amount=amount_to_charge_card, gateway=gateway)
 
         if gateway == 'paystack':
             metadata = {
@@ -201,7 +210,7 @@ def create_auto_savings(savings_type, request):
                 'payment_for': 'savings',
                 'reference': transaction.reference,
             }
-            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
+            success, response = get_paystack_link(email=email, amount=amount_to_charge_card, callback_url=callback_url, metadata=metadata)
             return success, response
 
     return success, response
