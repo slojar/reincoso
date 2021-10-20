@@ -274,5 +274,26 @@ class AdminInvestmentOptionView(APIView, CustomPagination):
         return Response({'detail': 'Investment Option deleted successfully'})
 
 
+class AdminSavingsTypeView(ModelViewSet):
+    permission_classes = [IsAdminUser]
+    serializer_class = SavingsTypeSerializer
+    queryset = SavingsType.objects.all()
+    lookup_field = 'id'
+
+
+class AdminWalletView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = WalletSerializer
+    queryset = Wallet.objects.all()
+
+
+class AdminWalletDetailView(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = Wallet.objects.all()
+    serializer_class = WalletSerializer
+    lookup_field = 'id'
+
+
+
 
 

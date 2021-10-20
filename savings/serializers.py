@@ -38,7 +38,7 @@ class SavingTransactionSerializer(serializers.ModelSerializer):
 
 
 class SavingsTypeSerializer(serializers.ModelSerializer):
-
+    slug = serializers.CharField(read_only=True)
     class Meta:
         model = SavingsType
         exclude = []

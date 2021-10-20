@@ -20,6 +20,7 @@ router.register('investment-specifiication', AdminInvestmentSpecificationView)
 router.register('general-setting', AdminGeneralSettingView)
 router.register('payment-gateway', AdminPaymentGatewayView)
 router.register('loan-setting', AdminLoanSettingView)
+router.register('saving-type', AdminSavingsTypeView)
 
 urlpatterns = [
     path('', AdminHomepage.as_view(), name='homepage'),
@@ -28,6 +29,8 @@ urlpatterns = [
     path('site/', AdminSiteView.as_view(), name='site'),
     path('investment-option/', AdminInvestmentOptionView.as_view(), name='investment-option'),
     path('investment-option/<int:pk>/', AdminInvestmentOptionView.as_view(), name='investment-option-detail'),
+    path('wallet/', AdminWalletView.as_view(), name='user-wallet'),
+    path('wallet/<int:id>/', AdminWalletDetailView.as_view(), name='user-wallet-detail'),
 ]
 
 urlpatterns += router.urls
