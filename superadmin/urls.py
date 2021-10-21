@@ -31,6 +31,8 @@ urlpatterns = [
     path('investment-option/<int:pk>/', AdminInvestmentOptionView.as_view(), name='investment-option-detail'),
     path('wallet/', AdminWalletView.as_view(), name='user-wallet'),
     path('wallet/<int:id>/', AdminWalletDetailView.as_view(), name='user-wallet-detail'),
+    path('loan/', AdminLoanView.as_view(), name='loan'),
+    path('loan/<int:id>/', AdminLoanDetailView.as_view(), name='loan-detail'),
 ]
 
 urlpatterns += router.urls

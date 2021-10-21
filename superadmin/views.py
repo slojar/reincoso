@@ -204,7 +204,6 @@ class AdminProfileView(APIView, CustomPagination):
             return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class AdminInvestmentOptionView(APIView, CustomPagination):
     permission_classes = [IsAdminUser]
 
@@ -294,6 +293,16 @@ class AdminWalletDetailView(generics.RetrieveUpdateAPIView):
     lookup_field = 'id'
 
 
+class AdminLoanView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = LoanSerializer
+    queryset = Loan.objects.all()
 
+
+class AdminLoanDetailView(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = Loan.objects.all()
+    serializer_class = LoanSerializer
+    lookup_field = 'id'
 
 
