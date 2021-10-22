@@ -74,7 +74,7 @@ def create_investment(profile, data):
         user_investment=user_investment, amount=amount, reference=reference, response=response
     )
 
-    user = debit_user_account(user=user, amount=amount)
+    user = debit_user_account(profile=profile, amount=amount)
 
     user_investment.start_date = timezone.now()
     user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)

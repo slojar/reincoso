@@ -144,6 +144,7 @@ def create_savings_transaction(saving, amount, gateway='paystack'):
 
 
 def update_savings_payment(saving, amount):
+    profile = saving.user
     saving.last_payment = amount
     saving.last_payment_date = timezone.now()
     saving.total = decimal.Decimal(saving.total) + decimal.Decimal(amount)
@@ -154,7 +155,7 @@ def update_savings_payment(saving, amount):
     saving.status = 'successful'
     saving.save()
 
-    credit_user_account(user=saving.user.user, amount=amount)
+    credit_user_account(profile=profile, amount=amount)
 
     return saving
 

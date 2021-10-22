@@ -23,26 +23,24 @@ from cryptography.fernet import Fernet
 log = logging.getLogger(__name__)
 
 
-def credit_user_account(user, amount):
-    user.refresh_from_db()
-    profile = user.profile
+def credit_user_account(profile, amount):
+    profile.refresh_from_db()
     with transaction.atomic():
         wallet, new_wallet = Wallet.objects.select_for_update().get_or_create(user=profile)
         wallet.balance += decimal.Decimal(amount)
         wallet.save()
-    user.refresh_from_db()
-    return user
+    profile.refresh_from_db()
+    return profile
 
 
-def debit_user_account(user, amount):
-    user.refresh_from_db()
-    profile = user.profile
+def debit_user_account(profile, amount):
+    profile.refresh_from_db()
     with transaction.atomic():
         wallet, new_wallet = Wallet.objects.select_for_update().get_or_create(user=profile)
         wallet.balance -= decimal.Decimal(amount)
         wallet.save()
-    user.refresh_from_db()
-    return user
+    profile.refresh_from_db()
+    return profile
 
 
 def encrypt_text(text: str):
