@@ -29,8 +29,8 @@ class InvestmentSerializer(serializers.ModelSerializer):
     options = serializers.SerializerMethodField()
 
     def get_options(self, obj):
-        if InvestmentOption.objects.filter(investment=obj, status='active').exists():
-            query = InvestmentOption.objects.filter(investment=obj, status='active')
+        if InvestmentOption.objects.filter(investment=obj, active=True).exists():
+            query = InvestmentOption.objects.filter(investment=obj, active=True)
             return InvestmentOptionSerializer(query, many=True).data
         return None
 
