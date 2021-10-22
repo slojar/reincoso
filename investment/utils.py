@@ -49,7 +49,7 @@ def create_investment(profile, data):
 
     try:
         investment = Investment.objects.get(id=investment_id)
-        option = InvestmentOption.objects.get(id=option_id, available_investment=investment)
+        option = InvestmentOption.objects.get(id=option_id, investment=investment)
         duration = InvestmentDuration.objects.get(id=duration)
     except Exception as ex:
         return False, str(ex)
