@@ -67,3 +67,19 @@ class GuarantorSerializer(serializers.ModelSerializer):
         model = Guarantor
         exclude = ['id', 'user']
 
+
+class WalletSerializer(serializers.ModelSerializer):
+    user_detail = serializers.SerializerMethodField()
+
+    def get_user_detail(self, obj):
+        user = dict()
+        user['first_name'] = obj.user.first_name()
+        user['last_name'] = obj.user.last_name()
+        user['email'] = obj.user.email()
+        return user
+
+    class Meta:
+        model = Wallet
+        exclude = ['user']
+
+

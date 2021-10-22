@@ -17,9 +17,10 @@ class LoanTransactionSerializer(serializers.ModelSerializer):
 
 
 class LoanSerializer(serializers.ModelSerializer):
-    duration = LoanDurationSerializer()
+    duration = LoanDurationSerializer(read_only=True)
     transactions = serializers.SerializerMethodField()
-    amount_left_to_repay = serializers.DecimalField(source='get_amount_left_to_repay', max_digits=20, decimal_places=2)
+    amount_left_to_repay = serializers.DecimalField(source='get_amount_left_to_repay', max_digits=20, decimal_places=2,
+                                                    read_only=True)
 
     def get_transactions(self, obj):
         return LoanTransactionSerializer(LoanTransaction.objects.filter(loan=obj), many=True).data

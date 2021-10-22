@@ -204,7 +204,6 @@ class AdminProfileView(APIView, CustomPagination):
             return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class AdminInvestmentOptionView(APIView, CustomPagination):
     permission_classes = [IsAdminUser]
 
@@ -274,5 +273,36 @@ class AdminInvestmentOptionView(APIView, CustomPagination):
         return Response({'detail': 'Investment Option deleted successfully'})
 
 
+class AdminSavingsTypeView(ModelViewSet):
+    permission_classes = [IsAdminUser]
+    serializer_class = SavingsTypeSerializer
+    queryset = SavingsType.objects.all()
+    lookup_field = 'id'
+
+
+class AdminWalletView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = WalletSerializer
+    queryset = Wallet.objects.all()
+
+
+class AdminWalletDetailView(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = Wallet.objects.all()
+    serializer_class = WalletSerializer
+    lookup_field = 'id'
+
+
+class AdminLoanView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = LoanSerializer
+    queryset = Loan.objects.all()
+
+
+class AdminLoanDetailView(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = Loan.objects.all()
+    serializer_class = LoanSerializer
+    lookup_field = 'id'
 
 
