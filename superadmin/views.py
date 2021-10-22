@@ -24,7 +24,7 @@ class AdminHomepage(APIView):
         data = dict()
         data['total_feedback'] = FeedbackMessage.objects.all().count()
         data['total_user'] = User.objects.all().count()
-        data['total_investment'] = Investment.objects.all().count()
+        data['total_investment'] = UserInvestment.objects.all().count()
         data['total_loan'] = Loan.objects.all().count()
         data['active_loan'] = Loan.objects.filter(status='ongoing').count()
         data['declined_loan'] = Loan.objects.filter(status='unapproved').count()
@@ -143,8 +143,8 @@ class AdminInvestmentDurationView(ModelViewSet):
 
 class AdminAvailableInvestmentView(ModelViewSet):
     permission_classes = [IsAdminUser]
-    serializer_class = AvailableInvestmentSerializer
-    queryset = AvailableInvestment.objects.all()
+    serializer_class = InvestmentSerializer
+    queryset = Investment.objects.all()
     lookup_field = 'id'
 
 

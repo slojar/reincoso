@@ -25,17 +25,25 @@ class InvestmentOptionSerializer(serializers.ModelSerializer):
         depth = 2
 
 
-class AvailableInvestmentSerializer(serializers.ModelSerializer):
+class InvestmentSerializer(serializers.ModelSerializer):
     options = serializers.SerializerMethodField()
 
     def get_options(self, obj):
-        if InvestmentOption.objects.filter(available_investment=obj, status='active').exists():
-            query = InvestmentOption.objects.filter(available_investment=obj, status='active')
+        if InvestmentOption.objects.filter(investment=obj, status='active').exists():
+            query = InvestmentOption.objects.filter(investment=obj, status='active')
             return InvestmentOptionSerializer(query, many=True).data
         return None
 
     class Meta:
-        model = AvailableInvestment
+        model = Investment
+        exclude = []
+        depth = 1
+
+
+class InvestmentTypeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = InvestmentType
         exclude = []
 
 
@@ -45,7 +53,7 @@ class InvestmentSpecificationSerializer(serializers.ModelSerializer):
         exclude = []
 
 
-class InvestmentSerializer(serializers.ModelSerializer):
+class UserInvestmentSerializer(serializers.ModelSerializer):
     investment = serializers.CharField(source='investment.name')
     option = serializers.CharField(source='option.name')
     duration = serializers.CharField(source='duration.title')
@@ -53,11 +61,11 @@ class InvestmentSerializer(serializers.ModelSerializer):
 
     def get_user(self, obj):
         from account.serializers import UserDetailSerializer
-        return UserDetailSerializer(obj.user).data
+        # return UserDetailSerializer(obj.user).data
 
     class Meta:
         depth = 1
-        model = Investment
+        model = UserInvestment
         exclude = []
 
 

@@ -8,23 +8,23 @@ from django.utils import timezone
 log = logging.getLogger(__name__)
 
 
-def can_pay_for_investment(investment):
+def can_pay_for_investment(user_investment):
     check_status = ['approved', 'ongoing', 'completed']
-    if investment.status in check_status:
+    if user_investment.status in check_status:
         return False
     return True
 
 
-def create_or_update_investment_transaction(investment, amount, **kwargs):
+def create_or_update_investment_transaction(user_investment, amount, **kwargs):
     status = kwargs.get('status', 'pending')
     transaction_type = kwargs.get('transaction_type', 'investment')
     payment_method = kwargs.get('payment_method', 'paystack')
     reference = kwargs.get('reference', '')
     response = kwargs.get('response')
-    user = investment.user
+    profile = user_investment.user
 
     transaction, created = InvestmentTransaction.objects.get_or_create(
-        user=user, investment=investment, amount=amount, status=status
+        user=profile, user_investment=user_investment, amount=amount, status=status
     )
     transaction.transaction_type = transaction_type
     transaction.payment_method = payment_method
@@ -48,43 +48,43 @@ def create_investment(profile, data):
         return False, "Insufficient balance for this investment, please top-up your account"
 
     try:
-        available_investment = AvailableInvestment.objects.get(id=investment_id)
-        option = InvestmentOption.objects.get(id=option_id, available_investment=available_investment)
+        investment = Investment.objects.get(id=investment_id)
+        option = InvestmentOption.objects.get(id=option_id, available_investment=investment)
         duration = InvestmentDuration.objects.get(id=duration)
     except Exception as ex:
         return False, str(ex)
 
-    investment, created = Investment.objects.get_or_create(
-        user=profile, investment=available_investment, option=option, duration=duration, amount_invested=amount,
+    user_investment, created = UserInvestment.objects.get_or_create(
+        user=profile, investment=investment, option=option, duration=duration, amount_invested=amount,
     )
 
     # check if user can pay for investment
-    if can_pay_for_investment(investment) is False:
-        return False, f"This investment is already {investment.status}"
+    if can_pay_for_investment(user_investment) is False:
+        return False, f"This investment is already {user_investment.status}"
 
     calc_roi = (amount * duration.percentage) / 100
-    investment.return_on_invested = amount + calc_roi
-    investment.number_of_month = duration.duration
-    investment.number_of_days = duration.number_of_days
-    investment.percentage = duration.percentage
-    investment.save()
+    user_investment.return_on_invested = amount + calc_roi
+    user_investment.number_of_month = duration.duration
+    user_investment.number_of_days = duration.number_of_days
+    user_investment.percentage = duration.percentage
+    user_investment.save()
 
-    reference = f"INV{investment.id}-{profile.id}"
+    reference = f"INV{user_investment.id}-{profile.id}"
     transaction = create_or_update_investment_transaction(
-        investment=investment, amount=amount, reference=reference, response=response
+        user_investment=user_investment, amount=amount, reference=reference, response=response
     )
 
     user = debit_user_account(user=user, amount=amount)
 
-    investment.start_date = timezone.now()
-    investment.end_date = investment.start_date + timezone.timedelta(days=investment.number_of_days)
-    investment.status = 'approved'
-    investment.save()
+    user_investment.start_date = timezone.now()
+    user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
+    user_investment.status = 'approved'
+    user_investment.save()
 
     transaction.status = 'success'
     transaction.save()
 
-    return success, investment
+    return success, user_investment
 
 
 def approve_investment(investment_id, payment_gateway, payment_reference):
@@ -93,15 +93,15 @@ def approve_investment(investment_id, payment_gateway, payment_reference):
     status = 'pending'
 
     try:
-        investment = Investment.objects.get(id=investment_id)
-        amount = investment.amount_invested
+        user_investment = UserInvestment.objects.get(id=investment_id)
+        amount = user_investment.amount_invested
     except Exception as ex:
         log.exception(str(ex))
         return False, str(ex)
 
     # check if user can pay for investment
-    if can_pay_for_investment(investment) is False:
-        return True, f"This investment is already {investment.status}"
+    if can_pay_for_investment(user_investment) is False:
+        return True, f"This investment is already {user_investment.status}"
 
     # Verify payment
     if payment_gateway == 'paystack':
@@ -113,14 +113,14 @@ def approve_investment(investment_id, payment_gateway, payment_reference):
         tokenize_user_card(response, 'paystack')
 
     create_or_update_investment_transaction(
-        investment=investment, amount=amount, status=status, reference=payment_reference, response=response
+        user_investment=user_investment, amount=amount, status=status, reference=payment_reference, response=response
     )
 
     if status == 'success':
-        investment.start_date = timezone.now()
-        investment.end_date = investment.start_date + timezone.timedelta(days=investment.number_of_days)
-        investment.status = 'approved'
-        investment.save()
+        user_investment.start_date = timezone.now()
+        user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
+        user_investment.status = 'approved'
+        user_investment.save()
 
     response = "Investment approved"
     return success, response
@@ -134,7 +134,7 @@ def investment_payment(user, data):
     gateway = reference = None
 
     try:
-        investment = Investment.objects.get(id=investment_id, user=user)
+        investment = UserInvestment.objects.get(id=investment_id, user=user)
     except Exception as ex:
         return False, str(ex)
 

@@ -1,4 +1,8 @@
+import logging
+
+from django.db.models import Q
 from django.shortcuts import render
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -11,41 +15,87 @@ from .utils import *
 
 
 class InvestmentsView(generics.ListAPIView):
-    queryset = AvailableInvestment.objects.all()
-    serializer_class = AvailableInvestmentSerializer
+    queryset = Investment.objects.all()
+    serializer_class = InvestmentSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        q = Q(active=True)
+        params = self.request.GET
+        if params.get('type_id'):
+            q = q & Q(type__id=params.get('type_id'))
+        if params.get('slug'):
+            q = q & Q(type__slug__iexact=params.get('slug'))
+        return Investment.objects.filter(q)
 
 
 class InvestmentDetailView(generics.RetrieveAPIView):
-    queryset = AvailableInvestment.objects.all()
-    serializer_class = AvailableInvestmentSerializer
+    queryset = Investment.objects.all()
+    serializer_class = InvestmentSerializer
 
     def retrieve(self, request, *args, **kwargs):
         data = dict()
         id_ = self.kwargs.get('id')
         try:
-            avail_investment = AvailableInvestment.objects.get(id=id_)
+            avail_investment = Investment.objects.get(id=id_)
         except Exception as ex:
             try:
-                avail_investment = AvailableInvestment.objects.get(name__iexact=id_)
+                avail_investment = Investment.objects.get(name__iexact=id_)
             except Exception as ex:
                 data['detail'] = str(ex)
                 return Response(data, status.HTTP_404_NOT_FOUND)
-        data = AvailableInvestmentSerializer(avail_investment).data
+        data = InvestmentSerializer(avail_investment).data
         return Response(data)
 
 
-class MyInvestmentView(generics.ListAPIView):
-    serializer_class = InvestmentSerializer
+class InvestmentOptionsView(generics.ListAPIView):
+    serializer_class = InvestmentOptionSerializer
     pagination_class = CustomPagination
 
     def get_queryset(self):
-        return Investment.objects.filter(user=self.request.user.profile)
+        return InvestmentOption.objects.filter(investment__id=self.kwargs.get('id'))
+
+
+class MyInvestmentView(generics.ListAPIView):
+    serializer_class = UserInvestmentSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        return UserInvestment.objects.filter(user=self.request.user.profile)
 
 
 class MyInvestmentDetailView(generics.RetrieveUpdateAPIView):
-    serializer_class = InvestmentSerializer
-    queryset = Investment.objects.all()
+    serializer_class = UserInvestmentSerializer
+    queryset = UserInvestment.objects.all()
     lookup_field = 'id'
+
+
+class InvestmentTypesView(generics.ListAPIView):
+    serializer_class = InvestmentTypeSerializer
+    pagination_class = CustomPagination
+    queryset = InvestmentType.objects.all()
+
+
+class InvestmentTypesDetailView(generics.RetrieveUpdateAPIView):
+    serializer_class = InvestmentTypeSerializer
+    lookup_field = 'id'
+
+    def get(self, request, **kwargs):
+        id_ = self.kwargs.get('id')
+        try:
+            query = InvestmentType.objects.get(id=id_)
+        except (InvestmentType.DoesNotExist, ValueError):
+            query = get_object_or_404(InvestmentType, slug__iexact=id_)
+        data = self.serializer_class(query).data
+
+        paginator = CustomPagination()
+        investment = Investment.objects.filter(type=query)
+        paginated_query = paginator.paginate_queryset(investment, request)
+        serialize = InvestmentSerializer(paginated_query, many=True).data
+        result = paginator.get_paginated_response(serialize).data
+        data['investments'] = result
+
+        return Response(data)
 
 
 class InvestView(APIView):
@@ -58,7 +108,7 @@ class InvestView(APIView):
             return Response(data, status.HTTP_400_BAD_REQUEST)
 
         data['detail'] = "Investment created successfully"
-        data['data'] = InvestmentSerializer(response).data
+        data['data'] = UserInvestmentSerializer(response).data
         return Response(data)
 
 
@@ -79,7 +129,7 @@ class InvestPaymentView(APIView):
 
         data['detail'] = response
         if card_id:
-            data['data'] = InvestmentSerializer(Investment.objects.get(id=investment_id, user=user)).data
+            data['data'] = UserInvestmentSerializer(UserInvestment.objects.get(id=investment_id, user=user)).data
         return Response(data)
 
 
