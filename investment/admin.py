@@ -46,8 +46,9 @@ class AvailableInvestmentAdmin(admin.ModelAdmin):
 
 @admin.register(InvestmentOption)
 class InvestmentOptionAdmin(admin.ModelAdmin):
-    list_display = ['id', 'investment', 'name', 'active', 'created_on', 'updated_on']
+    list_display = ['id', 'name', 'investment', 'active', 'created_on', 'updated_on']
     inlines = [InvestmentSpecInline]
+    list_filter = ['investment', 'active', 'created_on', 'updated_on']
 
 
 @admin.register(InvestmentSpecification)
