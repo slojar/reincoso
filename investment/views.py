@@ -53,7 +53,15 @@ class InvestmentOptionsView(generics.ListAPIView):
     pagination_class = CustomPagination
 
     def get_queryset(self):
-        return InvestmentOption.objects.filter(investment__id=self.kwargs.get('id'))
+        if self.kwargs.get('id'):
+            return InvestmentOption.objects.filter(investment__id=self.kwargs.get('id'))
+        return InvestmentOption.objects.all()
+
+
+class InvestmentOptionDetailView(generics.RetrieveAPIView):
+    lookup_field = 'id'
+    queryset = InvestmentOption.objects.all()
+    serializer_class = InvestmentOptionSerializer
 
 
 class MyInvestmentView(generics.ListAPIView):

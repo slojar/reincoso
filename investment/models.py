@@ -3,11 +3,14 @@ from transaction.choices import PAYMENT_GATEWAYS
 
 
 INVESTMENT_SPEC_CHOICES = (
-    ('key metric', "Key metric"), ('minimum return', "Minimum return"),
+    ('key metric', "Key metric"),
+    ('minimum return', "Minimum return"),
     ('target for return per annum', "Target for return per annum"),
     ('investible asset claim', "Investible asset claim"),
     ('30 days average return', "30 days average return"),
     ('return on investment', "Return on investment"),
+    ('minimum investment', "Minimum investment"),
+    ('maximum investment', "Maximum investment"),
 )
 
 AVAILABLE_INVESTMENT_STATUS_CHOICES = (
@@ -98,7 +101,7 @@ class InvestmentOption(models.Model):
 
 
 class InvestmentSpecification(models.Model):
-    investment_option = models.ForeignKey(InvestmentOption, on_delete=models.CASCADE)
+    option = models.ForeignKey(InvestmentOption, on_delete=models.CASCADE)
     key = models.CharField(max_length=100, choices=INVESTMENT_SPEC_CHOICES)
     value = models.CharField(max_length=100)
     status = models.CharField(max_length=100, choices=AVAILABLE_INVESTMENT_STATUS_CHOICES, default='active')
@@ -112,7 +115,7 @@ class InvestmentSpecification(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['investment_option', 'key'], name='investment_spec_constraint'
+                fields=['option', 'key'], name='investment_spec_constraint'
             )
         ]
 

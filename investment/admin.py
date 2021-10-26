@@ -53,7 +53,7 @@ class InvestmentOptionAdmin(admin.ModelAdmin):
 
 @admin.register(InvestmentSpecification)
 class InvestmentSpecificationAdmin(admin.ModelAdmin):
-    list_display = ['id', 'investment_option', 'key', 'value', 'visible', 'status', 'created_on', 'updated_on']
+    list_display = ['id', 'option', 'key', 'value', 'visible', 'status', 'created_on', 'updated_on']
 
 
 @admin.register(UserInvestment)

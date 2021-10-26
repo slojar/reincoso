@@ -39,7 +39,7 @@ def create_investment(profile, data):
     response = "Investment created successfully"
     investment_id = data.get('investment_id')
     option_id = data.get('option_id')
-    duration = data.get('duration_id')
+    duration_id = data.get('duration_id')
     amount = data.get('amount')
     user = profile.user
 
@@ -50,9 +50,25 @@ def create_investment(profile, data):
     try:
         investment = Investment.objects.get(id=investment_id)
         option = InvestmentOption.objects.get(id=option_id, investment=investment)
-        duration = InvestmentDuration.objects.get(id=duration)
+        duration = InvestmentDuration.objects.get(id=duration_id)
     except Exception as ex:
         return False, str(ex)
+
+    # Do minimum investment check
+    try:
+        min_investment = InvestmentSpecification.objects.get(option=option, key__iexact='minimum investment')
+        if float(amount) < float(min_investment.value):
+            return False, f"Minimum investment is {min_investment.value}"
+    except InvestmentSpecification.DoesNotExist:
+        pass
+
+    # Do maximum investment check
+    try:
+        max_investment = InvestmentSpecification.objects.get(option=option, key__iexact='maximum investment')
+        if float(amount) > float(max_investment.value):
+            return False, f"Maximum investment is {max_investment.value}"
+    except InvestmentSpecification.DoesNotExist:
+        pass
 
     user_investment, created = UserInvestment.objects.get_or_create(
         user=profile, investment=investment, option=option, duration=duration, amount_invested=amount,
