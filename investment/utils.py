@@ -68,7 +68,7 @@ def create_investment(profile, data):
     try:
         max_investment = InvestmentSpecification.objects.get(option=option, key__iexact='maximum investment')
         if float(amount) > float(max_investment.value):
-            return False, f"Maximum investment is {max_investment.value}"
+            return False, f"Maximum investment is {intcomma(max_investment.value)}"
     except InvestmentSpecification.DoesNotExist:
         pass
 
