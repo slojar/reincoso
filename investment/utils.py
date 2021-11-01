@@ -1,3 +1,5 @@
+from django.contrib.humanize.templatetags.humanize import intcomma
+
 from .models import *
 from account.models import UserCard, Wallet
 from account.utils import tokenize_user_card, debit_user_account
@@ -58,7 +60,7 @@ def create_investment(profile, data):
     try:
         min_investment = InvestmentSpecification.objects.get(option=option, key__iexact='minimum investment')
         if float(amount) < float(min_investment.value):
-            return False, f"Minimum investment is {min_investment.value}"
+            return False, f"Minimum investment is {intcomma(min_investment.value)}"
     except InvestmentSpecification.DoesNotExist:
         pass
 
