@@ -71,7 +71,7 @@ def create_investment(profile, data):
         pass
 
     user_investment, created = UserInvestment.objects.get_or_create(
-        user=profile, investment=investment, option=option, duration=duration, amount_invested=amount,
+        user=profile, investment=investment, option=option, duration=duration, amount_invested=amount, status='pending'
     )
 
     # check if user can pay for investment
