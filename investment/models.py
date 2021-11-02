@@ -3,11 +3,14 @@ from transaction.choices import PAYMENT_GATEWAYS
 
 
 INVESTMENT_SPEC_CHOICES = (
-    ('key metric', "Key metric"), ('minimum return', "Minimum return"),
+    ('key metric', "Key metric"),
+    ('minimum return', "Minimum return"),
     ('target for return per annum', "Target for return per annum"),
     ('investible asset claim', "Investible asset claim"),
     ('30 days average return', "30 days average return"),
     ('return on investment', "Return on investment"),
+    ('minimum investment', "Minimum investment"),
+    ('maximum investment', "Maximum investment"),
 )
 
 AVAILABLE_INVESTMENT_STATUS_CHOICES = (
@@ -32,6 +35,11 @@ TRANSACTION_STATUS_CHOICES = (
 )
 
 
+class ActiveOnlyManager(models.Manager):
+    def get_queryset(self):
+        return super(ActiveOnlyManager, self).get_queryset().filter(active=True)
+
+
 class InvestmentDuration(models.Model):
     title = models.CharField(max_length=50, default='')
     basis = models.CharField(max_length=50, choices=basis_type_choices, default="month")
@@ -45,23 +53,41 @@ class InvestmentDuration(models.Model):
         return f"{self.title}: {self.number_of_days} day(s)"
 
 
-class AvailableInvestment(models.Model):
+class InvestmentType(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    status = models.CharField(max_length=50, choices=AVAILABLE_INVESTMENT_STATUS_CHOICES, default='active')
+    slug = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    description = models.TextField(null=True, blank=True)
+    active = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+    objects = ActiveOnlyManager()
+
+    def __str__(self):
+        return f"{self.id}: {self.name}"
+
+
+class Investment(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    type = models.ForeignKey(InvestmentType, on_delete=models.SET_NULL, null=True)
+    description = models.TextField(null=True, blank=True)
+    active = models.BooleanField(default=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+    objects = ActiveOnlyManager()
 
     def __str__(self):
         return f"{self.pk}: {self.name}"
 
 
 class InvestmentOption(models.Model):
-    available_investment = models.ForeignKey(AvailableInvestment, on_delete=models.CASCADE)
+    investment = models.ForeignKey(Investment, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
     duration = models.ManyToManyField(InvestmentDuration, blank=True)
-    status = models.CharField(max_length=100, choices=AVAILABLE_INVESTMENT_STATUS_CHOICES, default='active')
+    active = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+    objects = ActiveOnlyManager()
 
     def __str__(self):
         return f"{self.pk}: {self.name}"
@@ -69,13 +95,13 @@ class InvestmentOption(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['available_investment', 'name'], name='investment_option_constraint'
+                fields=['investment', 'name'], name='investment_option_constraint'
             )
         ]
 
 
 class InvestmentSpecification(models.Model):
-    investment_option = models.ForeignKey(InvestmentOption, on_delete=models.CASCADE)
+    option = models.ForeignKey(InvestmentOption, on_delete=models.CASCADE)
     key = models.CharField(max_length=100, choices=INVESTMENT_SPEC_CHOICES)
     value = models.CharField(max_length=100)
     status = models.CharField(max_length=100, choices=AVAILABLE_INVESTMENT_STATUS_CHOICES, default='active')
@@ -89,14 +115,14 @@ class InvestmentSpecification(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['investment_option', 'key'], name='investment_spec_constraint'
+                fields=['option', 'key'], name='investment_spec_constraint'
             )
         ]
 
 
-class Investment(models.Model):
+class UserInvestment(models.Model):
     user = models.ForeignKey("account.Profile", on_delete=models.CASCADE)
-    investment = models.ForeignKey(AvailableInvestment, on_delete=models.CASCADE, related_name='investment')
+    investment = models.ForeignKey(Investment, on_delete=models.CASCADE, related_name='investment')
     option = models.ForeignKey(InvestmentOption, on_delete=models.CASCADE, related_name='option')
     duration = models.ForeignKey(InvestmentDuration, on_delete=models.CASCADE, related_name='investment_duration')
     amount_invested = models.DecimalField(decimal_places=2, max_digits=20, default=0)
@@ -116,7 +142,7 @@ class Investment(models.Model):
 
 class InvestmentTransaction(models.Model):
     user = models.ForeignKey("account.Profile", on_delete=models.CASCADE)
-    investment = models.ForeignKey(Investment, on_delete=models.CASCADE)
+    user_investment = models.ForeignKey(UserInvestment, on_delete=models.CASCADE)
     transaction_type = models.CharField(max_length=50, choices=TRANSACTION_TYPE_CHOICES, default='investment')
     amount = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     status = models.CharField(max_length=50, choices=TRANSACTION_STATUS_CHOICES, default='pending')
