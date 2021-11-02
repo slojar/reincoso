@@ -5,6 +5,7 @@ from loan.paginations import CustomPagination
 from savings.serializers import *
 from investment.serializers import *
 from settings.serializers import *
+from .filters import *
 from account.utils import encrypt_text
 
 from rest_framework import generics, status
@@ -15,6 +16,8 @@ from rest_framework.permissions import IsAdminUser
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
+from rest_framework.filters import SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class AdminHomepage(APIView):
@@ -284,6 +287,9 @@ class AdminWalletView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = WalletSerializer
     queryset = Wallet.objects.all()
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_class = WalletFilter
+    search_fields = ['user__user__first_name', 'user__user__last_name']
 
 
 class AdminWalletDetailView(generics.RetrieveUpdateAPIView):
@@ -293,16 +299,43 @@ class AdminWalletDetailView(generics.RetrieveUpdateAPIView):
     lookup_field = 'id'
 
 
-class AdminLoanView(generics.ListAPIView):
-    permission_classes = [IsAdminUser]
-    serializer_class = LoanSerializer
-    queryset = Loan.objects.all()
-
-
 class AdminLoanDetailView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAdminUser]
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
     lookup_field = 'id'
+
+
+class AdminLoanView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = LoanSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_class = LoanFilter
+    search_fields = ['user__user__first_name', 'user__user__last_name']
+    queryset = Loan.objects.all().order_by('-id')
+
+
+class AdminInvestmentView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = InvestmentSerializer
+    queryset = Investment.objects.all().order_by('-id')
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    filter_class = InvestmentFilter
+    search_fields = ['user__user__first_name', 'user__user__last_name']
+    lookup_field = 'id'
+
+
+class AdminSavingView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = SavingSerializer
+    queryset = Saving.objects.all().order_by('-id')
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['user__user__first_name', 'user__user__last_name']
+    filter_class = SavingFilter
+    lookup_field = 'id'
+
+
+
+
 
 

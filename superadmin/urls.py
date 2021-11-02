@@ -33,6 +33,10 @@ urlpatterns = [
     path('wallet/<int:id>/', AdminWalletDetailView.as_view(), name='user-wallet-detail'),
     path('loan/', AdminLoanView.as_view(), name='loan'),
     path('loan/<int:id>/', AdminLoanDetailView.as_view(), name='loan-detail'),
+    path('saving/', AdminSavingView.as_view(), name='saving'),
+    path('saving/<int:id>/', AdminSavingView.as_view(), name='saving-detail'),
+    path('investment/', AdminInvestmentView.as_view(), name='investment'),
+    path('investment/<int:id>/', AdminInvestmentView.as_view(), name='investment-detail'),
 ]
 
 urlpatterns += router.urls
