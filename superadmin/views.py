@@ -321,7 +321,7 @@ class AdminInvestmentView(generics.ListAPIView):
     queryset = Investment.objects.all().order_by('-id')
     filter_backends = [SearchFilter, DjangoFilterBackend]
     filter_class = InvestmentFilter
-    search_fields = ['user__user__first_name', 'user__user__last_name']
+    search_fields = ['name', 'type__name', 'description']
     lookup_field = 'id'
 
 

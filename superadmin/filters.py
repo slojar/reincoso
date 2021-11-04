@@ -50,23 +50,8 @@ class LoanFilter(filters.FilterSet):
 
 
 class InvestmentFilter(filters.FilterSet):
-    first_name = filters.CharFilter(field_name='user__user__first_name', lookup_expr='icontains')
-    last_name = filters.CharFilter(field_name='user__user__last_name', lookup_expr='icontains')
-    phone_number = filters.CharFilter(field_name='user__phone_number', lookup_expr='icontains')
-    member_id = filters.CharFilter(field_name='user__member_id', lookup_expr='iexact')
-    min_percentage = filters.NumberFilter(field_name='percentage', lookup_expr='gte')
-    max_percentage = filters.NumberFilter(field_name='percentage', lookup_expr='lte')
-    min_start_date = filters.NumberFilter(field_name='start_date', lookup_expr='gte')
-    max_start_date = filters.NumberFilter(field_name='start_date', lookup_expr='lte')
-    min_number_of_month = filters.NumberFilter(field_name='number_of_month', lookup_expr='gte')
-    max_number_of_month = filters.NumberFilter(field_name='number_of_month', lookup_expr='lte')
-    min_number_of_days = filters.NumberFilter(field_name='number_of_days', lookup_expr='gte')
-    max_number_of_days = filters.NumberFilter(field_name='number_of_days', lookup_expr='lte')
-    min_amount_invested = filters.NumberFilter(field_name='amount_invested', lookup_expr='gte')
-    max_amount_invested = filters.NumberFilter(field_name='amount_invested', lookup_expr='lte')
-    min_return_on_invested = filters.NumberFilter(field_name='return_on_invested', lookup_expr='gte')
-    max_return_on_invested = filters.NumberFilter(field_name='return_on_invested', lookup_expr='lte')
-    status = filters.CharFilter(field_name='status', lookup_expr='iexact')
+    investment_type = filters.CharFilter(field_name='type__name', lookup_expr='iexact')
+    active = filters.BooleanFilter(field_name='active')
     date_from = filters.DateTimeFilter(field_name='created_on', lookup_expr='gte')
     date_to = filters.DateTimeFilter(field_name='created_on', lookup_expr='lte')
 
