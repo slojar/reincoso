@@ -7,10 +7,7 @@ from settings.models import *
 
 
 class WalletFilter(filters.FilterSet):
-    first_name = filters.CharFilter(field_name='user__user__first_name', lookup_expr='icontains')
-    last_name = filters.CharFilter(field_name='user__user__last_name', lookup_expr='icontains')
-    phone_number = filters.CharFilter(field_name='user__phone_number', lookup_expr='icontains')
-    member_id = filters.CharFilter(field_name='user__member_id', lookup_expr='iexact')
+    email = filters.CharFilter(field_name='user__user__email', lookup_expr='iexact')
     min_balance = filters.NumberFilter(field_name='balance', lookup_expr='gte')
     max_balance = filters.NumberFilter(field_name='balance', lookup_expr='lte')
     min_bonus = filters.NumberFilter(field_name='bonus', lookup_expr='gte')
@@ -20,14 +17,11 @@ class WalletFilter(filters.FilterSet):
 
     class Meta:
         model = Wallet
-        exclude = []
+        fields = ['email', 'min_balance', 'max_balance', 'min_bonus', 'max_bonus', 'date_from', 'date_to']
 
 
 class LoanFilter(filters.FilterSet):
-    first_name = filters.CharFilter(field_name='user__user__first_name', lookup_expr='icontains')
-    last_name = filters.CharFilter(field_name='user__user__last_name', lookup_expr='icontains')
-    phone_number = filters.CharFilter(field_name='user__phone_number', lookup_expr='icontains')
-    member_id = filters.CharFilter(field_name='user__member_id', lookup_expr='iexact')
+    email = filters.CharFilter(field_name='user__user__email', lookup_expr='iexact')
     min_amount = filters.NumberFilter(field_name='amount', lookup_expr='gte')
     max_amount = filters.NumberFilter(field_name='amount', lookup_expr='lte')
     duration = filters.CharFilter(field_name='duration__title', lookup_expr='iexact')
@@ -36,17 +30,21 @@ class LoanFilter(filters.FilterSet):
     max_number_of_days = filters.NumberFilter(field_name='number_of_days', lookup_expr='lte')
     min_percentage = filters.NumberFilter(field_name='percentage', lookup_expr='gte')
     max_percentage = filters.NumberFilter(field_name='percentage', lookup_expr='lte')
-    min_start_date = filters.NumberFilter(field_name='start_date', lookup_expr='gte')
-    max_start_date = filters.NumberFilter(field_name='start_date', lookup_expr='lte')
-    min_next_repayment_date = filters.NumberFilter(field_name='next_repayment_date', lookup_expr='gte')
-    max_next_repayment_date = filters.NumberFilter(field_name='next_repayment_date', lookup_expr='lte')
+    min_start_date = filters.DateTimeFilter(field_name='start_date', lookup_expr='gte')
+    max_start_date = filters.DateTimeFilter(field_name='start_date', lookup_expr='lte')
+    min_next_repayment_date = filters.DateTimeFilter(field_name='next_repayment_date', lookup_expr='gte')
+    max_next_repayment_date = filters.DateTimeFilter(field_name='next_repayment_date', lookup_expr='lte')
     status = filters.CharFilter(field_name='status', lookup_expr='iexact')
     date_from = filters.DateTimeFilter(field_name='created_on', lookup_expr='gte')
     date_to = filters.DateTimeFilter(field_name='created_on', lookup_expr='lte')
 
     class Meta:
         model = Loan
-        exclude = []
+        fields = [
+            'email', 'min_amount', 'max_amount', 'duration', 'basis', 'min_number_of_days', 'max_number_of_days',
+            'min_percentage', 'max_percentage', 'min_start_date', 'max_start_date', 'min_next_repayment_date',
+            'max_next_repayment_date', 'status', 'date_from', 'date_to'
+        ]
 
 
 class InvestmentFilter(filters.FilterSet):
@@ -57,22 +55,22 @@ class InvestmentFilter(filters.FilterSet):
 
     class Meta:
         model = Investment
-        exclude = []
+        fields = ['investment_type', 'active', 'date_from', 'date_to']
 
 
 class SavingFilter(filters.FilterSet):
-    first_name = filters.CharFilter(field_name='user__user__first_name', lookup_expr='icontains')
-    last_name = filters.CharFilter(field_name='user__user__last_name', lookup_expr='icontains')
-    phone_number = filters.CharFilter(field_name='user__phone_number', lookup_expr='icontains')
-    member_id = filters.CharFilter(field_name='user__member_id', lookup_expr='iexact')
+    email = filters.CharFilter(field_name='user__user__email', lookup_expr='iexact')
+    saving_type = filters.CharFilter(field_name='type__name', lookup_expr='iexact')
+    duration = filters.CharFilter(field_name='duration__name', lookup_expr='iexact')
     min_total = filters.NumberFilter(field_name='total', lookup_expr='gte')
     max_total = filters.NumberFilter(field_name='total', lookup_expr='lte')
+    auto_save = filters.BooleanFilter(field_name='auto_save')
     # status = filters.CharFilter(field_name='status', lookup_expr='iexact')
     date_from = filters.DateTimeFilter(field_name='created_on', lookup_expr='gte')
     date_to = filters.DateTimeFilter(field_name='created_on', lookup_expr='lte')
 
     class Meta:
         model = Saving
-        exclude = []
+        fields = ['email', 'saving_type', 'duration', 'min_total', 'max_total', 'auto_save', 'date_from', 'date_to']
 
 

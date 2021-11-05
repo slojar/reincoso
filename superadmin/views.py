@@ -311,7 +311,7 @@ class AdminLoanView(generics.ListAPIView):
     serializer_class = LoanSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filter_class = LoanFilter
-    search_fields = ['user__user__first_name', 'user__user__last_name']
+    search_fields = ['user__user__first_name', 'user__user__last_name', 'user__user__email']
     queryset = Loan.objects.all().order_by('-id')
 
 
@@ -330,7 +330,7 @@ class AdminSavingView(generics.ListAPIView):
     serializer_class = SavingSerializer
     queryset = Saving.objects.all().order_by('-id')
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    search_fields = ['user__user__first_name', 'user__user__last_name']
+    search_fields = ['user__user__first_name', 'user__user__last_name', 'user__user__email']
     filter_class = SavingFilter
     lookup_field = 'id'
 
