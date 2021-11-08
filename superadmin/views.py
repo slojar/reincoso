@@ -335,6 +335,15 @@ class AdminSavingView(generics.ListAPIView):
     lookup_field = 'id'
 
 
+class AdminUserFilterView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = UserDetailSerializer
+    queryset = Profile.objects.all().order_by('-id')
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    filter_class = ProfileFilter
+    search_fields = ['user__first_name', 'user__last_name', 'user__email', 'phone_number', 'member_id']
+
+
 
 
 

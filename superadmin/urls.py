@@ -37,6 +37,7 @@ urlpatterns = [
     path('saving/<int:id>/', AdminSavingView.as_view(), name='saving-detail'),
     path('investment/', AdminInvestmentView.as_view(), name='investment'),
     path('investment/<int:id>/', AdminInvestmentView.as_view(), name='investment-detail'),
+    path('user-filter/', AdminUserFilterView.as_view(), name='user-filter'),
 ]
 
 urlpatterns += router.urls

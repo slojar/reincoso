@@ -74,3 +74,15 @@ class SavingFilter(filters.FilterSet):
         fields = ['email', 'saving_type', 'duration', 'min_total', 'max_total', 'auto_save', 'date_from', 'date_to']
 
 
+class ProfileFilter(filters.FilterSet):
+    email = filters.CharFilter(field_name='user__email', lookup_expr='iexact')
+    gender = filters.CharFilter(field_name='gender', lookup_expr='iexact')
+    status = filters.CharFilter(field_name='status', lookup_expr='iexact')
+    paid_membership = filters.BooleanFilter(field_name='paid_membership_fee')
+    date_from = filters.DateTimeFilter(field_name='created_on', lookup_expr='gte')
+    date_to = filters.DateTimeFilter(field_name='created_on', lookup_expr='lte')
+
+    class Meta:
+        model = Profile
+        fields = ['email', 'gender', 'status', 'paid_membership', 'date_from', 'date_to']
+
