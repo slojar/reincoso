@@ -50,7 +50,7 @@ class InvestmentDuration(models.Model):
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.title}: {self.number_of_days} day(s)"
+        return f"{self.title}: {self.number_of_days} day(s): {self.percentage}%"
 
 
 class InvestmentType(models.Model):
