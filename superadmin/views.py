@@ -60,23 +60,23 @@ class AdminFaqView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -90,23 +90,23 @@ class AdminFaqCategoryView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -120,23 +120,23 @@ class AdminFeedbackMessageView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -157,23 +157,23 @@ class AdminLoanDurationView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -187,23 +187,23 @@ class AdminLoanTransactionView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -217,23 +217,23 @@ class AdminSavingDurationView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -247,23 +247,23 @@ class AdminSavingTransactionView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -277,23 +277,23 @@ class AdminInvestmentSpecificationView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -307,23 +307,23 @@ class AdminGeneralSettingView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -337,23 +337,23 @@ class AdminPaymentGatewayView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -367,23 +367,23 @@ class AdminLoanSettingView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -396,7 +396,7 @@ class AdminSiteView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
 
@@ -409,23 +409,23 @@ class AdminInvestmentDurationView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -439,23 +439,23 @@ class AdminAvailableInvestmentView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -481,7 +481,7 @@ class AdminProfileView(APIView, CustomPagination):
         # if not can_change(request.user, self.model):
         #     return Response({'detail': 'You do not have permission to perform this action'})
         if request.user.is_staff is False:
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
 
         try:
             phone_number = request.data.get('phone_number')
@@ -516,7 +516,7 @@ class AdminProfileView(APIView, CustomPagination):
 
     def delete(self, request, profile_id):
         if not can_delete(request.user, self.model) or not can_delete(request.user, 'profile'):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
 
         try:
             profile = get_object_or_404(Profile, id=profile_id)
@@ -618,23 +618,23 @@ class AdminSavingsTypeView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().destroy(request, *args, **kwargs)
 
@@ -650,7 +650,7 @@ class AdminWalletView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
 
@@ -662,12 +662,12 @@ class AdminWalletDetailView(generics.RetrieveUpdateAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
@@ -680,12 +680,12 @@ class AdminLoanDetailView(generics.RetrieveUpdateAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         create_log(request, model=eval(self.model.strip('')))
         return super().update(request, *args, **kwargs)
 
@@ -701,7 +701,7 @@ class AdminLoanView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
 
@@ -717,7 +717,7 @@ class AdminInvestmentView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
 
@@ -733,7 +733,7 @@ class AdminUserInvestmentView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
 
@@ -749,7 +749,7 @@ class AdminSavingView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
 
@@ -764,7 +764,7 @@ class AdminUserFilterView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
 
@@ -776,7 +776,7 @@ class AdminGroupView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
-            return Response({'detail': 'You do not have permission to perform this action'})
+            return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
 
 
