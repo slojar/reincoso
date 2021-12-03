@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'transaction.apps.TransactionConfig',
     'settings.apps.SettingsConfig',
     'investment.apps.InvestmentConfig',
+    'superadmin.apps.SuperadminConfig',
 ]
 
 MIDDLEWARE = [

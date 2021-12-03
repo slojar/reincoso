@@ -58,6 +58,32 @@ class InvestmentFilter(filters.FilterSet):
         fields = ['investment_type', 'active', 'date_from', 'date_to']
 
 
+class UserInvestmentFilter(filters.FilterSet):
+    investment = filters.CharFilter(field_name='investment__name', lookup_expr='iexact')
+    status = filters.CharFilter(field_name='status', lookup_expr='iexact')
+    min_amount_invested = filters.NumberFilter(field_name='amount_invested', lookup_expr='gte')
+    max_amount_invested = filters.NumberFilter(field_name='amount_invested', lookup_expr='lte')
+    min_percentage = filters.NumberFilter(field_name='percentage', lookup_expr='gte')
+    max_percentage = filters.NumberFilter(field_name='percentage', lookup_expr='lte')
+    min_number_of_month = filters.NumberFilter(field_name='number_of_month', lookup_expr='gte')
+    max_number_of_month = filters.NumberFilter(field_name='number_of_month', lookup_expr='lte')
+    min_number_of_days = filters.NumberFilter(field_name='number_of_days', lookup_expr='gte')
+    max_number_of_days = filters.NumberFilter(field_name='number_of_days', lookup_expr='lte')
+    start_date_from = filters.DateTimeFilter(field_name='start_date', lookup_expr='gte')
+    start_date_to = filters.DateTimeFilter(field_name='start_date', lookup_expr='lte')
+    end_date_from = filters.DateTimeFilter(field_name='end_date', lookup_expr='gte')
+    end_date_to = filters.DateTimeFilter(field_name='end_date', lookup_expr='lte')
+    date_from = filters.DateTimeFilter(field_name='created_on', lookup_expr='gte')
+    date_to = filters.DateTimeFilter(field_name='created_on', lookup_expr='lte')
+
+    class Meta:
+        model = UserInvestment
+        fields = ['investment', 'status', 'min_amount_invested', 'max_amount_invested', 'min_percentage',
+                  'max_percentage', 'min_number_of_month', 'max_number_of_month', 'min_number_of_days',
+                  'max_number_of_days', 'start_date_from', 'start_date_to', 'end_date_from', 'end_date_to',
+                  'date_from', 'date_to']
+
+
 class SavingFilter(filters.FilterSet):
     email = filters.CharFilter(field_name='user__user__email', lookup_expr='iexact')
     saving_type = filters.CharFilter(field_name='type__name', lookup_expr='iexact')

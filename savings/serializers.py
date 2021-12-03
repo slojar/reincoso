@@ -9,8 +9,18 @@ class SavingsTransactionSerializer(serializers.ModelSerializer):
 
 
 class SavingSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
     transactions = serializers.SerializerMethodField()
     successful_transaction = serializers.SerializerMethodField()
+    # next_payment_date = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        user = dict()
+        user['first_name'] = obj.user.user.first_name
+        user['last_name'] = obj.user.user.last_name
+        user['email'] = obj.user.user.email
+        user['phone_number'] = obj.user.phone_number
+        return user
 
     def get_successful_transaction(self, obj):
         return SavingTransaction.objects.filter(saving=obj, status='success').count()
@@ -19,9 +29,14 @@ class SavingSerializer(serializers.ModelSerializer):
         trans = SavingTransaction.objects.filter(saving=obj)[:10]
         return SavingsTransactionSerializer(trans, many=True).data
 
+    # def get_next_payment_date(self, obj):
+    #     if obj.auto_save is False:
+    #         return obj.next_payment_date
+    #     return None
+
     class Meta:
         model = Saving
-        exclude = ['user']
+        exclude = []
         depth = 2
 
 

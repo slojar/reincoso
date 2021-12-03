@@ -28,6 +28,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     cards = serializers.SerializerMethodField()
     guarantors = serializers.SerializerMethodField()
     analytics = serializers.SerializerMethodField()
+    group = serializers.SerializerMethodField()
     wallet = serializers.DictField(source='get_wallet', read_only=True)
 
     def get_analytics(self, obj):
@@ -41,6 +42,11 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     def get_email(self, obj):
         return obj.email()
+
+    def get_group(self, obj):
+        if Group.objects.filter(user__email=obj.user.email).exists():
+            return [{'id': group.id, 'name': group.name} for group in Group.objects.filter(user__email=obj.user.email)]
+        return None
 
     def get_guarantors(self, obj):
         guarantors = [guarantor.guarantor for guarantor in Guarantor.objects.filter(user=obj).distinct()
@@ -81,5 +87,19 @@ class WalletSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wallet
         exclude = ['user']
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    permissions = serializers.SerializerMethodField()
+
+    def get_permissions(self, obj):
+        if obj.permissions:
+            perm = [perms.name for perms in obj.permissions.all()]
+            return perm
+        return None
+
+    class Meta:
+        model = Group
+        exclude = []
 
 

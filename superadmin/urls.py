@@ -37,7 +37,11 @@ urlpatterns = [
     path('saving/<int:id>/', AdminSavingView.as_view(), name='saving-detail'),
     path('investment/', AdminInvestmentView.as_view(), name='investment'),
     path('investment/<int:id>/', AdminInvestmentView.as_view(), name='investment-detail'),
+    path('user-investment/', AdminUserInvestmentView.as_view(), name='user-investment'),
+    path('user-investment/<int:id>/', AdminUserInvestmentView.as_view(), name='user-investment-detail'),
     path('user-filter/', AdminUserFilterView.as_view(), name='user-filter'),
+    path('group/', AdminGroupView.as_view(), name='group'),
+    path('activity/', AdminActivityLog.as_view(), name='activity'),
 ]
 
 urlpatterns += router.urls

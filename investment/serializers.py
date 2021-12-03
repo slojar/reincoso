@@ -60,7 +60,14 @@ class UserInvestmentSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
 
     def get_user(self, obj):
-        from account.serializers import UserDetailSerializer
+        user = {
+            'first_name': obj.user.user.first_name,
+            'last_name': obj.user.user.last_name,
+            'email': obj.user.user.email,
+            'phone_number': obj.user.phone_number,
+        }
+        return user
+        # from account.serializers import UserDetailSerializer
         # return UserDetailSerializer(obj.user).data
 
     class Meta:

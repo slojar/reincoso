@@ -1,8 +1,10 @@
 from django.db import models
+
 from account.models import Profile
 from .choices import *
 from django.contrib.sites.models import Site
 from savings.models import PAYMENT_GATEWAYS
+
 
 basis_type_choices = (
     ('weekly', 'Weekly'), ('monthly', 'Monthly'), ('yearly', 'Yearly'),
