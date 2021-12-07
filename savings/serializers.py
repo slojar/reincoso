@@ -12,7 +12,8 @@ class SavingSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     transactions = serializers.SerializerMethodField()
     successful_transaction = serializers.SerializerMethodField()
-    # next_payment_date = serializers.SerializerMethodField()
+    next_payment_date = serializers.SerializerMethodField()
+    duration = serializers.SerializerMethodField()
 
     def get_user(self, obj):
         user = dict()
@@ -29,10 +30,21 @@ class SavingSerializer(serializers.ModelSerializer):
         trans = SavingTransaction.objects.filter(saving=obj)[:10]
         return SavingsTransactionSerializer(trans, many=True).data
 
-    # def get_next_payment_date(self, obj):
-    #     if obj.auto_save is False:
-    #         return obj.next_payment_date
-    #     return None
+    def get_next_payment_date(self, obj):
+        if obj.type.slug == 'auto':
+            return obj.next_payment_date
+        return None
+
+    def get_duration(self, obj):
+        duration = None
+        if obj.type.slug == 'auto':
+            duration = {
+                'id': obj.duration.id,
+                'name': obj.duration.name,
+                'number_of_day': obj.duration.number_of_day,
+                'number_of_month': obj.duration.number_of_month
+            }
+        return duration
 
     class Meta:
         model = Saving
