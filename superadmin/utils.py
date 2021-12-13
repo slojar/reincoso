@@ -22,7 +22,7 @@ def create_log(request, model):
         content_type_id=ContentType.objects.get_for_model(model).pk,
         change_message=message,
         object_repr=f'{request.user.id} - {action_for}: {model}',
-        object_id='',
+        object_id=object.id,
         action_flag=action)
 
 

@@ -42,6 +42,7 @@ urlpatterns = [
     path('user-filter/', AdminUserFilterView.as_view(), name='user-filter'),
     path('group/', AdminGroupView.as_view(), name='group'),
     path('activity/', AdminActivityLog.as_view(), name='activity'),
+    path('activity/<int:id>/', AdminActivityLogDetail.as_view(), name='activity-detail'),
 ]
 
 urlpatterns += router.urls

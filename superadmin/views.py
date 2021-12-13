@@ -785,7 +785,14 @@ class AdminActivityLog(generics.ListAPIView):
     pagination_class = CustomPagination
     queryset = LogEntry.objects.all().order_by('-id')
     serializer_class = ActivityReportSerializer
+    lookup_field = 'id'
 
+
+class AdminActivityLogDetail(generics.RetrieveAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = LogEntry.objects.all()
+    serializer_class = ActivityReportSerializer
+    lookup_field = 'id'
 
 
 
