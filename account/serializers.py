@@ -49,9 +49,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
         return None
 
     def get_guarantors(self, obj):
-        guarantors = [guarantor.guarantor for guarantor in Guarantor.objects.filter(user=obj).distinct()
-                      if guarantor.guarantor != obj]
-        return UserDetailSerializer(guarantors, many=True).data
+        guarantors = Guarantor.objects.filter(user=obj).exclude(guarantor=obj).distinct()
+        return GuarantorSerializer(guarantors, many=True).data
 
     def get_cards(self, obj):
         return UserCard.objects.filter(user=obj).values('id', 'bank', 'card_type', 'bin', 'last4', 'exp_month',
@@ -59,15 +58,21 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        exclude = ['bvn', 'user']
+        exclude = ('bvn', 'user')
+
+
+class GuarantorProfileDetailSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    email = serializers.CharField(source='user.email')
+
+    class Meta:
+        model = Profile
+        exclude = ('bvn', 'user')
 
 
 class GuarantorSerializer(serializers.ModelSerializer):
-    # guarantor = serializers.SerializerMethodField()
-    # guarantor = UserDetailSerializer()
-
-    # def get_guarantor(self, obj):
-    #     return UserDetailSerializer(obj.guarantor).data
+    guarantor = GuarantorProfileDetailSerializer()
 
     class Meta:
         model = Guarantor
