@@ -2,7 +2,8 @@ from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.contrib.contenttypes.models import ContentType
 
 
-def create_log(request, model):
+def create_log(request, model, **kwargs):
+    model_id = kwargs.get('model_id')
     action = action_for = None
 
     if request.method == 'POST':
@@ -22,7 +23,7 @@ def create_log(request, model):
         content_type_id=ContentType.objects.get_for_model(model).pk,
         change_message=message,
         object_repr=f'{request.user.id} - {action_for}: {model}',
-        object_id=object.id,
+        object_id=model_id if model_id else '',
         action_flag=action)
 
 

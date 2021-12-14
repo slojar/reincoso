@@ -71,13 +71,19 @@ class AdminFaqView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -101,13 +107,19 @@ class AdminFaqCategoryView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -131,13 +143,19 @@ class AdminFeedbackMessageView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -168,13 +186,19 @@ class AdminLoanDurationView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -198,13 +222,19 @@ class AdminLoanTransactionView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -228,13 +258,19 @@ class AdminSavingDurationView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -258,13 +294,19 @@ class AdminSavingTransactionView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -288,13 +330,19 @@ class AdminInvestmentSpecificationView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -318,13 +366,19 @@ class AdminGeneralSettingView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -348,13 +402,19 @@ class AdminPaymentGatewayView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -378,13 +438,19 @@ class AdminLoanSettingView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -420,13 +486,19 @@ class AdminInvestmentDurationView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -450,13 +522,19 @@ class AdminAvailableInvestmentView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -509,7 +587,7 @@ class AdminProfileView(APIView, CustomPagination):
             profile.user.save()
             profile.save()
             data = UserDetailSerializer(profile).data
-            create_log(request, model=eval(self.model.strip('')))
+            create_log(request, model=eval(self.model.strip('')), model_id=profile.user.id)
             return Response(data)
         except Exception as ex:
             return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
@@ -520,8 +598,9 @@ class AdminProfileView(APIView, CustomPagination):
 
         try:
             profile = get_object_or_404(Profile, id=profile_id)
+            model_id = profile.user.id
             profile.delete()
-            create_log(request, model=eval(self.model.strip('')))
+            create_log(request, model=eval(self.model.strip('')), model_id=model_id)
             return Response({'detail': 'profile deleted successfully'})
         except Exception as ex:
             return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
@@ -572,7 +651,7 @@ class AdminInvestmentOptionView(APIView, CustomPagination):
         option.save()
 
         data = InvestmentOptionSerializer(option).data
-        create_log(request, model=eval(self.model.strip('')))
+        create_log(request, model=eval(self.model.strip('')), model_id=option.id)
         return Response(data)
 
     def put(self, request, pk):
@@ -592,7 +671,7 @@ class AdminInvestmentOptionView(APIView, CustomPagination):
                     option.duration.add(duration)
             option.save()
             data = InvestmentOptionSerializer(option).data
-            create_log(request, model=eval(self.model.strip('')))
+            create_log(request, model=eval(self.model.strip('')), model_id=option.id)
             return Response(data)
         except Exception as ex:
             return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
@@ -602,8 +681,9 @@ class AdminInvestmentOptionView(APIView, CustomPagination):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         try:
             option = get_object_or_404(InvestmentOption, id=pk)
+            model_id = option.id
             option.delete()
-            create_log(request, model=eval(self.model.strip('')))
+            create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         except Exception as ex:
             return Response({'detail': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'detail': 'Investment Option deleted successfully'})
@@ -629,13 +709,19 @@ class AdminSavingsTypeView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not can_delete(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().destroy(request, *args, **kwargs)
 
 
@@ -668,7 +754,10 @@ class AdminWalletDetailView(generics.RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
 
@@ -686,7 +775,10 @@ class AdminLoanDetailView(generics.RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         if not can_change(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        create_log(request, model=eval(self.model.strip('')))
+        model_id = 0
+        for i in self.get_queryset():
+            model_id = i.id
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
 
