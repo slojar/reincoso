@@ -66,14 +66,8 @@ class LoginView(APIView):
             data['detail'] = 'Wrong phone number provided'
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
         if Group.objects.filter(user=user).exists():
-            LogEntry.objects.log_action(
-                user_id=user.id,
-                content_type_id=ContentType.objects.get_for_model(User).pk,
-                change_message='Logged in',
-                # object_repr=f'{request.user.id} - {action_for}: {model}',
-                object_repr=f'',
-                object_id='',
-                action_flag=2)
+            LogEntry.objects.log_action(user_id=user.id, content_type_id=ContentType.objects.get_for_model(User).pk,
+                                        change_message='Logged in', object_repr=f'', object_id='', action_flag=2)
 
         data['success'] = True
         data['detail'] = 'Login successful'
