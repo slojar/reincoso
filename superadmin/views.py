@@ -832,7 +832,7 @@ class AdminUserInvestmentView(generics.ListAPIView):
 class AdminSavingView(generics.ListAPIView):
     pagination_class = CustomPagination
     serializer_class = SavingSerializer
-    queryset = Saving.objects.all().order_by('-id')
+    queryset = Saving.objects.all().order_by('-updated_on')
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['user__user__first_name', 'user__user__last_name', 'user__user__email']
     filter_class = SavingFilter
