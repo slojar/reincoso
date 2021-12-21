@@ -16,6 +16,8 @@ class ActivityReportSerializer(serializers.ModelSerializer):
             message = str(obj.change_message)
             message = message.replace('"', "").replace("[", "").replace("{", "").replace("]", "")
             message = message.replace("}", "").replace("fields:", "") + f' on {obj.content_type.model} - ID:{obj.object_id}'
+            if "logged".capitalize() in message:
+                message = "Logged in"
             return message
         elif obj.get_action_flag_display() == 'Deletion':
             message = f'deleted: {obj.content_type.model} - ID:{obj.object_id}'

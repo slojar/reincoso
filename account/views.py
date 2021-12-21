@@ -1,3 +1,4 @@
+from django.contrib.admin.models import LogEntry
 from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,6 +7,7 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIV
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from modules.paystack import get_paystack_link
+from django.contrib.contenttypes.models import ContentType
 from .serializers import *
 from .utils import *
 from django.contrib.auth import authenticate
@@ -63,6 +65,15 @@ class LoginView(APIView):
         if not user:
             data['detail'] = 'Wrong phone number provided'
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        if Group.objects.filter(user=user).exists():
+            LogEntry.objects.log_action(
+                user_id=user.id,
+                content_type_id=ContentType.objects.get_for_model(User).pk,
+                change_message='Logged in',
+                # object_repr=f'{request.user.id} - {action_for}: {model}',
+                object_repr=f'',
+                object_id='',
+                action_flag=2)
 
         data['success'] = True
         data['detail'] = 'Login successful'
