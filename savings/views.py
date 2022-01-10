@@ -149,6 +149,8 @@ class VerifyPaymentView(APIView):
                 trans.reference = reference
                 trans.status = 'success'
                 trans.response = response
+                profile.paid_membership_fee = True
+                profile.save()
                 trans.save()
 
             if payment_for == 'savings':

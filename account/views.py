@@ -137,7 +137,7 @@ class PayMembershipFeeView(APIView):
             if success:
                 data['payment_link'] = response
                 data['membership_id'] = profile.member_id
-                profile.paid_membership_fee = True
+                # profile.paid_membership_fee = True
                 profile.save()
             else:
                 data['detail'] = response
