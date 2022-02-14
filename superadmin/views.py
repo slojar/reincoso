@@ -549,7 +549,7 @@ class AdminProfileView(APIView, CustomPagination):
             user = Profile.objects.get(id=profile_id)
             serializer = UserDetailSerializer(user).data
         else:
-            user = Profile.objects.all()
+            user = Profile.objects.all().order_by('-id')
             user = self.paginate_queryset(user, request)
             user = UserDetailSerializer(user, many=True).data
             serializer = self.get_paginated_response(user).data
