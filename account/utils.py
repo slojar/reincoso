@@ -86,6 +86,9 @@ def signup(request):
     if not (account_no and account_name and bank_name):
         detail = 'Bank details are required'
         return success, detail
+    if not (len(account_no) == 10 and str(account_no).isnumeric()):
+        detail = 'Account number is not valid'
+        return success, detail
     else:
         phone_number = reformat_phone_number(phone_number)
     if User.objects.filter(username=phone_number).exists():
