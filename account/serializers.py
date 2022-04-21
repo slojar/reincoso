@@ -58,7 +58,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        exclude = ('bvn', 'user')
+        exclude = ('bvn', 'user', 'account_no')
 
 
 class GuarantorProfileDetailSerializer(serializers.ModelSerializer):
