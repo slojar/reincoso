@@ -65,6 +65,9 @@ def signup(request):
     data = request.data
     first_name = data.get('first_name')
     last_name = data.get('last_name')
+    account_no = data.get('account_no')
+    account_name = data.get('account_name')
+    bank_name = data.get('bank_name')
     email = data.get('email')
     phone_number = data.get('phone_number')
     bvn = data.get('bvn')
@@ -79,6 +82,9 @@ def signup(request):
         return success, detail
     if not phone_number:
         detail = 'Phone number not provided'
+        return success, detail
+    if not (account_no and account_name and bank_name):
+        detail = 'Bank details are required'
         return success, detail
     else:
         phone_number = reformat_phone_number(phone_number)
@@ -103,7 +109,10 @@ def signup(request):
     Token.objects.create(user=user)
     profile, created = Profile.objects.get_or_create(user=user)
     profile.phone_number = phone_number
+    profile.bank_name = bank_name
+    profile.account_name = account_name
     profile.bvn = encrypt_text(bvn)
+    profile.account_no = encrypt_text(account_no)
     profile.gender = gender
     profile.save()
 
