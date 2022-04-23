@@ -1,5 +1,6 @@
 from django.contrib.admin.models import LogEntry
 from rest_framework import serializers
+from .models import Transfer
 
 
 class ActivityReportSerializer(serializers.ModelSerializer):
@@ -31,4 +32,11 @@ class ActivityReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = LogEntry
         exclude = ['object_id', 'object_repr']
-#
+
+
+class TransferSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transfer
+        exclude = []
+
+

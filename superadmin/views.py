@@ -9,6 +9,7 @@ from investment.serializers import *
 from settings.serializers import *
 from .filters import *
 from .models import Transfer
+from .serializers import TransferSerializer
 from .permissions import *
 from .utils import *
 from account.utils import encrypt_text
@@ -900,8 +901,14 @@ class UpdateBankView(APIView):
         return Response({"detail": "Banks updated"})
 
 
-class TransferFundView(APIView):
-    permission_classes = []
+class TransferFundView(APIView, CustomPagination):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        transfer = self.paginate_queryset(Transfer.objects.all().order_by('-id'), request)
+        transfer = TransferSerializer(transfer, many=True).data
+        result = self.get_paginated_response(transfer).data
+        return Response(result)
 
     def post(self, request):
         user = request.data.get('profile_id')
