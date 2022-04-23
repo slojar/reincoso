@@ -1,5 +1,7 @@
 from django.contrib.admin.models import LogEntry
 from django.http import HttpResponse
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
@@ -209,4 +211,19 @@ class UpdateGuarantorView(APIView):
 
         data['detail'] = "Confirmation successful"
         return Response(data)
+
+
+class GetBankView(ListAPIView):
+    permission_classes = []
+    serializer_class = BankSerializer
+
+    def get_queryset(self):
+        queryset = Bank.objects.all()
+        name = self.request.GET.get('name')
+        print(name)
+        if name:
+            queryset = Bank.objects.filter(name__icontains=name)
+        return queryset
+
+
 

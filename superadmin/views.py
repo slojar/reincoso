@@ -1,14 +1,19 @@
+from decimal import Decimal
+
 from account.serializers import *
-from account.utils import signup, reformat_phone_number
+from account.utils import signup, reformat_phone_number, decrypt_text
 from loan.serializers import *
 from loan.paginations import CustomPagination
 from savings.serializers import *
 from investment.serializers import *
 from settings.serializers import *
 from .filters import *
+from .models import Transfer
 from .permissions import *
 from .utils import *
 from account.utils import encrypt_text
+from modules.paystack import get_banks, initialize_transfer, finalize_transfer
+from threading import Thread
 
 from rest_framework import generics, status
 from rest_framework.views import APIView
@@ -885,6 +890,69 @@ class AdminActivityLogDetail(generics.RetrieveAPIView):
     queryset = LogEntry.objects.all()
     serializer_class = ActivityReportSerializer
     lookup_field = 'id'
+
+
+class UpdateBankView(APIView):
+    permission_classes = []
+
+    def get(self, request):
+        Thread(target=get_banks, args=[]).start()
+        return Response({"detail": "Banks updated"})
+
+
+class TransferFundView(APIView):
+    permission_classes = []
+
+    def post(self, request):
+        user = request.data.get('profile_id')
+        description = request.data.get('description')
+        amount = request.data.get('amount')
+
+        try:
+            profile = Profile.objects.get(id=user)
+            recipient_code = decrypt_text(profile.recipient_code)
+
+            paystack_amount = amount / 100
+
+            response = initialize_transfer(recipient_code, description, paystack_amount)
+
+            if response['status'] is True:
+                transfer_code = response['data']['transfer_code']
+                transfer, _ = Transfer.objects.get_or_create(reference=transfer_code)
+                transfer.recipient_name = profile.account_name
+                transfer.recipient_account_no = profile.account_no
+                transfer.amount = Decimal(amount)
+                transfer.description = description
+                transfer.save()
+                return Response({"details": "Transfer added successfully"})
+            else:
+                return Response({"detail": response['message']}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"detail": "An error has occurred", "error": f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, transaction_ref):
+        otp = request.data.get("otp")
+
+        if not otp:
+            return Response({'detail': 'OTP is required to approve transfer'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not Transfer.objects.filter(reference=transaction_ref, status='pending').exists():
+            return Response({'detail': 'Reference number not found or is approved'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            response = finalize_transfer(transaction_ref, otp)
+            if response['status'] is True and response['data']['status'] == 'success':
+                transfer = Transfer.objects.get(reference=transaction_ref)
+                transfer.status = "successful"
+                transfer.save()
+                return Response({'detail': 'Transfer approved'})
+            else:
+                return Response({'detail': 'Transfer failed'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as err:
+            return Response({'detail': 'Transfer failed', 'error': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
 
 
 

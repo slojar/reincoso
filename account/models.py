@@ -7,13 +7,22 @@ from django.utils.text import slugify
 import uuid
 
 
+class Bank(models.Model):
+    name = models.CharField(max_length=250)
+    code = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f'{self.name} - Code: {self.code}'
+
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20)
     bvn = models.CharField(max_length=300)
+    recipient_code = models.CharField(max_length=300, blank=True, null=True)
     account_no = models.CharField(max_length=300, blank=True, null=True)
     account_name = models.CharField(max_length=300, blank=True, null=True)
-    bank_name = models.CharField(max_length=300, blank=True, null=True)
+    bank = models.ForeignKey(Bank, on_delete=models.SET_NULL, blank=True, null=True)
     member_id = models.CharField(max_length=200, editable=False, blank=True, null=True)
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='male')
     status = models.CharField(max_length=20, choices=ACTIVE_STATUS_CHOICES, default='active')

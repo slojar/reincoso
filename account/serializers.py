@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import *
-from .utils import get_user_analytics
+from .utils import get_user_analytics, decrypt_text
 
 
 class FaqCategorySerializer(serializers.ModelSerializer):
@@ -21,15 +21,28 @@ class FeedbackMessageSerializer(serializers.ModelSerializer):
         exclude = []
 
 
+class BankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bank
+        exclude = []
+
+
 class UserDetailSerializer(serializers.ModelSerializer):
     first_name = serializers.SerializerMethodField()
     last_name = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
     cards = serializers.SerializerMethodField()
+    recipient_code = serializers.SerializerMethodField()
     guarantors = serializers.SerializerMethodField()
     analytics = serializers.SerializerMethodField()
     group = serializers.SerializerMethodField()
     wallet = serializers.DictField(source='get_wallet', read_only=True)
+
+    def get_recipient_code(self, obj):
+        code = None
+        if obj.recipient_code:
+            code = decrypt_text(obj.recipient_code)
+        return code
 
     def get_analytics(self, obj):
         return get_user_analytics(obj)
@@ -59,6 +72,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         exclude = ('bvn', 'user', 'account_no')
+        depth = 1
 
 
 class GuarantorProfileDetailSerializer(serializers.ModelSerializer):

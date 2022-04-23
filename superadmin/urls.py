@@ -43,6 +43,10 @@ urlpatterns = [
     path('group/', AdminGroupView.as_view(), name='group'),
     path('activity/', AdminActivityLog.as_view(), name='activity'),
     path('activity/<int:id>/', AdminActivityLogDetail.as_view(), name='activity-detail'),
+    path('update-banks/', UpdateBankView.as_view(), name='update-banks'),
+
+    path('transfer/', TransferFundView.as_view(), name='transfer-fund'),
+    path('transfer/<str:transaction_ref>/', TransferFundView.as_view(), name='transfer-fund'),
 ]
 
 urlpatterns += router.urls

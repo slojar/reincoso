@@ -7,11 +7,13 @@ import json
 import base64
 from django.db.models import Sum, Q
 from rest_framework.authtoken.models import Token
+from threading import Thread
 
 from investment.models import UserInvestment
 from investment.serializers import UserInvestmentSerializer
 from loan.models import LoanTransaction, Loan
 from loan.serializers import LoanSerializer
+from modules.paystack import validate_account_no, create_recipient_code
 from savings.models import SavingTransaction, Saving
 from savings.serializers import SavingSerializer
 from .models import *
@@ -66,8 +68,7 @@ def signup(request):
     first_name = data.get('first_name')
     last_name = data.get('last_name')
     account_no = data.get('account_no')
-    account_name = data.get('account_name')
-    bank_name = data.get('bank_name')
+    bank = data.get('bank')
     email = data.get('email')
     phone_number = data.get('phone_number')
     bvn = data.get('bvn')
@@ -83,12 +84,24 @@ def signup(request):
     if not phone_number:
         detail = 'Phone number not provided'
         return success, detail
-    if not (account_no and account_name and bank_name):
+    if not (account_no and bank):
         detail = 'Bank details are required'
         return success, detail
+
     if not (len(account_no) == 10 and str(account_no).isnumeric()):
         detail = 'Account number is not valid, please check'
         return success, detail
+
+    # Check if account no is valid for selected bank
+    bank_code = Bank.objects.get(id=bank).code
+    response = validate_account_no(account_no, bank_code)
+    if response['status'] is False:
+        return success, "Account number not valid for selected bank"
+
+    account_name = ''
+    if response['status'] is True:
+        account_name = response['data']['account_name']
+
     else:
         phone_number = reformat_phone_number(phone_number)
     if User.objects.filter(username=phone_number).exists():
@@ -112,12 +125,14 @@ def signup(request):
     Token.objects.create(user=user)
     profile, created = Profile.objects.get_or_create(user=user)
     profile.phone_number = phone_number
-    profile.bank_name = bank_name
+    profile.bank = bank
     profile.account_name = account_name
     profile.bvn = encrypt_text(bvn)
     profile.account_no = encrypt_text(account_no)
     profile.gender = gender
     profile.save()
+
+    Thread(target=create_recipient_code, args=[profile]).start()
 
     success = True
     detail = 'Account created successfully'

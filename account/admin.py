@@ -59,6 +59,7 @@ class LogEntryAdmin(admin.ModelAdmin):
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(FaqCategory)
 admin.site.register(Faq)
+admin.site.register(Bank)
 admin.site.register(FeedbackMessage)
 
 

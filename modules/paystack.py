@@ -6,6 +6,8 @@ from django.conf import settings
 from rest_framework import status
 import logging
 
+from account.models import Bank
+from account.utils import *
 
 log = logging.getLogger(__name__)
 
@@ -136,4 +138,87 @@ def generate_payment_ref_with_paystack(uid):
     if not settings.PAYSTACK_REF:
         settings.PAYSTACK_REF = "COSO"
     return f'{uid}-{settings.PAYSTACK_REF}-{uuid.uuid4()}'
+
+
+def get_banks():
+    url = settings.PAYSTACK_BASE_URL + "/bank"
+    data = {"country": "nigeria"}
+    response = requests.get(url, params=data).json()
+    data = response['data']
+    for institution in data:
+        bank, _ = Bank.objects.get_or_create(code=institution['code'])
+        bank.name = institution['name']
+        bank.save()
+    return response
+
+
+def validate_account_no(account_no, bank_code):
+    url = settings.PAYSTACK_BASE_URL + "/bank/resolve"
+    header = {'Authorization': f'Bearer {settings.PAYSTACK_SECRET_KEY}'}
+    data = {"account_number": account_no, "bank_code": bank_code}
+    response = requests.get(url, params=data, headers=header).json()
+    log.info(f"url: {url}")
+    log.info(f"header: {header}")
+    log.info(f"payloads: {data}")
+    log.info(f"response: {response}")
+    return response
+
+
+def create_recipient_code(profile):
+    url = settings.PAYSTACK_BASE_URL + "/transferrecipient"
+    header = {'Authorization': f'Bearer {settings.PAYSTACK_SECRET_KEY}'}
+    data = {
+        "account_number": profile.account_no,
+        "bank_code": profile.bank.code,
+        "type": "nuban",
+        "name": profile.account_name,
+        "currency": "NGN"
+    }
+    response = requests.post(url, data=data, headers=header).json()
+    log.info(f"url: {url}")
+    log.info(f"header: {header}")
+    log.info(f"payloads: {data}")
+    log.info(f"response: {response}")
+
+    if response['status'] is True:
+        code = response['data']['recipient_code']
+        recipient_code = encrypt_text(code)
+        profile.recipient_code = recipient_code
+        profile.save()
+    return True
+
+
+def initialize_transfer(recipient_code, description, amount):
+    url = settings.PAYSTACK_BASE_URL + "/transfer"
+    header = {"Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}"}
+    payload = {
+        "source": "balance",
+        "reason": description,
+        "amount": amount,
+        "recipient": recipient_code,
+    }
+    response = requests.post(url, data=payload, headers=header).json()
+    log.info(f"url: {url}")
+    log.info(f"header: {header}")
+    log.info(f"payloads: {payload}")
+    log.info(f"response: {response}")
+    return response
+
+
+def finalize_transfer(transfer_code, code):
+    url = settings.PAYSTACK_BASE_URL + "/transfer/finalize_transfer"
+    header = {"Content-Type": "application/json", "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}"}
+    payloads = {
+        "transfer_code": transfer_code,
+        "otp": code,
+    }
+    response = requests.post(url, data=payloads, headers=header).json()
+    log.info(f"url: {url}")
+    log.info(f"header: {header}")
+    log.info(f"payloads: {payloads}")
+    log.info(f"response: {response}")
+    return response
+
+
+
 

@@ -16,5 +16,6 @@ urlpatterns = [
     path('add-guarantor/', AddGuarantorView.as_view(), name='add-guarantor'),
     path('update-guarantor/', UpdateGuarantorView.as_view(), name='update-guarantor'),
     path('verify-payment/', VerifyPaymentView.as_view(), name='verify-payment'),
+    path('bank/', GetBankView.as_view(), name='get-banks'),
 
 ]
