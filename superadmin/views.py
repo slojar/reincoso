@@ -915,11 +915,14 @@ class TransferFundView(APIView, CustomPagination):
         description = request.data.get('description')
         amount = request.data.get('amount')
 
+        if not (user and amount):
+            return Response({"detail": "profile_id and amount are required"}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             profile = Profile.objects.get(id=user)
-            recipient_code = decrypt_text(profile.recipient_code)
+            recipient_code = profile.recipient_code
 
-            paystack_amount = amount / 100
+            paystack_amount = amount * 100
 
             response = initialize_transfer(recipient_code, description, paystack_amount)
 
@@ -928,10 +931,11 @@ class TransferFundView(APIView, CustomPagination):
                 transfer, _ = Transfer.objects.get_or_create(reference=transfer_code)
                 transfer.recipient_name = profile.account_name
                 transfer.recipient_account_no = profile.account_no
-                transfer.amount = Decimal(amount)
+                transfer.amount = amount
                 transfer.description = description
+                transfer.created_by = request.user
                 transfer.save()
-                return Response({"details": "Transfer added successfully"})
+                return Response({"detail": "Transfer added successfully", "data": TransferSerializer(transfer).data})
             else:
                 return Response({"detail": response['message']}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -950,6 +954,7 @@ class TransferFundView(APIView, CustomPagination):
             if response['status'] is True and response['data']['status'] == 'success':
                 transfer = Transfer.objects.get(reference=transaction_ref)
                 transfer.status = "successful"
+                transfer.updated_by = request.user
                 transfer.save()
                 return Response({'detail': 'Transfer approved'})
             else:

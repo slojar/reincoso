@@ -1,13 +1,12 @@
 import json
 import uuid
-
 import requests
-from django.conf import settings
-from rest_framework import status
 import logging
 
+from django.conf import settings
+from rest_framework import status
+
 from account.models import Bank
-from account.utils import *
 
 log = logging.getLogger(__name__)
 
@@ -164,11 +163,11 @@ def validate_account_no(account_no, bank_code):
     return response
 
 
-def create_recipient_code(profile):
+def create_recipient_code(profile, account_no):
     url = settings.PAYSTACK_BASE_URL + "/transferrecipient"
     header = {'Authorization': f'Bearer {settings.PAYSTACK_SECRET_KEY}'}
     data = {
-        "account_number": profile.account_no,
+        "account_number": account_no,
         "bank_code": profile.bank.code,
         "type": "nuban",
         "name": profile.account_name,
@@ -182,8 +181,7 @@ def create_recipient_code(profile):
 
     if response['status'] is True:
         code = response['data']['recipient_code']
-        recipient_code = encrypt_text(code)
-        profile.recipient_code = recipient_code
+        profile.recipient_code = code
         profile.save()
     return True
 

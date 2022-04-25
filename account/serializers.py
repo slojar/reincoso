@@ -32,17 +32,17 @@ class UserDetailSerializer(serializers.ModelSerializer):
     last_name = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
     cards = serializers.SerializerMethodField()
-    recipient_code = serializers.SerializerMethodField()
+    # recipient_code = serializers.SerializerMethodField()
     guarantors = serializers.SerializerMethodField()
     analytics = serializers.SerializerMethodField()
     group = serializers.SerializerMethodField()
     wallet = serializers.DictField(source='get_wallet', read_only=True)
 
-    def get_recipient_code(self, obj):
-        code = None
-        if obj.recipient_code:
-            code = decrypt_text(obj.recipient_code)
-        return code
+    # def get_recipient_code(self, obj):
+    #     code = None
+    #     if obj.recipient_code:
+    #         code = obj.recipient_code
+    #     return code
 
     def get_analytics(self, obj):
         return get_user_analytics(obj)

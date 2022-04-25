@@ -98,12 +98,17 @@ def signup(request):
     if response['status'] is False:
         return success, "Account number not valid for selected bank"
 
+    bank_obj = Bank.objects.get(id=bank)
     account_name = ''
+    phone_number = reformat_phone_number(phone_number)
+
     if response['status'] is True:
         account_name = response['data']['account_name']
+        acct_name = str(account_name).upper().split()
 
-    else:
-        phone_number = reformat_phone_number(phone_number)
+        if str(last_name).upper() not in acct_name and str(first_name).upper() not in acct_name:
+            return success, "Please use your valid bank account or contact admin"
+
     if User.objects.filter(username=phone_number).exists():
         detail = 'Phone number taken'
         return success, detail
@@ -122,17 +127,16 @@ def signup(request):
     user.password = make_password(password)
     user.save()
 
-    Token.objects.create(user=user)
     profile, created = Profile.objects.get_or_create(user=user)
     profile.phone_number = phone_number
-    profile.bank = bank
+    profile.bank = bank_obj
     profile.account_name = account_name
     profile.bvn = encrypt_text(bvn)
     profile.account_no = encrypt_text(account_no)
     profile.gender = gender
     profile.save()
 
-    Thread(target=create_recipient_code, args=[profile]).start()
+    Thread(target=create_recipient_code, args=[profile, account_no]).start()
 
     success = True
     detail = 'Account created successfully'
