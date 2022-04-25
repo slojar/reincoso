@@ -10,6 +10,8 @@ ACTIVE_STATUS_CHOICES = (
 
 APPROVAL_STATUS_CHOICES = (
     ('pending', 'Pending'),
+    ('denied', 'Denied'),
+    ('failed', 'Failed'),
     ('approved', 'Approved'),
 )
 

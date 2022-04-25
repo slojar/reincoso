@@ -127,3 +127,17 @@ class UserCard(models.Model):
         return f"{self.id}. {self.user}"
 
 
+class Withdrawal(models.Model):
+    requested_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    amount = models.DecimalField(decimal_places=2, max_digits=20, default=0)
+    description = models.TextField()
+    status = models.CharField(max_length=100, choices=APPROVAL_STATUS_CHOICES, default='pending')
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_by')
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.requested_by.email} - {self.amount} - {self.status}'
+
+
+

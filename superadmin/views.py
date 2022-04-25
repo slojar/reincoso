@@ -8,8 +8,7 @@ from savings.serializers import *
 from investment.serializers import *
 from settings.serializers import *
 from .filters import *
-from .models import Transfer
-from .serializers import TransferSerializer
+from .models import AdminNotification
 from .permissions import *
 from .utils import *
 from account.utils import encrypt_text
@@ -28,7 +27,7 @@ from django.contrib.auth.models import Group
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .serializers import ActivityReportSerializer
+from .serializers import ActivityReportSerializer, WithdrawalSerializer, AdminNotificationSerializer
 
 
 class AdminHomepage(APIView):
@@ -901,67 +900,66 @@ class UpdateBankView(APIView):
         return Response({"detail": "Banks updated"})
 
 
-class TransferFundView(APIView, CustomPagination):
+class AdminWithdrawalView(APIView, CustomPagination):
     permission_classes = [IsAdminUser]
 
-    def get(self, request):
-        transfer = self.paginate_queryset(Transfer.objects.all().order_by('-id'), request)
-        transfer = TransferSerializer(transfer, many=True).data
-        result = self.get_paginated_response(transfer).data
-        return Response(result)
-
-    def post(self, request):
-        user = request.data.get('profile_id')
-        description = request.data.get('description')
-        amount = request.data.get('amount')
-
-        if not (user and amount):
-            return Response({"detail": "profile_id and amount are required"}, status=status.HTTP_400_BAD_REQUEST)
-
+    def get(self, request, withdrawal_id=None):
         try:
-            profile = Profile.objects.get(id=user)
-            recipient_code = profile.recipient_code
-
-            paystack_amount = amount * 100
-
-            response = initialize_transfer(recipient_code, description, paystack_amount)
-
-            if response['status'] is True:
-                transfer_code = response['data']['transfer_code']
-                transfer, _ = Transfer.objects.get_or_create(reference=transfer_code)
-                transfer.recipient_name = profile.account_name
-                transfer.recipient_account_no = profile.account_no
-                transfer.amount = amount
-                transfer.description = description
-                transfer.created_by = request.user
-                transfer.save()
-                return Response({"detail": "Transfer added successfully", "data": TransferSerializer(transfer).data})
-            else:
-                return Response({"detail": response['message']}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"detail": "An error has occurred", "error": f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request, transaction_ref):
-        otp = request.data.get("otp")
-
-        if not otp:
-            return Response({'detail': 'OTP is required to approve transfer'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not Transfer.objects.filter(reference=transaction_ref, status='pending').exists():
-            return Response({'detail': 'Reference number not found or is approved'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            response = finalize_transfer(transaction_ref, otp)
-            if response['status'] is True and response['data']['status'] == 'success':
-                transfer = Transfer.objects.get(reference=transaction_ref)
-                transfer.status = "successful"
-                transfer.updated_by = request.user
-                transfer.save()
-                return Response({'detail': 'Transfer approved'})
-            else:
-                return Response({'detail': 'Transfer failed'}, status=status.HTTP_400_BAD_REQUEST)
+            if withdrawal_id:
+                return Response(WithdrawalSerializer(Withdrawal.objects.get(id=withdrawal_id)).data)
+            withdrawal = self.paginate_queryset(Withdrawal.objects.all(), request)
+            data = WithdrawalSerializer(withdrawal, many=True).data
+            data = self.get_paginated_response(data).data
+            return Response(data)
         except Exception as err:
-            return Response({'detail': 'Transfer failed', 'error': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "An error has occurred", "error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
 
+    def put(self, request, withdrawal_id):
+        withdrawal = Withdrawal.objects.get(id=withdrawal_id)
+        approval = request.data.get('status')
+        if not withdrawal:
+            return Response({"detail": "Withdrawal request is invalid or not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not approval:
+            return Response({"detail": "Approval status is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        recipient = withdrawal.requested_by
+        recipient_wallet = recipient.profile.wallet
+        if approval == 'approved':
+            recipient_wallet.balance -= withdrawal.amount
+            recipient_wallet.save()
+        withdrawal.status = approval
+        withdrawal.updated_by = request.user
+        withdrawal.save()
+
+        return Response({"detail": "Withdrawal is updated successfully"})
+
+
+class AdminNotificationView(APIView, CustomPagination):
+    permission_classes = []
+
+    def get(self, request, notification_id=None):
+        try:
+            if notification_id:
+                return Response(AdminNotificationSerializer(AdminNotification.objects.get(id=notification_id)).data)
+            notice = self.paginate_queryset(AdminNotification.objects.all(), request)
+            data = WithdrawalSerializer(notice, many=True).data
+            data = self.get_paginated_response(data).data
+            return Response(data)
+        except Exception as err:
+            return Response({"detail": "An error has occurred", "error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, notification_id):
+        notice = AdminNotification.objects.get(id=notification_id)
+        read_status = request.data.get('read_status')
+        if not notice:
+            return Response({"detail": "Invalid notification selected"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if read_status == "true":
+            notice.read = True
+        notice.save()
+
+        return Response({"detail": "Withdrawal is updated successfully"})
 
 
 

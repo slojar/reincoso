@@ -45,8 +45,15 @@ urlpatterns = [
     path('activity/<int:id>/', AdminActivityLogDetail.as_view(), name='activity-detail'),
     path('update-banks/', UpdateBankView.as_view(), name='update-banks'),
 
-    path('transfer/', TransferFundView.as_view(), name='transfer-fund'),
-    path('transfer/<str:transaction_ref>/', TransferFundView.as_view(), name='transfer-fund'),
+    path('notification/', AdminNotificationView.as_view(), name='admin-notification'),
+    path('notification/<int:notification_id>/', AdminNotificationView.as_view(), name='admin-notification-detail'),
+
+    path('withdrawal/', AdminWithdrawalView.as_view(), name='admin-withdrawal'),
+    path('withdrawal/<int:withdrawal_id>/', AdminWithdrawalView.as_view(), name='admin-withdrawal-detail'),
+
+
+    # path('transfer/', TransferFundView.as_view(), name='transfer-fund'),
+    # path('transfer/<str:transaction_ref>/', TransferFundView.as_view(), name='transfer-fund'),
 ]
 
 urlpatterns += router.urls

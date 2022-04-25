@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.admin.models import LogEntry
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -10,6 +12,8 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from modules.paystack import get_paystack_link
 from django.contrib.contenttypes.models import ContentType
+
+from superadmin.models import AdminNotification
 from .serializers import *
 from .utils import *
 from django.contrib.auth import authenticate
@@ -224,6 +228,44 @@ class GetBankView(ListAPIView):
         if name:
             queryset = Bank.objects.filter(name__icontains=name)
         return queryset
+
+
+class RequestWithdrawalView(APIView):
+
+    def post(self, request):
+        amount = request.data.get('amount', '')
+        description = request.data.get('reason', '')
+        user = request.user
+
+        if not amount:
+            return Response({"detail": "Amount is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if Withdrawal.objects.filter(requested_by=user, status='pending').exists():
+            return Response({"detail": "You have a pending withdrawal, please contact admin"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        user_wallet_balance = user.profile.wallet.balance
+
+        if Decimal(amount) > user_wallet_balance:
+            return Response({"detail": "Amount cannot be greater than your total balance"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        withdrawal = Withdrawal.objects.create(requested_by=user)
+        withdrawal.amount = Decimal(amount)
+        withdrawal.description = description
+        withdrawal.save()
+
+        # Notification for admin
+        content = f"""
+        Dear Admin,
+        A user {request.user.first_name} {request.user.last_name} has requested a withdrawal,
+        Please check and act accordingly.
+        """
+        notification = AdminNotification.objects.create(message=content)
+
+        return Response({"detail": "Your withdrawal request is being processed"})
+
+
 
 
 
