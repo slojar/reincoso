@@ -961,7 +961,7 @@ class AdminNotificationView(APIView, CustomPagination):
             notice.read = True
         notice.save()
 
-        return Response({"detail": "Withdrawal is updated successfully"})
+        return Response({"detail": "Message read"})
 
 
 
