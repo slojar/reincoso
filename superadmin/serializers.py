@@ -36,6 +36,25 @@ class ActivityReportSerializer(serializers.ModelSerializer):
 
 
 class WithdrawalSerializer(serializers.ModelSerializer):
+    requested_by = serializers.SerializerMethodField()
+    updated_by = serializers.SerializerMethodField()
+
+    def get_requested_by(self, obj):
+        data = {
+            "first_name": obj.requested_by.first_name,
+            "last_name": obj.requested_by.last_name,
+            "email": obj.requested_by.email,
+            "username": obj.requested_by.username,
+        }
+        return data
+
+    def get_updated_by(self, obj):
+        data = {
+            "username": obj.requested_by.username,
+            "email": obj.requested_by.email,
+        }
+        return data
+
     class Meta:
         model = Withdrawal
         exclude = []

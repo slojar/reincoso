@@ -41,7 +41,7 @@ def create_investment(profile, data):
     response = "Investment created successfully"
     investment_id = data.get('investment_id')
     option_id = data.get('option_id')
-    duration_id = data.get('duration_id')
+    # duration_id = data.get('duration_id')
     amount = data.get('amount')
     user = profile.user
 
@@ -52,7 +52,8 @@ def create_investment(profile, data):
     try:
         investment = Investment.objects.get(id=investment_id)
         option = InvestmentOption.objects.get(id=option_id, investment=investment)
-        duration = InvestmentDuration.objects.get(id=duration_id)
+        # duration = InvestmentDuration.objects.get(id=duration_id)
+        duration = InvestmentDuration.objects.filter(basis="yearly", duration=1).first()
     except Exception as ex:
         return False, str(ex)
 

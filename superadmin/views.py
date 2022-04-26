@@ -917,6 +917,7 @@ class AdminWithdrawalView(APIView, CustomPagination):
     def put(self, request, withdrawal_id):
         withdrawal = Withdrawal.objects.get(id=withdrawal_id)
         approval = request.data.get('status')
+        description = request.data.get('description', "")
         if not withdrawal:
             return Response({"detail": "Withdrawal request is invalid or not found"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -929,6 +930,7 @@ class AdminWithdrawalView(APIView, CustomPagination):
             recipient_wallet.balance -= withdrawal.amount
             recipient_wallet.save()
         withdrawal.status = approval
+        withdrawal.description = description
         withdrawal.updated_by = request.user
         withdrawal.save()
 
@@ -943,7 +945,7 @@ class AdminNotificationView(APIView, CustomPagination):
             if notification_id:
                 return Response(AdminNotificationSerializer(AdminNotification.objects.get(id=notification_id)).data)
             notice = self.paginate_queryset(AdminNotification.objects.all(), request)
-            data = WithdrawalSerializer(notice, many=True).data
+            data = AdminNotificationSerializer(notice, many=True).data
             data = self.get_paginated_response(data).data
             return Response(data)
         except Exception as err:

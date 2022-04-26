@@ -137,7 +137,8 @@ class Withdrawal(models.Model):
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.requested_by.email} - {self.amount} - {self.status}'
+        return f'{self.requested_by.username} - {self.amount} - {self.status}'
+        # return f'{self.amount} - {self.status}'
 
 
 
