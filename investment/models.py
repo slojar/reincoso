@@ -52,7 +52,7 @@ class InvestmentOption(models.Model):
     investment = models.ForeignKey(Investment, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
-    duration = models.ManyToManyField(InvestmentDuration, blank=True)
+    duration = models.ForeignKey(InvestmentDuration, on_delete=models.SET_NULL, blank=True, null=True)
     active = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
