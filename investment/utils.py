@@ -46,6 +46,8 @@ def create_investment(profile, data):
     user = profile.user
 
     wallet, new_wallet = Wallet.objects.get_or_create(user=profile)
+    if amount < 1000000:
+        return False, "Investment amount cannot be lesser than 1,000,000"
     if float(wallet.balance) < float(amount):
         return False, "Insufficient balance for this investment, please top-up your account"
 
