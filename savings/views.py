@@ -1,5 +1,8 @@
+from ast import arg
 import logging
 from datetime import datetime, timedelta
+from threading import Thread
+from django.conf import settings
 
 from django.db.models import Sum
 from rest_framework import status
@@ -20,10 +23,10 @@ from transaction.models import Transaction
 from investment.utils import approve_investment
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
-
-
+from account import send_email 
 from .utils import get_savings_analysis, create_instant_savings, create_auto_savings, update_savings_payment
 
+# from account.send_email import failed_membership_fee_payment, successful_membership_fee_payment
 
 class MySavingsView(ListAPIView):
     serializer_class = SavingSerializer
@@ -101,12 +104,26 @@ class SavingsView(APIView):
         except Exception as ex:
             data['detail'] = f"{ex}"
             return Response(data, status.HTTP_400_BAD_REQUEST)
+        
+        profile = Profile.objects.get(user=request.user)
+        saving_amount = Saving.objects.filter(user=profile).last()
 
         if savings_type.slug == 'auto':
             success, response = create_auto_savings(savings_type=savings_type, request=request)
 
+            if success:
+                Thread(target=send_email.successful_auto_save_mail, args=[profile]).start()
+            else:
+                Thread(target=send_email.failed_auto_save_mail, args=[profile]).start()
+
+
         if savings_type.slug == 'instant':
             success, response = create_instant_savings(savings_type=savings_type, request=request)
+
+            if success:
+                Thread(target=send_email.successful_quick_save_mail, args=[profile]).start()
+            else:
+                Thread(target=send_email.failed_quick_save_mail, args=[profile]).start()
 
         data['detail'] = response
         data['payment_link'] = response
@@ -174,7 +191,30 @@ class VerifyPaymentView(APIView):
 
         if success is False:
             data['detail'] = "Transaction could not be verified at the moment"
+
+            # Send Transaction Failure mail
+
+            if payment_for == "membership fee":
+                Thread(target=send_email.failed_membership_fee_payment, args=[trans]).start()
+
+            if payment_for == 'savings':
+                ...
+
+            if payment_for == 'investment':
+                ...
         else:
+
+            # Send Transaction Success Mail
+
+            if payment_for == "membership fee":
+                Thread(target=send_email.successful_membership_fee_payment, args=[trans]).start()
+
+            if payment_for == 'savings':
+                ...
+
+            if payment_for == 'investment':
+                ...
+
             data['detail'] = "Transaction successful"
 
         data['msisdn'] = phone_number

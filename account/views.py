@@ -20,7 +20,9 @@ from django.contrib.auth import authenticate
 from settings.utils import general_settings
 from transaction.models import Transaction
 import logging
-
+from django.conf import settings
+from .send_email import *
+from threading import Thread
 
 log = logging.getLogger(__name__)
 
@@ -44,6 +46,7 @@ class SignupView(APIView):
         data['detail'] = detail
         if not success:
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
         return Response(data)
 
 
@@ -115,6 +118,7 @@ class FeedbackMessageDetailView(RetrieveAPIView):
 class PayMembershipFeeView(APIView):
 
     def post(self, request):
+        print("started payment")
         data = dict()
         site_settings = general_settings()
         gateway = request.data.get('gateway')
@@ -122,7 +126,7 @@ class PayMembershipFeeView(APIView):
 
         if not callback_url:
             callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
-
+        # print(callback_url)
         email = request.user.email
         profile = request.user.profile
         amount = site_settings.membership_fee
@@ -137,17 +141,15 @@ class PayMembershipFeeView(APIView):
             'transaction_id': trans.id,
             'payment_for': 'membership fee',
         }
-
         if gateway == 'paystack':
             success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
-            if success:
+            if success is True:
                 data['payment_link'] = response
                 data['membership_id'] = profile.member_id
                 # profile.paid_membership_fee = True
                 profile.save()
             else:
                 data['detail'] = response
-
         return Response(data)
 
 

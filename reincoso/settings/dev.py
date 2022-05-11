@@ -86,6 +86,22 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+
+# EMAIL Credentials Mail Gun
+# SMTP_HOSTNAME: str = "smtp.mailgun.org"
+# PORT: int = 587
+# USERNAME: str = "postmaster@sandboxfc1f18e495b442d6a7ec1dfef04b8044.mailgun.org"
+# DEFAULT_PASSWORD: str = "30f3db282afd7fce48f03e4590254bad-38029a9d-d25be48b"
+
+# EMAIL GMAIL
+DEFAULT_FROM_EMAIL: str = "crypticwisdom84@gmail.com"
+EMAIL_HOST_USER: str = "smtp.gmail.com"
+PORT: int = 465
+EMAIL_HOST_PASSWORD: str = "dwtcsmetlwiuacef"
+
+
+
+
 # Activate Django-Heroku.
 django_heroku.settings(locals())
 
