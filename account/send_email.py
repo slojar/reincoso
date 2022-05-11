@@ -1,10 +1,13 @@
 import profile
+from re import A
 import smtplib
 import ssl
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from django.conf import settings
 from django.core.mail import send_mail
+
+from savings.models import Saving
 
 from .models import Wallet
 
@@ -20,7 +23,7 @@ from .models import Wallet
 #           "text": "Testing some Mailgun awesomness!"}
 # )
 
-# Done cleaned _/
+# Done cleaned _/ Reformat message
 def send_welcome_email_to_user(profile):
     body = f'''
     Dear {profile.user.first_name},
@@ -47,7 +50,7 @@ def send_welcome_email_to_user(profile):
         server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
     print("welcome Email has been sent")
 
-# Done 
+# Done _/ Reformat message
 def successful_membership_fee_payment(trans) -> None:
     body = f"""
     Dear {trans.user.user.first_name},
@@ -74,7 +77,7 @@ def successful_membership_fee_payment(trans) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, trans.user.user.email, text)
     print("Success Membership Payment Email has been sent")
 
-# Done
+# Done _/ Reformat message
 def failed_membership_fee_payment(trans) -> None:
     body = f"""
     Dear {trans.user.user.first_name},    
@@ -99,15 +102,15 @@ def failed_membership_fee_payment(trans) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, trans.user.user.email, text)
     print("Failed Payment Email has been sent")
 
-# Done
-def successful_quick_save_mail(profile, saving_amount) -> None:
-    # balance = Wallet.objects.get(user=profile).balance
+# Done _/ Reformat message
+def successful_quick_save_mail(profile, amount) -> None:
+    balance = Wallet.objects.get(user=profile).balance
     
     print(profile)
     body = f"""
       Dear {profile.user.first_name},    
-            Thank you for using Reincoso Quick Save option.Your quick save of N{saving_amount.amount} is successful.
-            Your current balance is N{saving_amount.total}.
+            Thank you for using Reincoso Quick Save option.Your quick save of N{amount} is successful.
+            Your current balance is N{balance}.
       """
     # Create a multipart message and set headers
     message = MIMEMultipart()
@@ -127,12 +130,12 @@ def successful_quick_save_mail(profile, saving_amount) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
     print("Success Auto Save Email has been sent")
 
-# Done
-def failed_quick_save_mail(profile) -> None:
+# Done _/ Reformat message
+def failed_quick_save_mail(profile, amount) -> None:
     balance = Wallet.objects.get(user=profile)
     body = f"""
         Dear {profile.user.first_name},
-            Your Quick Save option of N$$$ is NOT successful (due to insufficient bank balance or network issues). 
+            Your Quick Save option of N{amount} is NOT successful (due to insufficient bank balance or network issues). 
             Kindly try again or contact us on coopadmin@reincoso.com. If the problem presides, please contact your bank
         """
     # Create a multipart message and set headers
@@ -154,11 +157,10 @@ def failed_quick_save_mail(profile) -> None:
     print("Failed Auto Save Email has been sent")
 
 # Automated Savings
-def auto_save_creation_mail(profile) -> None:
-    balance = Wallet.objects.get(user=profile)
+def auto_save_creation_mail(profile_name, duration_name) -> None:
     body = f"""
-    Dear {profile.user.first_name},
-        You have successfully opted for our (weekly,monthly,quarterly,bi-annually)Auto save plan. 
+    Dear {profile_name},
+        You have successfully opted for our {duration_name} Auto save plan. 
         For any further inquiry, please contact us on:
         Email - coopadmin@reincoso.com
     """
@@ -181,12 +183,12 @@ def auto_save_creation_mail(profile) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
     print("Activated Auto Save Email has been sent")
 
-# Done
-def successful_auto_save_mail(profile) -> None:
+# Done _/ Text format
+def successful_auto_save_mail(profile, amount) -> None:
     balance = Wallet.objects.get(user=profile).balance
     body = f"""
     Dear {profile.user.first_name},
-        Thank you for using Reincoso Auto Save option. Your Auto save of N$$$  (weekly,monthly,quarterly,bi-annually)
+        Thank you for using Reincoso Auto Save option. Your Auto save of N{amount.amount} ({amount.duration})
         plan is successful. Your current balance is N{balance}.
         
         For any further inquiry, please contact us on:
@@ -211,12 +213,11 @@ def successful_auto_save_mail(profile) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
     print("Success Auto Save Email has been sent")
 
-# Done
-def failed_auto_save_mail(profile) -> None:
-    # balance = Wallet.objects.get(user=profile).balance
+# Done _/ Text format
+def failed_auto_save_mail(profile, amount) -> None:
     body = f"""
         Dear {profile.user.first_name},
-            Your Auto Save option of N$$$ (weekly,monthly,quarterly,bi-annually) plan is NOT successful (due to insufficient bank balance or network issues).
+            Your Auto Save option of N{amount.amount} ({amount.duration}) plan is NOT successful (due to insufficient bank balance or network issues).
             Kindly try again or contact us on coopadmin@reincoso.com. 
             If the problem presides, please contact your bank.
         """

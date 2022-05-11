@@ -98,6 +98,7 @@ class SavingsView(APIView):
         response = ""
         data = dict()
         savings_type = request.data.get('savings_type')
+        amount = request.data.get("amount")
 
         try:
             savings_type = SavingsType.objects.get(id=savings_type)
@@ -110,20 +111,19 @@ class SavingsView(APIView):
 
         if savings_type.slug == 'auto':
             success, response = create_auto_savings(savings_type=savings_type, request=request)
-
-            if success:
-                Thread(target=send_email.successful_auto_save_mail, args=[profile]).start()
-            else:
-                Thread(target=send_email.failed_auto_save_mail, args=[profile]).start()
-
+            print(success, "savings view line 114")
 
         if savings_type.slug == 'instant':
             success, response = create_instant_savings(savings_type=savings_type, request=request)
 
+            # I noticed, there's no check on what this user can auto save, it was supposed to be check against this,
+            # user's current account balance. Where is the user's current account balance, that holds the total amout
+            # this user worth's. 
+            # success = False # Turned success False, For testing the 'failed_quick_save_mail'
             if success:
-                Thread(target=send_email.successful_quick_save_mail, args=[profile]).start()
+                Thread(target=send_email.successful_quick_save_mail, args=[profile, amount]).start()
             else:
-                Thread(target=send_email.failed_quick_save_mail, args=[profile]).start()
+                Thread(target=send_email.failed_quick_save_mail, args=[profile, amount]).start()
 
         data['detail'] = response
         data['payment_link'] = response
@@ -146,6 +146,7 @@ class VerifyPaymentView(APIView):
 
         if gateway == 'paystack':
             success, response = verify_paystack_transaction(reference)
+            print(success)
             data['detail'] = response
 
             if success is False:
@@ -198,7 +199,8 @@ class VerifyPaymentView(APIView):
                 Thread(target=send_email.failed_membership_fee_payment, args=[trans]).start()
 
             if payment_for == 'savings':
-                ...
+                amount = Saving.objects.filter(user=profile).last()
+                Thread(target=send_email.failed_auto_save_mail, args=[profile, amount]).start()
 
             if payment_for == 'investment':
                 ...
@@ -210,13 +212,15 @@ class VerifyPaymentView(APIView):
                 Thread(target=send_email.successful_membership_fee_payment, args=[trans]).start()
 
             if payment_for == 'savings':
-                ...
+                amount = Saving.objects.filter(user=profile).last()
+                Thread(target=send_email.successful_auto_save_mail, args=[profile, amount]).start()
+            
 
             if payment_for == 'investment':
                 ...
 
             data['detail'] = "Transaction successful"
-
+        print(success, "Last")
         data['msisdn'] = phone_number
         return Response(data)
 

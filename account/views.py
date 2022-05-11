@@ -125,8 +125,14 @@ class PayMembershipFeeView(APIView):
         callback_url = request.data.get('callback_url')
 
         if not callback_url:
+            # Findings
+            # 1. The call_back url here was supposed to be /verify-payment/
+            # 2. I noticed that, if i choose the decline option on the paystack option for payment
+                # It doesn't do anything, therefore not allowing me send a Failed Payment Email to user.
             callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
-        # print(callback_url)
+            # callback_url = f"{request.scheme}://{request.get_host()}/verify-payment/{request.path}"
+            # print(callback_url)
+
         email = request.user.email
         profile = request.user.profile
         amount = site_settings.membership_fee
