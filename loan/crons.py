@@ -1,6 +1,11 @@
+import logging
 from .models import Loan, LoanTransaction
+from account.models import UserCard
 from django.utils import timezone
 from modules.paystack import paystack_auto_charge
+from .utils import verify_loan_repayment
+
+log = logging.getLogger(__name__)
 
 
 def loan_repayment_cron():
@@ -19,11 +24,40 @@ def loan_repayment_cron():
 
             if repay is True:
                 print("Auto debit user card")
+
+                profile = loan.user
+                amount = loan.amount_to_repay_split
+
+                transaction, _ = LoanTransaction.objects.get_or_create(
+                    user=profile, loan=loan, transaction_type='repayment', amount=amount, status='pending'
+                )
+
+                metadata = {
+                    'payment_type': 'loan_repayment',
+                    'loan_id': loan.id,
+                    'transaction_id': transaction.id,
+                }
+
+                user_card_id = UserCard.objects.filter(user=profile).last()
+
                 # Charge user's card automatically
-                paystack_auto_charge(authorization_code='', email='', amount='')
-                # update last repayment date field to now
-                # update next repayment date field to next payment
-                # update amount repaid
-                # create transaction for user
+                authorization_code = user_card_id.authorization_code
+                email = profile.user.email
+
+                success, response = paystack_auto_charge(authorization_code=authorization_code, email=email,
+                                                         amount=amount, metadata=metadata)
+
+                log.info(f'Auto_Deduct_Loan_CRON: Charging user card --->>> success: {success}')
+                log.info(f'Auto_Deduct_Loan_CRON: Charging user card --->>> response: {response}')
+
+                if success is False:
+                    return success, response.get('message')
+
+                reference = response['data']['reference']
+                success, response = verify_loan_repayment(user_card_id.gateway, reference)
+
+                log.info(f'Auto_Deduct_Loan_CRON: Verifying payment --->>> success: {success}')
+                log.info(f'Auto_Deduct_Loan_CRON: Verifying payment --->>> response: {response}')
+
                 # notify user for transaction and auto-debit of loan payment
 
