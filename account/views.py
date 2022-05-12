@@ -166,8 +166,8 @@ class AddGuarantorView(APIView):
         response = []
         for number in guarantor:
             try:
-                guarantor = Profile.objects.get(phone_number=reformat_phone_number(number))
-                guarantor, created = Guarantor.objects.get_or_create(user=request.user.profile, guarantor=guarantor)
+                guarantor_profile = Profile.objects.get(phone_number=reformat_phone_number(number))
+                guarantor, created = Guarantor.objects.get_or_create(user=request.user.profile, guarantor=guarantor_profile)
                 if not created:
                     response.append({
                         'success': False,
@@ -176,6 +176,7 @@ class AddGuarantorView(APIView):
                     })
 
                 if created:
+                    
                     response.append({
                         'success': True,
                         'phone_number': number,
@@ -183,13 +184,18 @@ class AddGuarantorView(APIView):
                     })
 
                     # send notification to guarantor
-
+                    print(guarantor_profile)
+                    Thread(target=mail_to_guarantor, args=[request, guarantor_profile]).start()
             except Profile.DoesNotExist:
                 response.append({
                     'success': False,
                     'phone_number': number,
                     'detail': 'Phone number not registered',
                 })
+
+        # send mail to user
+        if response[0].get("success") is True:
+            Thread(target=inform_user_of_added_guarantor, args=[request]).start()
 
         return Response(response)
 

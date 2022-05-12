@@ -6,10 +6,11 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from django.conf import settings
 from django.core.mail import send_mail
+from loan.models import Loan, LoanTransaction
 
 from savings.models import Saving
 
-from .models import Wallet
+from .models import Profile, Wallet
 
 # Email imports
 
@@ -156,7 +157,7 @@ def failed_quick_save_mail(profile, amount) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
     print("Failed Auto Save Email has been sent")
 
-# Automated Savings
+# Opt into Automated Savings ?? I haven't figured out the point where user opts into Auto_Save plan
 def auto_save_creation_mail(profile_name, duration_name) -> None:
     body = f"""
     Dear {profile_name},
@@ -240,13 +241,12 @@ def failed_auto_save_mail(profile, amount) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
     print("Failed Auto Save Email has been sent")
 
-
-def successful_investment_mail(request) -> None:
-    balance = Wallet.objects.get(user=request.user).balance
+# pending ...
+def successful_investment_mail(request, investment) -> None:
     body = f"""
             Dear {request.user.first_name},
-                You have made an investment of Nxxxxx on (Real estate/P2P/Agriculture/Fixed income) with X% per annum.
-                Your current investment balance is NXXXX.
+                You have made an investment of Nxxxxx on ({investment.type.name}) with X% per annum.
+                Your current investment balance is N{investment.amount_invested}.
                 For any further inquiry, please contact us on:
                 Email - coopadmin@reincoso.com
             """
@@ -269,12 +269,12 @@ def successful_investment_mail(request) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
     print("Successful investment Email has been sent")
 
-
+# pending ...
 def failed_investment_mail(request) -> None:
     balance = Wallet.objects.get(user=request.user).balance
     body = f"""
                 Dear {request.user.first_name},
-                    Your Investment of Nxxxxx on (Real estate/P2P/Agriculture/Fixed income) is NOT successful (due to insufficient bank balance or network issues). 
+                    Your Investment of Nxxxx on (Real estate/P2P/Agriculture/Fixed income) is NOT successful (due to insufficient bank balance or network issues). 
                     Kindly try again or contact us on coopadmin@reincoso.com. If the problem presides, please contact your bank
                 """
 
@@ -296,7 +296,7 @@ def failed_investment_mail(request) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
     print("Failed investment mail Email has been sent")
 
-
+# pending ...
 def investment_maturity_mail(request) -> None:
     balance = Wallet.objects.get(user=request.user).balance
     body = f"""
@@ -354,10 +354,14 @@ def loan_request_processing_mail(request) -> None:
     print("Loan request processing mail Email has been sent")
 
 
-def mail_to_guarantor(request) -> None:
+def mail_to_guarantor(request, guarantor) -> None:
+    profile = Profile.objects.get(user=request.user)
+    loan = LoanTransaction.objects.filter(user=profile).last()
+    print(guarantor.user.first_name)
+    print(guarantor.user.email)
     body = f"""
-            Dear Guarantor Name,
-                You have been selected to guarantee for the loan amount of Nxxxx for ({request.user.first_name}) and you will be held liable if the debts are not repaid. 
+            Dear {guarantor.user.first_name},
+                You have been selected to guarantee for the loan amount of N{loan.amount} for ({request.user.first_name}) and you will be held liable if the debts are not repaid. 
                 You can accept or reject offer of guarantor-ship by sending Yes to accept / No to reject.
                 For any further inquiry please contact us on:
                 Email - coopadmin@reincoso.com
@@ -366,7 +370,7 @@ def mail_to_guarantor(request) -> None:
     # Create a multipart message and set headers
     message = MIMEMultipart()
     message["From"] = "crypticwisdom84@gmail.com"
-    message["To"] = request.user.email
+    message["To"] = guarantor.user.email
     message["Subject"] = "Guarantor"
     # message["Bcc"] = receiver_email  # Recommended for mass emails
 
@@ -381,18 +385,21 @@ def mail_to_guarantor(request) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
     print("Guarantor Email has been sent")
 
-
-def added_guarantor_mail_to_user(request) -> None:
+# done _/ text format
+def inform_user_of_added_guarantor(request) -> None:
+    profile = Profile.objects.get(user=request.user)
+    loan = LoanTransaction.objects.filter(user=profile).last()
+    guarantor = ", ".join(list(request.data.get("guarantor")))
     body = f"""
             Dear {request.user.first_name},
-                You have added xxxx and xxxxx as your guarantor(s) for the loan amount of Nxxxxx.
+                You have added {guarantor} as your guarantor(s) for the loan amount of N{loan.amount}.
                 For any further inquiry please contact us on:
                 Email - coopadmin@reincoso.com
         """
 
     # Create a multipart message and set headers
     message = MIMEMultipart()
-    message["From"] = "crypticwisdom84@gmail.com"
+    message["From"] = settings.DEFAULT_FROM_EMAIL
     message["To"] = request.user.email
     message["Subject"] = "Guarantor Added"
     # message["Bcc"] = receiver_email  # Recommended for mass emails

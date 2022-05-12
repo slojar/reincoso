@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+from investment.models import UserInvestment
 
 from loan.paginations import CustomPagination
 from savings.models import Duration, Saving, SavingTransaction
@@ -108,10 +109,18 @@ class SavingsView(APIView):
         
         profile = Profile.objects.get(user=request.user)
         saving_amount = Saving.objects.filter(user=profile).last()
-
         if savings_type.slug == 'auto':
             success, response = create_auto_savings(savings_type=savings_type, request=request)
-            print(success, "savings view line 114")
+            # Not sure, but this could e the point where user opts into Auto Save Plan.
+            # print(success, "savings view line 115")
+            
+            if success:
+                # this mail is recieved even before the payment is successfull or fails
+                Thread(target=send_email.auto_save_creation_mail, args=[request.user.first_name, saving_amount.duration])
+                print("Sent Auto Save Opt Plan")
+            # else:
+                # Thread(target=send_email.failed_quick_save_mail, args=[profile, amount]).start()
+                # print(success, "savings view line 121")
 
         if savings_type.slug == 'instant':
             success, response = create_instant_savings(savings_type=savings_type, request=request)
@@ -146,7 +155,6 @@ class VerifyPaymentView(APIView):
 
         if gateway == 'paystack':
             success, response = verify_paystack_transaction(reference)
-            print(success)
             data['detail'] = response
 
             if success is False:
@@ -203,7 +211,10 @@ class VerifyPaymentView(APIView):
                 Thread(target=send_email.failed_auto_save_mail, args=[profile, amount]).start()
 
             if payment_for == 'investment':
-                ...
+                user_investment = UserInvestment.objects.get().amount_invested
+                print("Investmnet", user_investment)
+                Thread(target=send_email.failed_investment_mail, args=[request]).start()
+
         else:
 
             # Send Transaction Success Mail
@@ -217,10 +228,11 @@ class VerifyPaymentView(APIView):
             
 
             if payment_for == 'investment':
-                ...
+                investment = UserInvestment.objects.get(id=investment_id)
+                Thread(target=send_email.successful_investment_mail, args=[request, investment]).start()
+                
 
             data['detail'] = "Transaction successful"
-        print(success, "Last")
         data['msisdn'] = phone_number
         return Response(data)
 
