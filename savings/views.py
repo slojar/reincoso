@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from investment.models import UserInvestment
+from investment.models import InvestmentTransaction, UserInvestment
 
 from loan.paginations import CustomPagination
 from savings.models import Duration, Saving, SavingTransaction
@@ -190,21 +190,27 @@ class VerifyPaymentView(APIView):
                 trans.response = response
                 trans.save()
 
+
             if payment_for == 'investment':
                 investment_id = response['payload']['data']['metadata'].get('investment_id', None)
                 success, response = approve_investment(investment_id, gateway, reference)
-
-                # send success mail to user
-                # investment = UserInvestment.objects.get(id=investment_id)
-                # Thread(target=send_email.successful_investment_mail, args=[request, investment]).start()
                 
                 data['detail'] = response
+
                 if success is False:
             
-                    # send failure mail
-                    # user_investment = UserInvestment.objects.get().amount_invested
-                    # Thread(target=send_email.failed_investment_mail, args=[request]).start()
+                    # Send Failure email to user.
+
+                    print("Investment Failure from saving's view")
+                    Thread(target=send_email.failed_investment_mail, args=[request, investment_id]).start()
+                    
                     return Response(data, status.HTTP_400_BAD_REQUEST)
+
+        # Send Success email to user
+
+        print("Investment Success from saving's view")
+        Thread(target=send_email.successful_investment_mail, args=[request, investment_id]).start()
+
                 # return Response(data)
             
         if success is False:
@@ -219,9 +225,6 @@ class VerifyPaymentView(APIView):
                 amount = Saving.objects.filter(user=profile).last()
                 Thread(target=send_email.failed_auto_save_mail, args=[profile, amount]).start()
 
-            # if payment_for == 'investment':
-            #     ...
-
         else:
 
             # Send Transaction Success Mail
@@ -233,8 +236,6 @@ class VerifyPaymentView(APIView):
                 amount = Saving.objects.filter(user=profile).last()
                 Thread(target=send_email.successful_auto_save_mail, args=[profile, amount]).start()
             
-            # if payment_for == 'investment':
-            #     ...
 
             data['detail'] = "Transaction successful"
         data['msisdn'] = phone_number

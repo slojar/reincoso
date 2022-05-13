@@ -6,6 +6,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from django.conf import settings
 from django.core.mail import send_mail
+from investment.models import InvestmentTransaction, UserInvestment
 from loan.models import Loan, LoanTransaction
 
 from savings.models import Saving
@@ -242,7 +243,9 @@ def failed_auto_save_mail(profile, amount) -> None:
     print("Failed Auto Save Email has been sent")
 
 # Partially done but, Expecting an error here !! 
-def successful_investment_mail(request, investment, user_transaction) -> None:
+def successful_investment_mail(request, investment_id) -> None:
+    investment = UserInvestment.objects.get(id=investment_id, user=request.user.profile)
+    user_transaction = InvestmentTransaction(user=request.user.profile, user_investment=investment)
     body = f"""
 Dear {request.user.first_name},
 
@@ -272,7 +275,9 @@ Email - coopadmin@reincoso.com
     print("Successful investment Email has been sent")
 
 # partially done _/
-def failed_investment_mail(request, user_investment, user_transaction) -> None:
+def failed_investment_mail(request, investment_id) -> None:
+    user_investment = UserInvestment.objects.get(id=investment_id, user=request.user.profile)
+    user_transaction = InvestmentTransaction(user=request.user.profile, user_investment=user_investment)
     body = f"""
 Dear {request.user.first_name},
 
