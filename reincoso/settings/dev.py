@@ -98,6 +98,7 @@ DEFAULT_FROM_EMAIL: str = "crypticwisdom84@gmail.com"
 EMAIL_HOST_USER: str = "smtp.gmail.com"
 PORT: int = 465
 EMAIL_HOST_PASSWORD: str = "dwtcsmetlwiuacef"
+ADMIN_EMAIL: str = "coopadmin@reincoso.com"
 
 
 

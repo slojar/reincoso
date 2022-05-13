@@ -132,17 +132,26 @@ class InvestPaymentView(APIView):
         user = request.user.profile
         success, response = investment_payment(request.user.profile, request.data)
         
+        # I handled Investment Email at this point, but this is not the right point to do that.
         if success is False:
             data['detail'] = "There is an error with request sent"
             data['data'] = response
-            # Thread(failed_investment_mail, args=[]).start()
-            
+
+            # Send Failure email to user.
+            user_investment = UserInvestment.objects.get(id=investment_id, user=user)
+            user_transaction = InvestmentTransaction(user=user, user_investment=user_investment)
+            Thread(target=send_email.failed_investment_mail, args=[request, user_investment, user_transaction]).start()
             return Response(data, status.HTTP_400_BAD_REQUEST)
-            
+        
         data['detail'] = response
         if card_id:
             data['data'] = UserInvestmentSerializer(UserInvestment.objects.get(id=investment_id, user=user)).data
-        # Thread(successful_investment_mail, args=[])
+        
+        # Send Success email to user
+        investment = UserInvestment.objects.get(id=investment_id, user=user)
+        user_transaction = InvestmentTransaction(user=user, user_investment=investment)
+        Thread(target=send_email.successful_investment_mail, args=[request, investment, user_transaction]).start()
+
         return Response(data)
 
 

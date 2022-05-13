@@ -193,11 +193,20 @@ class VerifyPaymentView(APIView):
             if payment_for == 'investment':
                 investment_id = response['payload']['data']['metadata'].get('investment_id', None)
                 success, response = approve_investment(investment_id, gateway, reference)
+
+                # send success mail to user
+                # investment = UserInvestment.objects.get(id=investment_id)
+                # Thread(target=send_email.successful_investment_mail, args=[request, investment]).start()
+                
                 data['detail'] = response
                 if success is False:
+            
+                    # send failure mail
+                    # user_investment = UserInvestment.objects.get().amount_invested
+                    # Thread(target=send_email.failed_investment_mail, args=[request]).start()
                     return Response(data, status.HTTP_400_BAD_REQUEST)
                 # return Response(data)
-
+            
         if success is False:
             data['detail'] = "Transaction could not be verified at the moment"
 
@@ -210,10 +219,8 @@ class VerifyPaymentView(APIView):
                 amount = Saving.objects.filter(user=profile).last()
                 Thread(target=send_email.failed_auto_save_mail, args=[profile, amount]).start()
 
-            if payment_for == 'investment':
-                user_investment = UserInvestment.objects.get().amount_invested
-                print("Investmnet", user_investment)
-                Thread(target=send_email.failed_investment_mail, args=[request]).start()
+            # if payment_for == 'investment':
+            #     ...
 
         else:
 
@@ -226,11 +233,8 @@ class VerifyPaymentView(APIView):
                 amount = Saving.objects.filter(user=profile).last()
                 Thread(target=send_email.successful_auto_save_mail, args=[profile, amount]).start()
             
-
-            if payment_for == 'investment':
-                investment = UserInvestment.objects.get(id=investment_id)
-                Thread(target=send_email.successful_investment_mail, args=[request, investment]).start()
-                
+            # if payment_for == 'investment':
+            #     ...
 
             data['detail'] = "Transaction successful"
         data['msisdn'] = phone_number

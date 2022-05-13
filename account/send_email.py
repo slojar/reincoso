@@ -241,19 +241,21 @@ def failed_auto_save_mail(profile, amount) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
     print("Failed Auto Save Email has been sent")
 
-# pending ...
-def successful_investment_mail(request, investment) -> None:
+# Partially done but, Expecting an error here !! 
+def successful_investment_mail(request, investment, user_transaction) -> None:
     body = f"""
-            Dear {request.user.first_name},
-                You have made an investment of Nxxxxx on ({investment.type.name}) with X% per annum.
-                Your current investment balance is N{investment.amount_invested}.
-                For any further inquiry, please contact us on:
-                Email - coopadmin@reincoso.com
-            """
+Dear {request.user.first_name},
+
+You have made an investment of {user_transaction.amount} on ({investment.investment.type.name}) with {investment.percentage}% per annum.
+Your current investment balance is N{investment.amount_invested}.
+
+For any further inquiry, please contact us on:
+Email - coopadmin@reincoso.com
+    """
 
     # Create a multipart message and set headers
     message = MIMEMultipart()
-    message["From"] = "crypticwisdom84@gmail.com"
+    message["From"] = settings.DEFAULT_FROM_EMAIL
     message["To"] = request.user.email
     message["Subject"] = "Successful investment mail"
     # message["Bcc"] = receiver_email  # Recommended for mass emails
@@ -269,14 +271,14 @@ def successful_investment_mail(request, investment) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
     print("Successful investment Email has been sent")
 
-# pending ...
-def failed_investment_mail(request) -> None:
-    balance = Wallet.objects.get(user=request.user).balance
+# partially done _/
+def failed_investment_mail(request, user_investment, user_transaction) -> None:
     body = f"""
-                Dear {request.user.first_name},
-                    Your Investment of Nxxxx on (Real estate/P2P/Agriculture/Fixed income) is NOT successful (due to insufficient bank balance or network issues). 
-                    Kindly try again or contact us on coopadmin@reincoso.com. If the problem presides, please contact your bank
-                """
+Dear {request.user.first_name},
+
+Your Investment of N{user_transaction.amount} on {user_investment.investment.type.name} is NOT successful (due to insufficient bank balance or network issues). 
+Kindly try again or contact us on coopadmin@reincoso.com. If the problem presides, please contact your bank
+    """
 
     # Create a multipart message and set headers
     message = MIMEMultipart()
@@ -324,20 +326,23 @@ def investment_maturity_mail(request) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
     print("Investment maturity mail Email has been sent")
 
-
+# done and well formatted _/
 def loan_request_processing_mail(request) -> None:
-    balance = Wallet.objects.get(user=request.user).balance
+    #: This body was indented this way intentionally, so as to be well structured when recieved via mail.
     body = f"""
-            Dear {request.user.first_name},
-                Your loan application has been received and is being reviewed by the loan committee.Your loan will be 
-                disbursed as soon as all requirements are met.
-                For any further inquiry please contact us on:
-                Email - coopadmin@reincoso.com
-        """
+Dear {request.user.first_name},
+
+Your loan application has been received and is being reviewed by the loan committee.\n
+Your loan will be disbursed as soon as all requirements are met.
+
+For any further inquiry please contact us on:
+Email - coopadmin@reincoso.com
+
+"""
 
     # Create a multipart message and set headers
     message = MIMEMultipart()
-    message["From"] = "crypticwisdom84@gmail.com"
+    message["From"] = settings.DEFAULT_FROM_EMAIL
     message["To"] = request.user.email
     message["Subject"] = "Loan request processing mail"
     # message["Bcc"] = receiver_email  # Recommended for mass emails
@@ -353,12 +358,10 @@ def loan_request_processing_mail(request) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
     print("Loan request processing mail Email has been sent")
 
-
+# done _/ text format
 def mail_to_guarantor(request, guarantor) -> None:
     profile = Profile.objects.get(user=request.user)
     loan = LoanTransaction.objects.filter(user=profile).last()
-    print(guarantor.user.first_name)
-    print(guarantor.user.email)
     body = f"""
             Dear {guarantor.user.first_name},
                 You have been selected to guarantee for the loan amount of N{loan.amount} for ({request.user.first_name}) and you will be held liable if the debts are not repaid. 
@@ -369,7 +372,7 @@ def mail_to_guarantor(request, guarantor) -> None:
 
     # Create a multipart message and set headers
     message = MIMEMultipart()
-    message["From"] = "crypticwisdom84@gmail.com"
+    message["From"] = settings.DEFAULT_FROM_EMAIL
     message["To"] = guarantor.user.email
     message["Subject"] = "Guarantor"
     # message["Bcc"] = receiver_email  # Recommended for mass emails
@@ -415,12 +418,13 @@ def inform_user_of_added_guarantor(request) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
     print("Guarantor Added Email has been sent")
 
-
+# done and well formated _/ 
 def admin_loan_processing_status_mail(request) -> None:
     body = f"""
-        Dear Reincoso,
-            The loan amount of Nxxxxx from (name) is currently waiting to be reviewed and approved. 
-            Kindly go through it and process as due.
+Dear Reincoso,
+
+The loan amount of N{request.data.get("amount")} from {request.user.first_name} is currently waiting to be reviewed and approved. 
+Kindly go through it and process as due.
         """
 
     # Create a multipart message and set headers
@@ -444,12 +448,13 @@ def admin_loan_processing_status_mail(request) -> None:
 
 def user_loan_processing_status_mail(request) -> None:
     body = f"""
-        Dear {request.user.first_name},
-            Your loan of Nxxxxx has been approved/rejected and the funds will be deposited into the account you gave shortly. 
-            Please read the terms and conditions that were emailed to you.
-            If rejected- Sorry, you do not match the criteria for a loan at this time, either save more or contact us.
-            For any further inquiry please contact us on:
-            Email - coopadmin@reincoso.com
+Dear {request.user.first_name},
+
+Your loan of Nxxxxx has been approved/rejected and the funds will be deposited into the account you gave shortly. 
+Please read the terms and conditions that were emailed to you.
+If rejected- Sorry, you do not match the criteria for a loan at this time, either save more or contact us.
+For any further inquiry please contact us on:
+Email - coopadmin@reincoso.com
         """
 
     # Create a multipart message and set headers
@@ -477,12 +482,12 @@ def loan_clear_off(request) -> None:
             Congratulations! You have successfully cleared your loan of Nxxxxxx. Your loan balance is N0.00. 
             You can apply for more loans with us.
             For any further inquiry please contact us on:
-            Email - coopadmin@reincoso.comd 
+            Email - coopadmin@reincoso.com
         """
 
     # Create a multipart message and set headers
     message = MIMEMultipart()
-    message["From"] = "crypticwisdom84@gmail.com"
+    message["From"] = settings.DEFAULT_FROM_EMAIL
     message["To"] = request.user.email
     message["Subject"] = "Loan clear off"
     # message["Bcc"] = receiver_email  # Recommended for mass emails
@@ -498,9 +503,61 @@ def loan_clear_off(request) -> None:
         server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
     print("Loan clear off Email has been sent")
 
+# done _/ text format
+def withdrawal_request_mail_user(request) -> None:
+    body = f"""
+        Dear {request.user.first_name},
+            Your application to make a withdrawal of N{request.data.get("amount")} has been received and is being reviewed by the committee.
+            You will be credited shortly.
+            For any further inquiry please contact us on:
+            Email - coopadmin@reincoso.com
+        """
 
+    # Create a multipart message and set headers
+    message = MIMEMultipart()
+    message["From"] = settings.DEFAULT_FROM_EMAIL
+    message["To"] = request.user.email
+    message["Subject"] = "Withdraw Request"
+    # message["Bcc"] = receiver_email  # Recommended for mass emails
 
+    # Add body to email
+    message.attach(MIMEText(body, "plain"))
+    text = message.as_string()
 
+    # Log in to server using secure context and send email
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
+        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
+        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
+    print("Withdraw Request Email has been sent")
+
+# done _/ text format
+def withdrawal_request_mail_admin(request, content) -> None:
+    body = f"""
+    Hi Reincoso,
+        A withdrawal request of N{request.data.get("amount")} from {request.user.first_name} is currently
+        waiting to be approved and disbursed.
+        Kindly go through it and process as due.
+        
+    """
+
+    # Create a multipart message and set headers
+    message = MIMEMultipart()
+    message["From"] = settings.DEFAULT_FROM_EMAIL
+    message["To"] = settings.ADMIN_EMAIL
+    message["Subject"] = "Withdrawal Request"
+    # message["Bcc"] = receiver_email  # Recommended for mass emails
+
+    # Add body to email
+    message.attach(MIMEText(body, "plain"))
+    text = message.as_string()
+
+    # Log in to server using secure context and send email
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
+        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
+        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
+    print("Withdrawal Request Email has been sent")
 
 # def send_welcome_email_to_user(user):
 #     name = user.first_name

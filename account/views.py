@@ -276,7 +276,11 @@ class RequestWithdrawalView(APIView):
         Please check and act accordingly.
         """
         notification = AdminNotification.objects.create(message=content)
+        # Email admin.
+        Thread(target=withdrawal_request_mail_admin, args=[request, content]).start()
 
+        # Email user.
+        Thread(target=withdrawal_request_mail_user, args=[request]).start()
         return Response({"detail": "Your withdrawal request is being processed"})
 
 

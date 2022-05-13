@@ -1,8 +1,10 @@
 import decimal
+from threading import Thread
 from django.shortcuts import get_object_or_404, reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+from account import send_email
 from savings.models import Saving, SavingTransaction
 from rest_framework import status
 from django.utils import timezone
@@ -55,7 +57,7 @@ class ApplyForLoanView(APIView):
                 })
             offer['repayment_split'] = payment_split
             offer['detail'] = f"You pay {split} for {duration.duration} {duration.basis[:-2]}(s)"
-
+        # print("success on loa")
         return Response(offer)
 
     def post(self, request):
@@ -93,6 +95,13 @@ class ApplyForLoanView(APIView):
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
         data['detail'] = response
+
+        # Mail to User
+        Thread(target=send_email.loan_request_processing_mail, args=[request]).start()
+
+        # Mail to Admin
+        Thread(target=send_email.admin_loan_processing_status_mail, args=[request]).start()
+        
         return Response(data)
 
 
