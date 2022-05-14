@@ -24,7 +24,7 @@ def loan_repayment_cron():
 
             if loan.basis == 'weekly':
                 repay = this_month == month_to_pay and this_day == int(day_to_pay) and this_time >= time_to_pay
-            if loan.payment_day != '30':
+            if loan.payment_day != '30' and loan.basis != 'weekly':
                 date_to_pay = int(loan.payment_day)
                 repay = this_month == month_to_pay and this_date == date_to_pay and this_time >= time_to_pay
 
