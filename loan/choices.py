@@ -11,3 +11,8 @@ loan_transaction_status_choices = (
     ('pending', 'Pending'), ('unsuccessful', 'Unsuccessful'), ('cancelled', 'Cancelled'), ('success', 'Success'),
 )
 
+day_of_the_week_choices = (
+    ('monday', 'Monday'), ('tuesday', 'Tuesday'), ('wednesday', 'Wednesday'), ('thursday', 'Thursday'),
+    ('friday', 'Friday'), ('saturday', 'Saturday'), ('sunday', 'Sunday')
+)
+

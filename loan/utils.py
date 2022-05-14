@@ -57,13 +57,34 @@ def get_loan_repayment_count(duration):
     return repayment_day_count
 
 
-def create_loan(profile, amount, duration):
+def create_loan(request, profile, amount, duration):
+    success = False
+    repayment_day_of_the_week = request.data.get('repayment_day_of_the_week')
+    repayment_day_of_the_month = request.data.get('repayment_day_f_the_month')
+
+    if duration.basis == 'weekly':
+        days_list = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        if not (repayment_day_of_the_week and str(repayment_day_of_the_week).lower() in days_list):
+            response = f"You must select a repayment day of the week to continue"
+            return success, response
+
+    if duration.basis != 'weekly':
+        days_list = [str(day) for day in range(0, 32)]
+        if not (repayment_day_of_the_month and repayment_day_of_the_month in days_list):
+            response = f"You must select a repayment day of the month to continue"
+            return success, response
+
     success = True
     response = "Loan application successful, please wait while we process your loan"
 
     amount = decimal.Decimal(amount)
     loan = Loan.objects.create(user=profile)
     loan.amount = amount
+
+    if repayment_day_of_the_week:
+        loan.day_of_the_week = repayment_day_of_the_week
+    if repayment_day_of_the_month:
+        loan.payment_day = repayment_day_of_the_month
 
     loan.duration = duration
     loan.basis = duration.basis
@@ -76,6 +97,8 @@ def create_loan(profile, amount, duration):
     loan.amount_to_repay_split = loan.amount_to_repay / loan.basis_duration
     loan.start_date = timezone.now()
     loan.end_date = loan.start_date + timezone.timedelta(days=duration.number_of_days)
+    if duration.basis == 'weekly':
+        loan.next_repayment_date = loan.start_date + timezone.timedelta(days=15)
     loan.next_repayment_date = loan.start_date + timezone.timedelta(days=get_loan_repayment_count(duration))
     loan.status = "processing"
     loan.save()

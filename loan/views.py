@@ -87,7 +87,8 @@ class ApplyForLoanView(APIView):
                 data['code'] = requirement
                 return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
-        success, response = create_loan(profile=request.user.profile, amount=amount, duration=duration)
+        profile = request.user.profile
+        success, response = create_loan(request, profile, amount, duration)
         if not success:
             data['detail'] = response
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)

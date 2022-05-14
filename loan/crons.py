@@ -14,13 +14,15 @@ def loan_repayment_cron():
         transactions = LoanTransaction.objects.filter(loan=loan, transaction_type='repayment', status='success').count()
         if transactions < loan.basis_duration:
             this_month = timezone.now().month
-            this_day = timezone.now().day
+            this_date = timezone.now().day
+            this_day = timezone.now().isoweekday()
             this_time = int(f"{timezone.now().hour}{timezone.now().minute}")
             month_to_pay = loan.next_repayment_date.month
-            day_to_pay = loan.next_repayment_date.day
+            day_to_pay = loan.day_of_the_week
+            date_to_pay = loan.next_repayment_date.day
             time_to_pay = int(f"{loan.next_repayment_date.hour}{loan.next_repayment_date.minute}")
 
-            repay = this_month == month_to_pay and this_day == day_to_pay and this_time >= time_to_pay
+            repay = this_month == month_to_pay and this_day == int(day_to_pay) and this_date == date_to_pay and this_time >= time_to_pay
 
             if repay is True:
                 print("Auto debit user card")
