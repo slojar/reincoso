@@ -63,7 +63,7 @@ def create_loan(request, profile, amount, duration):
     repayment_day_of_the_month = request.data.get('repayment_day_f_the_month')
 
     if duration.basis == 'weekly':
-        days_list = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        days_list = [str(day) for day in range(0, 8)]
         if not (repayment_day_of_the_week and str(repayment_day_of_the_week).lower() in days_list):
             response = f"You must select a repayment day of the week to continue"
             return success, response

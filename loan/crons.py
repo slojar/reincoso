@@ -22,7 +22,13 @@ def loan_repayment_cron():
             date_to_pay = loan.next_repayment_date.day
             time_to_pay = int(f"{loan.next_repayment_date.hour}{loan.next_repayment_date.minute}")
 
-            repay = this_month == month_to_pay and this_day == int(day_to_pay) and this_date == date_to_pay and this_time >= time_to_pay
+            if loan.basis == 'weekly':
+                repay = this_month == month_to_pay and this_day == int(day_to_pay) and this_time >= time_to_pay
+            if loan.payment_day != '30':
+                date_to_pay = int(loan.payment_day)
+                repay = this_month == month_to_pay and this_date == date_to_pay and this_time >= time_to_pay
+
+            repay = this_month == month_to_pay and this_date == date_to_pay and this_time >= time_to_pay
 
             if repay is True:
                 print("Auto debit user card")

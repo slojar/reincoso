@@ -30,7 +30,7 @@ class Loan(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     duration = models.ForeignKey(LoanDuration, on_delete=models.SET_NULL, null=True)
-    day_of_the_week = models.CharField(max_length=20, choices=day_of_the_week_choices, default='monday')
+    day_of_the_week = models.CharField(max_length=20, choices=day_of_the_week_choices, default='1')
     payment_day = models.CharField(max_length=5, choices=DAYS_OF_THE_MONTH_CHOICES, default='30', null=True)
     basis = models.CharField(max_length=50, choices=basis_type_choices, default='monthly')
     basis_duration = models.IntegerField(default=0)
