@@ -1,31 +1,39 @@
 import profile
+import requests
+import logging
 from re import A
-import smtplib
-import ssl
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from django.conf import settings
-from django.core.mail import send_mail
 from investment.models import InvestmentTransaction, UserInvestment
 from loan.models import Loan, LoanTransaction
 
 from savings.models import Saving
-
 from .models import Profile, Wallet
 
-# Email imports
 
-# import requests
-# response = requests.post(
-#     "https://api.mailgun.net/v3/sandboxfc1f18e495b442d6a7ec1dfef04b8044.mailgun.org/messages",
-#     auth=("api", "0fc607b5f9c416383d7143401f1308c9-38029a9d-18a8e2d0"),
-#     data={"from": "mailgun@sandboxfc1f18e495b442d6a7ec1dfef04b8044.mailgun.org",
-#           "to": ["definatelycrypticwisdom@gmail.com"],
-#           "subject": "Testing mailgun",
-#           "text": "Testing some Mailgun awesomness!"}
-# )
+base_url = settings.EMAIL_API_URL
+api_key = settings.EMAIL_API_KEY
+email_sender = settings.EMAIL_SENDER
 
-# Done cleaned _/ Reformat message
+
+def log_request(*args):
+    for arg in args:
+        logging.info(arg)
+
+
+def send_email_using_mailgun(recipient, subject, message):
+    auth = ("api", api_key)
+    data = dict()
+
+    data['from'] = email_sender
+    data['to'] = recipient
+    data['subject'] = subject
+    data['text'] = message
+
+    response = requests.post(base_url, auth=auth, data=data)
+    log_request(base_url, auth, data, response.json())
+    return response
+
+
 def send_welcome_email_to_user(profile):
     body = f'''
     Dear {profile.user.first_name},
@@ -34,25 +42,13 @@ def send_welcome_email_to_user(profile):
         our gratitude on behalf of the whole organization. In the meanwhile, please visit our website (www.reincosocoop.com) 
         to learn more about our products and services.
     '''
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = profile.user.email
-    message["Subject"] = "Welcome to REINCOSO"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    recipient = profile.user.email
+    subject = "Welcome to REINCOSO"
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
-    print("welcome Email has been sent")
+    send_email_using_mailgun(recipient, subject, body)
 
-# Done _/ Reformat message
+
 def successful_membership_fee_payment(trans) -> None:
     body = f"""
     Dear {trans.user.user.first_name},
@@ -61,50 +57,26 @@ def successful_membership_fee_payment(trans) -> None:
         Email - coopadmin@reincoso.com
     
     """
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = trans.user.user.email
-    message["Subject"] = "Success Payment"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    recipient = trans.user.user.email
+    subject = "Success Payment"
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, trans.user.user.email, text)
-    print("Success Membership Payment Email has been sent")
+    send_email_using_mailgun(recipient, subject, body)
 
-# Done _/ Reformat message
+
 def failed_membership_fee_payment(trans) -> None:
     body = f"""
     Dear {trans.user.user.first_name},    
         Your membership fee payment of 100,000 was not successful. Kindly try again or contact us on coopadmin@reincoso.com.
         If the problem presides, please contact your bank
     """
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = trans.user.user.email
-    message["Subject"] = "Failed Membership Payment"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    recipient = trans.user.user.email
+    subject = "Failed Membership Payment"
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, trans.user.user.email, text)
-    print("Failed Payment Email has been sent")
+    send_email_using_mailgun(recipient, subject, body)
 
-# Done _/ Reformat message
+
 def successful_quick_save_mail(profile, amount) -> None:
     balance = Wallet.objects.get(user=profile).balance
     
@@ -114,25 +86,13 @@ def successful_quick_save_mail(profile, amount) -> None:
             Thank you for using Reincoso Quick Save option.Your quick save of N{amount} is successful.
             Your current balance is N{balance}.
       """
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = profile.user.email
-    message["Subject"] = "Successful Quick Save"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    recipient = profile.user.email
+    subject = "Successful Quick Save"
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
-    print("Success Auto Save Email has been sent")
+    send_email_using_mailgun(recipient, subject, body)
 
-# Done _/ Reformat message
+
 def failed_quick_save_mail(profile, amount) -> None:
     balance = Wallet.objects.get(user=profile)
     body = f"""
@@ -140,23 +100,12 @@ def failed_quick_save_mail(profile, amount) -> None:
             Your Quick Save option of N{amount} is NOT successful (due to insufficient bank balance or network issues). 
             Kindly try again or contact us on coopadmin@reincoso.com. If the problem presides, please contact your bank
         """
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = profile.user.email
-    message["Subject"] = "Failed Quick Save"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    recipient = profile.user.email
+    subject = "Failed Quick Save"
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
-    print("Failed Auto Save Email has been sent")
+    send_email_using_mailgun(recipient, subject, body)
+
 
 # Opt into Automated Savings ?? I haven't figured out the point where user opts into Auto_Save plan
 def auto_save_creation_mail(profile_name, duration_name) -> None:
@@ -167,25 +116,12 @@ def auto_save_creation_mail(profile_name, duration_name) -> None:
         Email - coopadmin@reincoso.com
     """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = profile.user.email
-    message["Subject"] = "Activated Auto Save"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = profile.user.email
+    subject = "Activated Auto Save"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    send_email_using_mailgun(recipient, subject, body)
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
-    print("Activated Auto Save Email has been sent")
 
-# Done _/ Text format
 def successful_auto_save_mail(profile, amount) -> None:
     balance = Wallet.objects.get(user=profile).balance
     body = f"""
@@ -197,25 +133,12 @@ def successful_auto_save_mail(profile, amount) -> None:
         Email - coopadmin@reincoso.com
     """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = profile.user.email
-    message["Subject"] = "Success Auto Save"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = profile.user.email
+    subject = "Success Auto Save"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    send_email_using_mailgun(recipient, subject, body)
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
-    print("Success Auto Save Email has been sent")
 
-# Done _/ Text format
 def failed_auto_save_mail(profile, amount) -> None:
     body = f"""
         Dear {profile.user.first_name},
@@ -224,23 +147,11 @@ def failed_auto_save_mail(profile, amount) -> None:
             If the problem presides, please contact your bank.
         """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] =  settings.DEFAULT_FROM_EMAIL
-    message["To"] = profile.user.email
-    message["Subject"] = "Failed Auto Save"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = profile.user.email
+    subject = "Failed Auto Save"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    send_email_using_mailgun(recipient, subject, body)
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
-    print("Failed Auto Save Email has been sent")
 
 # Partially done but, Expecting an error here !! 
 def successful_investment_mail(request, investment_id) -> None:
@@ -256,23 +167,11 @@ For any further inquiry, please contact us on:
 Email - coopadmin@reincoso.com
     """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = request.user.email
-    message["Subject"] = "Successful investment mail"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = request.user.email
+    subject = "Successful investment mail"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    send_email_using_mailgun(recipient, subject, body)
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
-    print("Successful investment Email has been sent")
 
 # partially done _/
 def failed_investment_mail(request, investment_id) -> None:
@@ -285,23 +184,11 @@ Your Investment of N{user_transaction.amount} on {user_investment.investment.typ
 Kindly try again or contact us on coopadmin@reincoso.com. If the problem presides, please contact your bank
     """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = "crypticwisdom84@gmail.com"
-    message["To"] = request.user.email
-    message["Subject"] = "Failed investment mail"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = request.user.email
+    subject = "Failed investment mail"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    send_email_using_mailgun(recipient, subject, body)
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
-    print("Failed investment mail Email has been sent")
 
 # pending ...
 def investment_maturity_mail(request) -> None:
@@ -313,25 +200,12 @@ def investment_maturity_mail(request) -> None:
         Email - coopadmin@reincoso.com
     """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = "crypticwisdom84@gmail.com"
-    message["To"] = request.user.email
-    message["Subject"] = "Investment maturity mail"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = request.user.email
+    subject = "Investment maturity mail"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    send_email_using_mailgun(recipient, subject, body)
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
-    print("Investment maturity mail Email has been sent")
 
-# done and well formatted _/
 def loan_request_processing_mail(request) -> None:
     #: This body was indented this way intentionally, so as to be well structured when recieved via mail.
     body = f"""
@@ -345,25 +219,12 @@ Email - coopadmin@reincoso.com
 
 """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = request.user.email
-    message["Subject"] = "Loan request processing mail"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = request.user.email
+    subject = "Loan request processing mail"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    send_email_using_mailgun(recipient, subject, body)
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
-    print("Loan request processing mail Email has been sent")
 
-# done _/ text format
 def mail_to_guarantor(request, guarantor) -> None:
     profile = Profile.objects.get(user=request.user)
     loan = LoanTransaction.objects.filter(user=profile).last()
@@ -375,25 +236,12 @@ def mail_to_guarantor(request, guarantor) -> None:
                 Email - coopadmin@reincoso.com
         """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = guarantor.user.email
-    message["Subject"] = "Guarantor"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = guarantor.user.email
+    subject = "Guarantor"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    send_email_using_mailgun(recipient, subject, body)
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
-    print("Guarantor Email has been sent")
 
-# done _/ text format
 def inform_user_of_added_guarantor(request) -> None:
     profile = Profile.objects.get(user=request.user)
     loan = LoanTransaction.objects.filter(user=profile).last()
@@ -405,25 +253,12 @@ def inform_user_of_added_guarantor(request) -> None:
                 Email - coopadmin@reincoso.com
         """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = request.user.email
-    message["Subject"] = "Guarantor Added"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = request.user.email
+    subject = "Guarantor Added"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    send_email_using_mailgun(recipient, subject, body)
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
-    print("Guarantor Added Email has been sent")
 
-# done and well formated _/ 
 def admin_loan_processing_status_mail(request) -> None:
     body = f"""
 Dear Reincoso,
@@ -432,23 +267,10 @@ The loan amount of N{request.data.get("amount")} from {request.user.first_name} 
 Kindly go through it and process as due.
         """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = "crypticwisdom84@gmail.com"
-    message["To"] = request.user.email
-    message["Subject"] = "Loan processing status"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = request.user.email
+    subject = "Loan processing status"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
-
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
-    print("Loan processing status to Admin Email has been sent")
+    send_email_using_mailgun(recipient, subject, body)
 
 
 def user_loan_processing_status_mail(request) -> None:
@@ -462,23 +284,10 @@ For any further inquiry please contact us on:
 Email - coopadmin@reincoso.com
         """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = "crypticwisdom84@gmail.com"
-    message["To"] = request.user.email
-    message["Subject"] = "Loan processing status"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = request.user.email
+    subject = "Loan processing status"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
-
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
-    print(" Loan processing status to user Email has been sent")
+    send_email_using_mailgun(recipient, subject, body)
 
 
 def loan_clear_off(request) -> None:
@@ -490,25 +299,12 @@ def loan_clear_off(request) -> None:
             Email - coopadmin@reincoso.com
         """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = request.user.email
-    message["Subject"] = "Loan clear off"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = request.user.email
+    subject = "Loan clear off"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    send_email_using_mailgun(recipient, subject, body)
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
-    print("Loan clear off Email has been sent")
 
-# done _/ text format
 def withdrawal_request_mail_user(request) -> None:
     body = f"""
         Dear {request.user.first_name},
@@ -518,25 +314,12 @@ def withdrawal_request_mail_user(request) -> None:
             Email - coopadmin@reincoso.com
         """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = request.user.email
-    message["Subject"] = "Withdraw Request"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = request.user.email
+    subject = "Withdraw Request"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    send_email_using_mailgun(recipient, subject, body)
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
-    print("Withdraw Request Email has been sent")
 
-# done _/ text format
 def withdrawal_request_mail_admin(request, content) -> None:
     body = f"""
     Hi Reincoso,
@@ -546,47 +329,10 @@ def withdrawal_request_mail_admin(request, content) -> None:
         
     """
 
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = settings.ADMIN_EMAIL
-    message["Subject"] = "Withdrawal Request"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+    recipient = settings.ADMIN_EMAIL
+    subject = "Withdrawal Request"
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    send_email_using_mailgun(recipient, subject, body)
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
-    print("Withdrawal Request Email has been sent")
 
-# def send_welcome_email_to_user(user):
-#     name = user.first_name
-#     if not name:
-#         name = 'Investor'
-#     name = 'Investor'
-#     from_email = "crypticwisdom84@gmail.com"
-#     email_to = ['definatelycrypticwisdom@gmail.com']
-#     subject = 'Welcome to REINCOSO GROUP'
-#     message = f"""
-#         Dear {name},
-#
-#         We are happy to have you as an investor on WealthEx. You are now on the road to the most convenient way to crypto wealth.
-#         With WealthEx, you can invest in any cryptocurrency of your choice anywhere in the world.
-#
-#         Please contact us at support@wealthexinvestment.com for more enquiries
-#
-#         Regards.
-#         Reincoso Team
-#
-#         """
-#
-#     send_mail(subject=subject, message=message, from_email=from_email, recipient_list=email_to)
-#
-#     print(f'Email sent to: {email_to}')
-    # send_mail('Subject here', 'Here is the message.', 'crypticwisdom84@gmail.com',
-    #           ['definatelycrypticwisdom@gmail.com'], fail_silently=False)
+
