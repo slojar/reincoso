@@ -49,6 +49,12 @@ PAYSTACK_PUBLIC_KEY = 'pk_test_db348e565111ebfbc63e12ca0ad9f73d8eb93a98'
 PAYSTACK_REF = "COSO"
 PAYSTACK_TEST_CHARGE = 10
 
+# SENDING EMAIL CREDENTIALS
+EMAIL_API_URL = "https://api.mailgun.net/v3/reincosocoop.com/messages"
+EMAIL_API_KEY = "0fc607b5f9c416383d7143401f1308c9-38029a9d-18a8e2d0"
+EMAIL_SENDER = "Reincoso <no-reply@reincosocoop.com>"
+
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
@@ -85,23 +91,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
-
-
-# EMAIL Credentials Mail Gun
-# SMTP_HOSTNAME: str = "smtp.mailgun.org"
-# PORT: int = 587
-# USERNAME: str = "postmaster@sandboxfc1f18e495b442d6a7ec1dfef04b8044.mailgun.org"
-# DEFAULT_PASSWORD: str = "30f3db282afd7fce48f03e4590254bad-38029a9d-d25be48b"
-
-# EMAIL GMAIL
-DEFAULT_FROM_EMAIL: str = "crypticwisdom84@gmail.com"
-EMAIL_HOST_USER: str = "smtp.gmail.com"
-PORT: int = 465
-EMAIL_HOST_PASSWORD: str = "dwtcsmetlwiuacef"
-ADMIN_EMAIL: str = "coopadmin@reincoso.com"
-
-
-
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
