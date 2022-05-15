@@ -1,4 +1,6 @@
+from ast import arg
 import logging
+from threading import Thread
 
 from django.db.models import Q
 from django.shortcuts import render
@@ -7,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import generics
+from account.send_email import failed_investment_mail, successful_investment_mail
 
 from loan.paginations import CustomPagination
 from .models import *
@@ -127,17 +130,25 @@ class InvestPaymentView(APIView):
         investment_id = request.data.get('investment_id')
         card_id = request.data.get('card_id')
         user = request.user.profile
-
         success, response = investment_payment(request.user.profile, request.data)
-
-        if success is False:
+        
+        # I handled Investment Email at this point, but this is not the right point to do that.
+        if success is False: 
             data['detail'] = "There is an error with request sent"
             data['data'] = response
-            return Response(data, status.HTTP_400_BAD_REQUEST)
 
+            # Send Failure email to user.
+
+            Thread(target=send_email.failed_investment_mail, args=[request, investment_id]).start()
+            return Response(data, status.HTTP_400_BAD_REQUEST)
+        
         data['detail'] = response
         if card_id:
             data['data'] = UserInvestmentSerializer(UserInvestment.objects.get(id=investment_id, user=user)).data
+        
+        # Send Success email to user
+        Thread(target=send_email.successful_investment_mail, args=[request, investment_id]).start()
+
         return Response(data)
 
 

@@ -1,11 +1,15 @@
+from ast import arg
 import logging
 from datetime import datetime, timedelta
+from threading import Thread
+from django.conf import settings
 
 from django.db.models import Sum
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+from investment.models import InvestmentTransaction, UserInvestment
 
 from loan.paginations import CustomPagination
 from savings.models import Duration, Saving, SavingTransaction
@@ -20,10 +24,10 @@ from transaction.models import Transaction
 from investment.utils import approve_investment
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
-
-
+from account import send_email 
 from .utils import get_savings_analysis, create_instant_savings, create_auto_savings, update_savings_payment
 
+# from account.send_email import failed_membership_fee_payment, successful_membership_fee_payment
 
 class MySavingsView(ListAPIView):
     serializer_class = SavingSerializer
@@ -95,18 +99,40 @@ class SavingsView(APIView):
         response = ""
         data = dict()
         savings_type = request.data.get('savings_type')
+        amount = request.data.get("amount")
 
         try:
             savings_type = SavingsType.objects.get(id=savings_type)
         except Exception as ex:
             data['detail'] = f"{ex}"
             return Response(data, status.HTTP_400_BAD_REQUEST)
-
+        
+        profile = Profile.objects.get(user=request.user)
+        saving_amount = Saving.objects.filter(user=profile).last()
         if savings_type.slug == 'auto':
             success, response = create_auto_savings(savings_type=savings_type, request=request)
+            # Not sure, but this could e the point where user opts into Auto Save Plan.
+            # print(success, "savings view line 115")
+            
+            if success:
+                # this mail is recieved even before the payment is successfull or fails
+                Thread(target=send_email.auto_save_creation_mail, args=[request.user.first_name, saving_amount.duration])
+                print("Sent Auto Save Opt Plan")
+            # else:
+                # Thread(target=send_email.failed_quick_save_mail, args=[profile, amount]).start()
+                # print(success, "savings view line 121")
 
         if savings_type.slug == 'instant':
             success, response = create_instant_savings(savings_type=savings_type, request=request)
+
+            # I noticed, there's no check on what this user can auto save, it was supposed to be check against this,
+            # user's current account balance. Where is the user's current account balance, that holds the total amout
+            # this user worth's. 
+            # success = False # Turned success False, For testing the 'failed_quick_save_mail'
+            if success:
+                Thread(target=send_email.successful_quick_save_mail, args=[profile, amount]).start()
+            else:
+                Thread(target=send_email.failed_quick_save_mail, args=[profile, amount]).start()
 
         data['detail'] = response
         data['payment_link'] = response
@@ -164,19 +190,54 @@ class VerifyPaymentView(APIView):
                 trans.response = response
                 trans.save()
 
+
             if payment_for == 'investment':
                 investment_id = response['payload']['data']['metadata'].get('investment_id', None)
                 success, response = approve_investment(investment_id, gateway, reference)
+                
                 data['detail'] = response
-                if success is False:
-                    return Response(data, status.HTTP_400_BAD_REQUEST)
-                # return Response(data)
 
+                if success is False:
+            
+                    # Send Failure email to user.
+
+                    print("Investment Failure from saving's view")
+                    Thread(target=send_email.failed_investment_mail, args=[request, investment_id]).start()
+                    
+                    return Response(data, status.HTTP_400_BAD_REQUEST)
+
+        # Send Success email to user
+
+        print("Investment Success from saving's view")
+        Thread(target=send_email.successful_investment_mail, args=[request, investment_id]).start()
+
+                # return Response(data)
+            
         if success is False:
             data['detail'] = "Transaction could not be verified at the moment"
-        else:
-            data['detail'] = "Transaction successful"
 
+            # Send Transaction Failure mail
+
+            if payment_for == "membership fee":
+                Thread(target=send_email.failed_membership_fee_payment, args=[trans]).start()
+
+            if payment_for == 'savings':
+                amount = Saving.objects.filter(user=profile).last()
+                Thread(target=send_email.failed_auto_save_mail, args=[profile, amount]).start()
+
+        else:
+
+            # Send Transaction Success Mail
+
+            if payment_for == "membership fee":
+                Thread(target=send_email.successful_membership_fee_payment, args=[trans]).start()
+
+            if payment_for == 'savings':
+                amount = Saving.objects.filter(user=profile).last()
+                Thread(target=send_email.successful_auto_save_mail, args=[profile, amount]).start()
+            
+
+            data['detail'] = "Transaction successful"
         data['msisdn'] = phone_number
         return Response(data)
 

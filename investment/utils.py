@@ -1,4 +1,9 @@
+from operator import inv
+from threading import Thread
 from django.contrib.humanize.templatetags.humanize import intcomma
+from requests import request
+
+from account import send_email
 
 from .models import *
 from account.models import UserCard, Wallet
@@ -46,14 +51,17 @@ def create_investment(profile, data):
     user = profile.user
 
     wallet, new_wallet = Wallet.objects.get_or_create(user=profile)
+    # print(wallet, amount)
     if amount < 1000000:
         return False, "Investment amount cannot be lesser than 1,000,000"
     if float(wallet.balance) < float(amount):
         return False, "Insufficient balance for this investment, please top-up your account"
 
     try:
+        
         investment = Investment.objects.get(id=investment_id)
         option = InvestmentOption.objects.get(id=option_id, investment=investment)
+        
         # duration = InvestmentDuration.objects.get(id=duration_id)
         duration = option.duration
     except Exception as ex:
@@ -104,7 +112,7 @@ def create_investment(profile, data):
 
     transaction.status = 'success'
     transaction.save()
-
+    
     return success, user_investment
 
 
@@ -197,7 +205,7 @@ def investment_payment(user, data):
 
         if not gateway:
             return False, "gateway is required"
-
+        
         # get paystack payment link
         success, response = get_paystack_link(
             email=user.user.email, amount=investment.amount_invested, callback_url=callback_url, metadata=metadata,

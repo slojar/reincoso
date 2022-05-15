@@ -62,5 +62,6 @@ admin.site.register(Faq)
 admin.site.register(Bank)
 admin.site.register(FeedbackMessage)
 admin.site.register(Withdrawal)
+admin.site.register(Guarantor)
 
 

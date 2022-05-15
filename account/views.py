@@ -20,7 +20,9 @@ from django.contrib.auth import authenticate
 from settings.utils import general_settings
 from transaction.models import Transaction
 import logging
-
+from django.conf import settings
+from .send_email import *
+from threading import Thread
 
 log = logging.getLogger(__name__)
 
@@ -44,6 +46,7 @@ class SignupView(APIView):
         data['detail'] = detail
         if not success:
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
         return Response(data)
 
 
@@ -115,13 +118,20 @@ class FeedbackMessageDetailView(RetrieveAPIView):
 class PayMembershipFeeView(APIView):
 
     def post(self, request):
+        print("started payment")
         data = dict()
         site_settings = general_settings()
         gateway = request.data.get('gateway')
         callback_url = request.data.get('callback_url')
 
         if not callback_url:
+            # Findings
+            # 1. The call_back url here was supposed to be /verify-payment/
+            # 2. I noticed that, if i choose the decline option on the paystack option for payment
+                # It doesn't do anything, therefore not allowing me send a Failed Payment Email to user.
             callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
+            # callback_url = f"{request.scheme}://{request.get_host()}/verify-payment/{request.path}"
+            # print(callback_url)
 
         email = request.user.email
         profile = request.user.profile
@@ -137,17 +147,15 @@ class PayMembershipFeeView(APIView):
             'transaction_id': trans.id,
             'payment_for': 'membership fee',
         }
-
         if gateway == 'paystack':
             success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
-            if success:
+            if success is True:
                 data['payment_link'] = response
                 data['membership_id'] = profile.member_id
                 # profile.paid_membership_fee = True
                 profile.save()
             else:
                 data['detail'] = response
-
         return Response(data)
 
 
@@ -158,8 +166,8 @@ class AddGuarantorView(APIView):
         response = []
         for number in guarantor:
             try:
-                guarantor = Profile.objects.get(phone_number=reformat_phone_number(number))
-                guarantor, created = Guarantor.objects.get_or_create(user=request.user.profile, guarantor=guarantor)
+                guarantor_profile = Profile.objects.get(phone_number=reformat_phone_number(number))
+                guarantor, created = Guarantor.objects.get_or_create(user=request.user.profile, guarantor=guarantor_profile)
                 if not created:
                     response.append({
                         'success': False,
@@ -168,6 +176,7 @@ class AddGuarantorView(APIView):
                     })
 
                 if created:
+                    
                     response.append({
                         'success': True,
                         'phone_number': number,
@@ -175,13 +184,18 @@ class AddGuarantorView(APIView):
                     })
 
                     # send notification to guarantor
-
+                    print(guarantor_profile)
+                    Thread(target=mail_to_guarantor, args=[request, guarantor_profile]).start()
             except Profile.DoesNotExist:
                 response.append({
                     'success': False,
                     'phone_number': number,
                     'detail': 'Phone number not registered',
                 })
+
+        # send mail to user
+        if response[0].get("success") is True:
+            Thread(target=inform_user_of_added_guarantor, args=[request]).start()
 
         return Response(response)
 
@@ -262,7 +276,11 @@ class RequestWithdrawalView(APIView):
         Please check and act accordingly.
         """
         notification = AdminNotification.objects.create(message=content)
+        # Email admin.
+        Thread(target=withdrawal_request_mail_admin, args=[request, content]).start()
 
+        # Email user.
+        Thread(target=withdrawal_request_mail_user, args=[request]).start()
         return Response({"detail": "Your withdrawal request is being processed"})
 
 

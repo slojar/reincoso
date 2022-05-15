@@ -21,6 +21,7 @@ from django.contrib.auth.hashers import make_password
 from django.conf import settings
 
 from cryptography.fernet import Fernet
+from .send_email import send_welcome_email_to_user
 
 log = logging.getLogger(__name__)
 
@@ -137,7 +138,7 @@ def signup(request):
     profile.save()
 
     Thread(target=create_recipient_code, args=[profile, account_no]).start()
-
+    Thread(target=send_welcome_email_to_user, args=[profile]).start()
     success = True
     detail = 'Account created successfully'
     return success, detail
