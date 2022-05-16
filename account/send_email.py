@@ -28,11 +28,14 @@ from .models import Profile, Wallet
 # Done cleaned _/ Reformat message
 def send_welcome_email_to_user(profile):
     body = f'''
-    Dear {profile.user.first_name},
-        [Reincoso Cooperative Society] welcomes you! 
-        We're thrilled to have you among us. We consider ourselves fortunate that you picked us and I'd want to express 
-        our gratitude on behalf of the whole organization. In the meanwhile, please visit our website (www.reincosocoop.com) 
-        to learn more about our products and services.
+Dear {profile.user.first_name},
+
+
+Reincoso Cooperative Society welcomes you! 
+We're thrilled to have you among us. We consider ourselves fortunate that you picked us and I'd want to express 
+our gratitude on behalf of the whole organization. In the meanwhile, please visit our website (www.reincosocoop.com) 
+to learn more about our products and services.
+    
     '''
     # Create a multipart message and set headers
     message = MIMEMultipart()
@@ -55,10 +58,11 @@ def send_welcome_email_to_user(profile):
 # Done _/ Reformat message
 def successful_membership_fee_payment(trans) -> None:
     body = f"""
-    Dear {trans.user.user.first_name},
-        Thank you for choosing Reincoso Cooperative Society, Your membership fee of 100,000 is successful. For any further
-        inquiry please contact us on:
-        Email - coopadmin@reincoso.com
+Dear {trans.user.user.first_name},
+
+Thank you for choosing Reincoso Cooperative Society, Your membership fee of 100,000 is successful. For any further
+inquiry please contact us on:
+Email - coopadmin@reincoso.com
     
     """
     # Create a multipart message and set headers
@@ -82,9 +86,10 @@ def successful_membership_fee_payment(trans) -> None:
 # Done _/ Reformat message
 def failed_membership_fee_payment(trans) -> None:
     body = f"""
-    Dear {trans.user.user.first_name},    
-        Your membership fee payment of 100,000 was not successful. Kindly try again or contact us on coopadmin@reincoso.com.
-        If the problem presides, please contact your bank
+Dear {trans.user.user.first_name},  
+  
+Your membership fee payment of 100,000 was not successful. Kindly try again or contact us on coopadmin@reincoso.com.
+If the problem presides, please contact your bank
     """
     # Create a multipart message and set headers
     message = MIMEMultipart()
@@ -107,38 +112,27 @@ def failed_membership_fee_payment(trans) -> None:
 # Done _/ Reformat message
 def successful_quick_save_mail(profile, amount) -> None:
     balance = Wallet.objects.get(user=profile).balance
-    
-    print(profile)
     body = f"""
-      Dear {profile.user.first_name},    
-            Thank you for using Reincoso Quick Save option.Your quick save of N{amount} is successful.
-            Your current balance is N{balance}.
-      """
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = profile.user.email
-    message["Subject"] = "Successful Quick Save"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
+Dear {profile.user.first_name}, 
+ 
+Thank you for using Reincoso Quick Save option.Your quick save of N{amount} is successful.
+Your current balance is N{balance}.
+    """
 
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
+    recipient = profile.user.email
+    subject = "Successful Quick Save"
 
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, profile.user.email, text)
-    print("Success Auto Save Email has been sent")
+    send_email_using_mailgun(recipient, subject, body)
 
-# Done _/ Reformat message
+
+>>>>>>> Stashed changes
 def failed_quick_save_mail(profile, amount) -> None:
     balance = Wallet.objects.get(user=profile)
     body = f"""
-        Dear {profile.user.first_name},
-            Your Quick Save option of N{amount} is NOT successful (due to insufficient bank balance or network issues). 
-            Kindly try again or contact us on coopadmin@reincoso.com. If the problem presides, please contact your bank
+Dear {profile.user.first_name},
+
+Your Quick Save option of N{amount} is NOT successful (due to insufficient bank balance or network issues). 
+Kindly try again or contact us on coopadmin@reincoso.com. If the problem presides, please contact your bank
         """
     # Create a multipart message and set headers
     message = MIMEMultipart()
@@ -189,12 +183,13 @@ def auto_save_creation_mail(profile_name, duration_name) -> None:
 def successful_auto_save_mail(profile, amount) -> None:
     balance = Wallet.objects.get(user=profile).balance
     body = f"""
-    Dear {profile.user.first_name},
-        Thank you for using Reincoso Auto Save option. Your Auto save of N{amount.amount} ({amount.duration})
-        plan is successful. Your current balance is N{balance}.
-        
-        For any further inquiry, please contact us on:
-        Email - coopadmin@reincoso.com
+Dear {profile.user.first_name},
+
+Thank you for using Reincoso Auto Save option. Your Auto save of N{amount.amount} {amount.duration}
+plan is successful. Your current balance is N{balance}.
+
+For any further inquiry, please contact us on:
+Email - coopadmin@reincoso.com
     """
 
     # Create a multipart message and set headers
@@ -218,10 +213,11 @@ def successful_auto_save_mail(profile, amount) -> None:
 # Done _/ Text format
 def failed_auto_save_mail(profile, amount) -> None:
     body = f"""
-        Dear {profile.user.first_name},
-            Your Auto Save option of N{amount.amount} ({amount.duration}) plan is NOT successful (due to insufficient bank balance or network issues).
-            Kindly try again or contact us on coopadmin@reincoso.com. 
-            If the problem presides, please contact your bank.
+Dear {profile.user.first_name},
+
+Your Auto Save option of N{amount.amount} ({amount.duration}) plan is NOT successful (due to insufficient bank balance or network issues).
+Kindly try again or contact us on coopadmin@reincoso.com. 
+If the problem presides, please contact your bank.
         """
 
     # Create a multipart message and set headers
@@ -243,36 +239,21 @@ def failed_auto_save_mail(profile, amount) -> None:
     print("Failed Auto Save Email has been sent")
 
 # Partially done but, Expecting an error here !! 
-def successful_investment_mail(request, investment_id) -> None:
-    investment = UserInvestment.objects.get(id=investment_id, user=request.user.profile)
-    user_transaction = InvestmentTransaction(user=request.user.profile, user_investment=investment)
+def successful_investment_mail(user, user_investment) -> None:
     body = f"""
-Dear {request.user.first_name},
+Dear {user.first_name},
 
-You have made an investment of {user_transaction.amount} on ({investment.investment.type.name}) with {investment.percentage}% per annum.
-Your current investment balance is N{investment.amount_invested}.
+You have made an investment of {user_investment.amount_invested} on {user_investment.investment.name} with {user_investment.percentage}% per annum.
+Your current investment balance is N{user_investment.amount_invested}.
 
 For any further inquiry, please contact us on:
 Email - coopadmin@reincoso.com
     """
-
-    # Create a multipart message and set headers
-    message = MIMEMultipart()
-    message["From"] = settings.DEFAULT_FROM_EMAIL
-    message["To"] = request.user.email
-    message["Subject"] = "Successful investment mail"
-    # message["Bcc"] = receiver_email  # Recommended for mass emails
-
-    # Add body to email
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
-
-    # Log in to server using secure context and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.EMAIL_HOST_USER, settings.PORT, context=context) as server:
-        server.login(settings.DEFAULT_FROM_EMAIL, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.DEFAULT_FROM_EMAIL, request.user.email, text)
-    print("Successful investment Email has been sent")
+    recipient = user.email
+    subject = "Successful investment mail"
+    print(body)
+    send_email_using_mailgun(recipient, subject, body)
+    print("success investment email")
 
 # partially done _/
 def failed_investment_mail(request, investment_id) -> None:

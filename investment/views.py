@@ -113,7 +113,7 @@ class InvestView(APIView):
 
     def post(self, request):
         data = dict()
-        success, response = create_investment(profile=request.user.profile, data=request.data)
+        success, response = create_investment(profile=request.user.profile, data=request.dat)
         if success is False:
             data['detail'] = response
             return Response(data, status.HTTP_400_BAD_REQUEST)
