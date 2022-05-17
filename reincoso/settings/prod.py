@@ -6,10 +6,10 @@ import logging
 import environ
 
 env = environ.Env()
-environ.Env.read_env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
-SECRET_KEY = 'hjdj7=4rjhwo7-=1_())1!FvHxrcgvkliePY0t+rkmklmPdZn29wv5aLF0t0WW/2w'
+SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = False
 
@@ -31,6 +31,11 @@ PAYSTACK_SECRET_KEY = env('PAYSTACK_SECRET_KEY')
 PAYSTACK_PUBLIC_KEY = env('PAYSTACK_PUBLIC_KEY')
 PAYSTACK_REF = env('PAYSTACK_REF')
 PAYSTACK_TEST_CHARGE = env('PAYSTACK_TEST_CHARGE')
+
+EMAIL_API_URL = env('EMAIL_API_URL')
+EMAIL_API_KEY = env('EMAIL_API_KEY')
+EMAIL_SENDER = env('EMAIL_SENDER')
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://reincosocoop.com"
