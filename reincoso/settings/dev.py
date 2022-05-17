@@ -30,18 +30,6 @@ DATABASES = {
     }
 }
 
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS':
-        'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100,
-
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-}
 
 PAYSTACK_BASE_URL = 'https://api.paystack.co'
 PAYSTACK_SECRET_KEY = 'sk_test_9b3d455a84aa3da9bf0a7610a80529dc524c377d'
