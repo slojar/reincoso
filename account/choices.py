@@ -10,7 +10,9 @@ ACTIVE_STATUS_CHOICES = (
 
 APPROVAL_STATUS_CHOICES = (
     ('pending', 'Pending'),
-    ('approved', 'Approved')
+    ('denied', 'Denied'),
+    ('failed', 'Failed'),
+    ('approved', 'Approved'),
 )
 
 DAYS_OF_THE_MONTH_CHOICES = (
@@ -19,3 +21,5 @@ DAYS_OF_THE_MONTH_CHOICES = (
     ('17', '17'), ('18', '18'), ('19', '19'), ('20', '20'), ('21', '21'), ('22', '22'), ('23', '23'), ('24', '24'),
     ('25', '25'), ('26', '26'), ('27', '27'), ('28', '28'), ('29', '29'), ('30', '30'), ('31', '31')
 )
+
+

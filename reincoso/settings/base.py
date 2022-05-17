@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.contrib import admin
 import cloudinary
 import os
+import logging
 
 
 admin.AdminSite.site_title = "Reincoso Admin Panel"
@@ -34,25 +35,42 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     'rest_framework',
-    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
 
     'account.apps.AccountConfig',
     'savings.apps.SavingsConfig',
     'loan.apps.LoanConfig',
-    'investment.apps.InvestmentConfig',
     'transaction.apps.TransactionConfig',
     'settings.apps.SettingsConfig',
+    'investment.apps.InvestmentConfig',
+    'superadmin.apps.SuperadminConfig',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsPostCsrfMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS':
+        'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100,
+
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
 
 ROOT_URLCONF = 'reincoso.urls'
 
@@ -124,6 +142,15 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+logging.basicConfig(
+    filename='log.log',
+    filemode='a',
+    level=logging.DEBUG,
+    format='[{asctime}] {levelname} {module} {thread:d} - {message}',
+    datefmt='%d-%m-%Y %H:%M:%S',
+    style='{',
+)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -138,7 +165,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': 'logs.log',
+            'filename': 'reincoso.log',
             'formatter': 'verbose',
         },
     },

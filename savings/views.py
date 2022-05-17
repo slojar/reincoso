@@ -1,8 +1,17 @@
+from ast import arg
+import logging
 from datetime import datetime, timedelta
+from threading import Thread
+from django.conf import settings
+
+from django.db.models import Sum
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from investment.models import InvestmentTransaction, UserInvestment
+
+from loan.paginations import CustomPagination
 from savings.models import Duration, Saving, SavingTransaction
 from .serializers import *
 from settings.models import PaymentGateway
@@ -12,96 +21,123 @@ from account.utils import tokenize_user_card
 from account.models import UserCard
 from modules.paystack import paystack_auto_charge
 from transaction.models import Transaction
+from investment.utils import approve_investment
+from django.shortcuts import get_object_or_404
+from rest_framework import permissions
+from account import send_email 
+from .utils import get_savings_analysis, create_instant_savings, create_auto_savings, update_savings_payment
+
+# from account.send_email import failed_membership_fee_payment, successful_membership_fee_payment
+
+class MySavingsView(ListAPIView):
+    serializer_class = SavingSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        profile = self.request.user.profile
+        query = Saving.objects.filter(user=profile)
+        return query
+
+    def list(self, request, *args, **kwargs):
+        profile = self.request.user.profile
+        data = super(MySavingsView, self).list(request, *args, **kwargs).data
+        data['user'] = get_savings_analysis(profile)
+        return Response(data)
+
+
+class MySavingsDetailView(RetrieveAPIView):
+    serializer_class = SavingSerializer
+
+    def get(self, request, pk):
+        profile = request.user.profile
+        savings = get_object_or_404(Saving, pk=pk, user=profile)
+        data = SavingSerializer(savings).data
+        data['user'] = get_savings_analysis(profile)
+        return Response(data)
+
+
+class SavingTransactionView(ListAPIView):
+    serializer_class = SavingsTransactionSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        savings_id = self.kwargs.get('savings_id')
+        return SavingTransaction.objects.filter(saving_id=savings_id)
+
+    def list(self, request, *args, **kwargs):
+        profile = request.user.profile
+        data = super(SavingTransactionView, self).list(request, *args, **kwargs).data
+        data['user'] = get_savings_analysis(profile)
+        return Response(data)
+
+
+class SavingTransactionDetailView(RetrieveAPIView):
+    serializer_class = SavingsTransactionSerializer
+    lookup_field = 'pk'
+    queryset = SavingTransaction.objects.all()
+
+    def get(self, request, pk):
+        profile = request.user.profile
+        data = super(SavingTransactionDetailView, self).get(request).data
+        data['user'] = get_savings_analysis(profile)
+        return Response(data)
 
 
 class SavingsView(APIView):
+
     def get(self, request):
         data = dict()
-        queryset = Duration.objects.all()
-        data['durations'] = SavingDurationSerializer(queryset, many=True).data
+        profile = request.user.profile
+        data['user'] = get_savings_analysis(profile)
+        data['savings_types'] = SavingsTypeSerializer(SavingsType.objects.filter(active=True), many=True).data
+        data['durations'] = SavingDurationSerializer(Duration.objects.all(), many=True).data
         data['gateways'] = PaymentGateway.objects.all().values('id', 'name', 'slug')
         return Response(data)
 
     def post(self, request):
+        success = False
+        response = ""
         data = dict()
-        amount = request.data.get('amount')
-        fixed_payment = request.data.get('fixed_payment')
-        repayment_day = request.data.get('repayment_day')
-        gateway = request.data.get('gateway')
-        payment_duration_id = request.data.get('payment_duration_id')
-        card_id = request.data.get('card_id')
+        savings_type = request.data.get('savings_type')
+        amount = request.data.get("amount")
 
-        callback_url = request.data.get('callback_url')
-        if not callback_url:
-            callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
-        callback_url = callback_url + f"?gateway={gateway}"
-
-        if not Duration.objects.filter(id=payment_duration_id).exists():
-            data['detail'] = 'Invalid payment duration'
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
-
-        email = request.user.email
-        payment_duration_id = Duration.objects.get(id=payment_duration_id)
-
-        if fixed_payment:
-            amount = fixed_payment
-
-        # Create/Update Saving Account
-        saving, created = Saving.objects.get_or_create(user=request.user.profile)
-        saving.title = payment_duration_id
-        saving.last_payment = amount
-
-        if not fixed_payment:
-            saving.amount = amount
-
-        if saving.amount <= 0 and fixed_payment:
-            saving.amount = fixed_payment
-
-        saving.last_payment_date = datetime.now()
-        saving.total = saving.total + amount
-        saving.repayment_day = repayment_day
-
-        # Calculate next repayment date
-        last_date = saving.last_payment_date
-        duration_interval = saving.title.interval
-        next_date = last_date + timedelta(days=duration_interval)
-        saving.next_payment_date = next_date
-        saving.save()
-
-        # Create saving transaction
-        transaction, created = SavingTransaction.objects.get_or_create(user=request.user.profile,
-                                                                       saving_id=saving.id, status='pending')
-        transaction.payment_method = gateway
-        transaction.amount = amount
-        transaction.save()
-
-        metadata = {
-            'transaction_id': transaction.id,
-            'payment_for': 'savings',
-        }
-
-        if card_id:
-            try:
-                card = UserCard.objects.get(id=card_id)
-                success = False
-                response_status = status.HTTP_400_BAD_REQUEST
-                json_response = None
-                authorization_code = card.authorization_code
-                paystack_auto_charge(authorization_code, email, amount, metadata=metadata)
-                return success, json_response, response_status
-
-            except Exception as ex:
-                return Response({'success': False,
-                                 'detail': 'Invalid card selected',
-                                 'error': str(ex)},
-                                status=status.HTTP_400_BAD_REQUEST)
-
-        if gateway == 'paystack':
-            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
+        try:
+            savings_type = SavingsType.objects.get(id=savings_type)
+        except Exception as ex:
+            data['detail'] = f"{ex}"
+            return Response(data, status.HTTP_400_BAD_REQUEST)
+        
+        profile = Profile.objects.get(user=request.user)
+        saving_amount = Saving.objects.filter(user=profile).last()
+        if savings_type.slug == 'auto':
+            success, response = create_auto_savings(savings_type=savings_type, request=request)
+            # Not sure, but this could e the point where user opts into Auto Save Plan.
+            # print(success, "savings view line 115")
+            
             if success:
-                data['payment_link'] = response
+                # this mail is recieved even before the payment is successfull or fails
+                Thread(target=send_email.auto_save_creation_mail, args=[request.user.first_name, saving_amount.duration])
+                print("Sent Auto Save Opt Plan")
+            # else:
+                # Thread(target=send_email.failed_quick_save_mail, args=[profile, amount]).start()
+                # print(success, "savings view line 121")
+
+        if savings_type.slug == 'instant':
+            success, response = create_instant_savings(savings_type=savings_type, request=request)
+
+            # I noticed, there's no check on what this user can auto save, it was supposed to be check against this,
+            # user's current account balance. Where is the user's current account balance, that holds the total amout
+            # this user worth's. 
+            # success = False # Turned success False, For testing the 'failed_quick_save_mail'
+            if success:
+                Thread(target=send_email.successful_quick_save_mail, args=[profile, amount]).start()
             else:
-                data['detail'] = response
+                Thread(target=send_email.failed_quick_save_mail, args=[profile, amount]).start()
+
+        data['detail'] = response
+        data['payment_link'] = response
+        if not success:
+            return Response(data, status.HTTP_400_BAD_REQUEST)
 
         return Response(data)
 
@@ -115,19 +151,23 @@ class VerifyPaymentView(APIView):
         reference = request.GET.get('reference')
         phone_number = None
         success = False
+        response = dict()
 
         if gateway == 'paystack':
             success, response = verify_paystack_transaction(reference)
             data['detail'] = response
 
             if success is False:
-                return Response(data, status=status.HTTP_406_NOT_ACCEPTABLE)
+                return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
+            # tokenize card
+            tokenize_user_card(response, gateway)
+
+            amount = response['amount']
             email = response['email']
-            transaction_id = int(response['payload']['data']['metadata']['transaction_id'])
+            transaction_id = response['payload']['data']['metadata'].get('transaction_id', None)
             payment_for = response['payload']['data']['metadata'].get('payment_for', None)
-
-            profile = Profile.objects.get(user__email=email)
+            profile = Profile.objects.get(user__email__iexact=email)
             phone_number = profile.phone_number
 
             if payment_for == 'membership fee':
@@ -135,21 +175,68 @@ class VerifyPaymentView(APIView):
                 trans.reference = reference
                 trans.status = 'success'
                 trans.response = response
+                profile.paid_membership_fee = True
+                profile.save()
                 trans.save()
 
             if payment_for == 'savings':
                 trans = SavingTransaction.objects.get(id=transaction_id, user__user__email__iexact=email)
+
                 trans.reference = reference
-                trans.status = 'success'
+                if trans.status != 'success':
+                    trans.status = 'success'
+                    saving = update_savings_payment(saving=trans.saving, amount=amount)
+
                 trans.response = response
                 trans.save()
 
-            # tokenize card
-            tokenize_user_card(response)
 
+            if payment_for == 'investment':
+                investment_id = response['payload']['data']['metadata'].get('investment_id', None)
+                success, response = approve_investment(investment_id, gateway, reference)
+                
+                data['detail'] = response
+
+                if success is False:
+            
+                    # Send Failure email to user.
+
+                    print("Investment Failure from saving's view")
+                    Thread(target=send_email.failed_investment_mail, args=[request, investment_id]).start()
+                    
+                    return Response(data, status.HTTP_400_BAD_REQUEST)
+
+        # Send Success email to user
+
+        print("Investment Success from saving's view")
+        Thread(target=send_email.successful_investment_mail, args=[request, investment_id]).start()
+
+                # return Response(data)
+            
         if success is False:
             data['detail'] = "Transaction could not be verified at the moment"
+
+            # Send Transaction Failure mail
+
+            if payment_for == "membership fee":
+                Thread(target=send_email.failed_membership_fee_payment, args=[trans]).start()
+
+            if payment_for == 'savings':
+                amount = Saving.objects.filter(user=profile).last()
+                Thread(target=send_email.failed_auto_save_mail, args=[profile, amount]).start()
+
         else:
+
+            # Send Transaction Success Mail
+
+            if payment_for == "membership fee":
+                Thread(target=send_email.successful_membership_fee_payment, args=[trans]).start()
+
+            if payment_for == 'savings':
+                amount = Saving.objects.filter(user=profile).last()
+                Thread(target=send_email.successful_auto_save_mail, args=[profile, amount]).start()
+            
+
             data['detail'] = "Transaction successful"
         data['msisdn'] = phone_number
         return Response(data)

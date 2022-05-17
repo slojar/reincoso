@@ -1,14 +1,28 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+
+from transaction.choices import PAYMENT_GATEWAYS
 from .choices import *
 from django.utils.text import slugify
 import uuid
 
 
+class Bank(models.Model):
+    name = models.CharField(max_length=250)
+    code = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f'{self.name} - Code: {self.code}'
+
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20)
-    bvn = models.CharField(max_length=20)
+    bvn = models.CharField(max_length=300)
+    recipient_code = models.CharField(max_length=300, blank=True, null=True)
+    account_no = models.CharField(max_length=300, blank=True, null=True)
+    account_name = models.CharField(max_length=300, blank=True, null=True)
+    bank = models.ForeignKey(Bank, on_delete=models.SET_NULL, blank=True, null=True)
     member_id = models.CharField(max_length=200, editable=False, blank=True, null=True)
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='male')
     status = models.CharField(max_length=20, choices=ACTIVE_STATUS_CHOICES, default='active')
@@ -25,8 +39,29 @@ class Profile(models.Model):
     def email(self):
         return self.user.email or None
 
+    def get_wallet(self):
+        wallet, created = Wallet.objects.get_or_create(user=self)
+        data = {
+            'balance': wallet.balance,
+            'bonus': wallet.bonus,
+            'pending': wallet.pending,
+        }
+        return data
+
     def __str__(self):
         return f'{self.user} - {self.member_id}'
+
+
+class Wallet(models.Model):
+    user = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    balance = models.DecimalField(decimal_places=2, max_digits=20, default=0)
+    pending = models.DecimalField(decimal_places=2, max_digits=20, default=0)
+    bonus = models.DecimalField(decimal_places=2, max_digits=20, default=0)
+    created_on = models.DateField(auto_now_add=True)
+    updated_on = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.id}: {self.user} - {self.balance}"
 
 
 class FaqCategory(models.Model):
@@ -82,7 +117,7 @@ class UserCard(models.Model):
     exp_year = models.CharField(max_length=4, null=True)
     signature = models.CharField(max_length=200, null=True)
     authorization_code = models.CharField(max_length=200, null=True)
-    gateway = models.CharField(max_length=50, null=True, default='paystack')
+    gateway = models.CharField(max_length=50, null=True, default='paystack', choices=PAYMENT_GATEWAYS)
     payload = models.TextField(null=True)
     default = models.BooleanField(default=False, null=True)
     created_on = models.DateTimeField(auto_now_add=True)
@@ -90,5 +125,20 @@ class UserCard(models.Model):
 
     def __str__(self):
         return f"{self.id}. {self.user}"
+
+
+class Withdrawal(models.Model):
+    requested_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    amount = models.DecimalField(decimal_places=2, max_digits=20, default=0)
+    description = models.TextField()
+    status = models.CharField(max_length=100, choices=APPROVAL_STATUS_CHOICES, default='pending')
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_by')
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.requested_by.username} - {self.amount} - {self.status}'
+        # return f'{self.amount} - {self.status}'
+
 
 

@@ -1,8 +1,11 @@
 from django.db import models
+
+from account.choices import DAYS_OF_THE_MONTH_CHOICES
 from account.models import Profile
 from .choices import *
 from django.contrib.sites.models import Site
 from savings.models import PAYMENT_GATEWAYS
+
 
 basis_type_choices = (
     ('weekly', 'Weekly'), ('monthly', 'Monthly'), ('yearly', 'Yearly'),
@@ -27,6 +30,8 @@ class Loan(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     duration = models.ForeignKey(LoanDuration, on_delete=models.SET_NULL, null=True)
+    day_of_the_week = models.CharField(max_length=20, choices=day_of_the_week_choices, default='1')
+    payment_day = models.CharField(max_length=5, choices=DAYS_OF_THE_MONTH_CHOICES, default='30', null=True)
     basis = models.CharField(max_length=50, choices=basis_type_choices, default='monthly')
     basis_duration = models.IntegerField(default=0)
     number_of_days = models.IntegerField(default=1)
@@ -65,6 +70,9 @@ class LoanTransaction(models.Model):
     response = models.TextField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self):
         return f"id: {self.id}:{self.user}: {self.transaction_type} - {self.amount}"
