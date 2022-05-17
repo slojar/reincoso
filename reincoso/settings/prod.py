@@ -37,16 +37,16 @@ EMAIL_API_KEY = env('EMAIL_API_KEY')
 EMAIL_SENDER = env('EMAIL_SENDER')
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://reincosocoop.com"
-    "https://reincosocoop.com"
-    "http://api.reincosocoop.com"
-    "https://api.reincosocoop.com"
-    "http://admin.reincosocoop.com"
-    "https://admin.reincosocoop.com"
-    "http://bot.reincosocoop.com"
-    "https://bot.reincosocoop.com"
-]
+#CORS_ALLOWED_ORIGINS = [
+#    "http://reincosocoop.com"
+#    "https://reincosocoop.com"
+#    "http://api.reincosocoop.com"
+#    "https://api.reincosocoop.com"
+#    "http://admin.reincosocoop.com"
+#    "https://admin.reincosocoop.com"
+#    "http://bot.reincosocoop.com"
+#    "https://bot.reincosocoop.com"
+#]
 
 CORS_ALLOW_ALL_ORIGINS = True
 # CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
@@ -79,5 +79,8 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
