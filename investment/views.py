@@ -113,7 +113,7 @@ class InvestView(APIView):
 
     def post(self, request):
         data = dict()
-        success, response = create_investment(profile=request.user.profile, data=request.dat)
+        success, response = create_investment(profile=request.user.profile, data=request.data)
         if success is False:
             data['detail'] = response
             return Response(data, status.HTTP_400_BAD_REQUEST)
@@ -140,6 +140,7 @@ class InvestPaymentView(APIView):
             # Send Failure email to user.
 
             Thread(target=send_email.failed_investment_mail, args=[request, investment_id]).start()
+            print("InvestmentPaymentView Line 143")
             return Response(data, status.HTTP_400_BAD_REQUEST)
         
         data['detail'] = response
@@ -148,6 +149,7 @@ class InvestPaymentView(APIView):
         
         # Send Success email to user
         Thread(target=send_email.successful_investment_mail, args=[request, investment_id]).start()
+        print("InvestmentPaymentView Line 143")
 
         return Response(data)
 

@@ -152,7 +152,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': 'logs.log',
+            'filename': 'reincoso.log',
             'formatter': 'verbose',
         },
     },

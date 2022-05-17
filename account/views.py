@@ -176,7 +176,6 @@ class AddGuarantorView(APIView):
                     })
 
                 if created:
-                    
                     response.append({
                         'success': True,
                         'phone_number': number,
