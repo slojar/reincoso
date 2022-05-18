@@ -104,7 +104,6 @@ def create_investment(profile, data):
     )
 
     user = debit_user_account(profile=profile, amount=amount)
-
     user_investment.start_date = timezone.now()
     user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
     user_investment.status = 'approved'
@@ -112,14 +111,6 @@ def create_investment(profile, data):
 
     transaction.status = 'success'
     transaction.save()
-
-    if not success:
-        print(success, " Investment was not successful")
-        # Thread(target=, args=[]).start()
-    else:
-        print(success, " Investment was successful")
-        Thread(target=send_email.successful_investment_mail, args=[user, user_investment]).start()
-        print(success, user, user.email, user_investment.amount_invested, user_investment.percentage, user_investment.investment.name)
 
     return success, user_investment
 

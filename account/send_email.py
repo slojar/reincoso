@@ -141,10 +141,11 @@ Email - coopadmin@reincoso.com
 
 
 def failed_auto_save_mail(profile, amount) -> None:
+
     body = f"""
 Dear {profile.user.first_name},
 
-Your Auto Save option of N{amount.amount} ({amount.duration}) plan is NOT successful (due to insufficient bank balance or network issues).
+Your Auto Save option of N{amount.amount} {amount.duration} plan is NOT successful (due to insufficient bank balance or network issues).
 Kindly try again or contact us on coopadmin@reincoso.com. 
 If the problem presides, please contact your bank.
         """
@@ -155,36 +156,32 @@ If the problem presides, please contact your bank.
     send_email_using_mailgun(recipient, subject, body)
 
 
-# Partially done but, Expecting an error here !! 
-def successful_investment_mail(user, user_investment) -> None:
-    body = f"""
-Dear {user.first_name},
-
-You have made an investment of {user_investment.amount_invested} on {user_investment.investment.name} with {user_investment.percentage}% per annum.
-Your current investment balance is N{user_investment.amount_invested}.
-
-For any further inquiry, please contact us on:
-Email - coopadmin@reincoso.com
-    """
-    recipient = request.user.email
-    subject = "Successful investment mail"
-
-    send_email_using_mailgun(recipient, subject, body)
-
-
-# partially done _/
-def failed_investment_mail(request, investment_id) -> None:
-    user_investment = UserInvestment.objects.get(id=investment_id, user=request.user.profile)
-    user_transaction = InvestmentTransaction(user=request.user.profile, user_investment=user_investment)
+def successful_investment_mail(request, investment_transaction, total_amount_invested) -> None:
     body = f"""
 Dear {request.user.first_name},
 
-Your Investment of N{user_transaction.amount} on {user_investment.investment.type.name} is NOT successful (due to insufficient bank balance or network issues). 
-Kindly try again or contact us on coopadmin@reincoso.com. If the problem presides, please contact your bank
-    """
+You have made an investment of {investment_transaction.amount} on {investment_transaction.user_investment.investment.name} with {investment_transaction.user_investment.percentage}% per annum.
+Your current investment balance is N{total_amount_invested}.
+
+For any further inquiry, please contact us on:
+Email - coopadmin@reincoso.com
+"""
 
     recipient = request.user.email
-    subject = "Failed investment mail"
+    subject = "Investment with Reincoso"
+    send_email_using_mailgun(recipient, subject, body)
+
+
+def failed_investment_mail(request, investment_transaction) -> None:
+    body = f"""
+Dear {request.user.first_name},
+
+Your Investment of N{investment_transaction.amount} on {investment_transaction.user_investment.investment.name} is NOT successful (due to insufficient bank balance or network issues). 
+Kindly try again or contact us on coopadmin@reincoso.com. If the problem presides, please contact your bank
+"""
+
+    recipient = request.user.email
+    subject = "Investment with Reincoso"
 
     send_email_using_mailgun(recipient, subject, body)
 
@@ -200,7 +197,7 @@ def investment_maturity_mail(request) -> None:
     """
 
     recipient = request.user.email
-    subject = "Investment maturity mail"
+    subject = "Investment with Reincoso"
 
     send_email_using_mailgun(recipient, subject, body)
 

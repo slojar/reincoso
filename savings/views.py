@@ -113,22 +113,19 @@ class SavingsView(APIView):
         if savings_type.slug == 'auto':
             success, response = create_auto_savings(savings_type=savings_type, request=request)
 
-            # create_auto_savings, handles payment with card.
-            if success and request.data.get("card_id") is not None:
+            # Send email depending on what create_auto_savings() function returns
+            if success:
                 Thread(target=send_email.successful_auto_save_mail, args=[profile, saving_amount]).start()
-            elif success is False:
+            else:
                 Thread(target=send_email.failed_auto_save_mail, args=[profile, saving_amount]).start()
 
         if savings_type.slug == 'instant':
             success, response = create_instant_savings(savings_type=savings_type, request=request)
 
-            # create_instant_savings, handles payment with card
-            # this checks if create_instant_savings is True and card_id is not provided, this should send a success mail
-            if success and request.data.get("card_id") is not None:
+            # Send email depending on what create_instant_savings() function returns
+            if success:
                 Thread(target=send_email.successful_quick_save_mail, args=[profile, amount]).start()
-
-            # This checks if create_instant_savings is False then failure mail
-            elif success is False:
+            else:
                 Thread(target=send_email.failed_quick_save_mail, args=[profile, amount]).start()
 
         data['detail'] = response
@@ -193,7 +190,6 @@ class VerifyPaymentView(APIView):
                         # send mail for success in auto save transaction
                         amount = Saving.objects.filter(user=profile).last()
                         Thread(target=send_email.successful_auto_save_mail, args=[profile, amount]).start()
-                        print("auto save ran line 197 SavingView")
 
                     else:
                         # Thinking to run a Thread for failure in transaction
@@ -211,14 +207,12 @@ class VerifyPaymentView(APIView):
                 if success is False:
             
                     # Send Failure email to user.
-
                     print("Investment Failure from saving's view")
                     Thread(target=send_email.failed_investment_mail, args=[request, investment_id]).start()
                     
                     return Response(data, status.HTTP_400_BAD_REQUEST)
 
                 # Send Success email to user
-
                 print("Investment Success from saving's view")
                 Thread(target=send_email.successful_investment_mail, args=[request, investment_id]).start()
 
@@ -239,7 +233,6 @@ class VerifyPaymentView(APIView):
         else:
 
             # Send Transaction Success Mail
-
             if payment_for == "membership fee":
                 Thread(target=send_email.successful_membership_fee_payment, args=[trans]).start()
 
