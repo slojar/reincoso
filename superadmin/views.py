@@ -35,7 +35,7 @@ class AdminHomepage(APIView):
     def get(self, request):
         data = dict()
         data['total_feedback'] = FeedbackMessage.objects.all().count()
-        data['total_user'] = User.objects.all().count()
+        data['total_user'] = Profile.objects.all().count()
         data['total_investment'] = UserInvestment.objects.all().count()
         data['total_loan'] = Loan.objects.all().count()
         data['active_loan'] = Loan.objects.filter(status='ongoing').count()
