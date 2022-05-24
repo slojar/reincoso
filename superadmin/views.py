@@ -848,9 +848,10 @@ class AdminUserInvestmentDetailView(generics.RetrieveUpdateAPIView):
         update_status = request.data.get('status')
         model_id = self.kwargs.get('id')
         user_investment = UserInvestment.objects.get(id=model_id)
-        user_investment.start_date = timezone.now()
-        user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
         user_investment.status = update_status
+        if update_status == "approved":
+            user_investment.start_date = timezone.now()
+            user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
         user_investment.save()
         create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
