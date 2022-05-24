@@ -54,9 +54,9 @@ class InvestmentSpecificationSerializer(serializers.ModelSerializer):
 
 
 class UserInvestmentSerializer(serializers.ModelSerializer):
-    investment = serializers.CharField(source='investment.name')
-    option = serializers.CharField(source='option.name')
-    duration = serializers.CharField(source='duration.title')
+    investment = serializers.CharField(source='investment.name', read_only=True)
+    option = serializers.CharField(source='option.name', read_only=True)
+    duration = serializers.CharField(source='duration.title', read_only=True)
     user = serializers.SerializerMethodField()
 
     def get_user(self, obj):

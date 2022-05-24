@@ -104,10 +104,11 @@ def create_investment(profile, data):
     )
 
     user = debit_user_account(profile=profile, amount=amount)
-    user_investment.start_date = timezone.now()
-    user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
-    user_investment.status = 'approved'
-    user_investment.save()
+
+    # user_investment.start_date = timezone.now()
+    # user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
+    # user_investment.status = 'approved'
+    # user_investment.save()
 
     transaction.status = 'success'
     transaction.save()
