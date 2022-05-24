@@ -109,26 +109,20 @@ class SavingsView(APIView):
         
         profile = Profile.objects.get(user=request.user)
         saving_amount = Saving.objects.filter(user=profile).last()
+
         if savings_type.slug == 'auto':
             success, response = create_auto_savings(savings_type=savings_type, request=request)
-            # Not sure, but this could e the point where user opts into Auto Save Plan.
-            # print(success, "savings view line 115")
-            
+
+            # Send email depending on what create_auto_savings() function returns
             if success:
-                # this mail is recieved even before the payment is successfull or fails
-                Thread(target=send_email.auto_save_creation_mail, args=[request.user.first_name, saving_amount.duration])
-                print("Sent Auto Save Opt Plan")
-            # else:
-                # Thread(target=send_email.failed_quick_save_mail, args=[profile, amount]).start()
-                # print(success, "savings view line 121")
+                Thread(target=send_email.successful_auto_save_mail, args=[profile, saving_amount]).start()
+            else:
+                Thread(target=send_email.failed_auto_save_mail, args=[profile, saving_amount]).start()
 
         if savings_type.slug == 'instant':
             success, response = create_instant_savings(savings_type=savings_type, request=request)
 
-            # I noticed, there's no check on what this user can auto save, it was supposed to be check against this,
-            # user's current account balance. Where is the user's current account balance, that holds the total amout
-            # this user worth's. 
-            # success = False # Turned success False, For testing the 'failed_quick_save_mail'
+            # Send email depending on what create_instant_savings() function returns
             if success:
                 Thread(target=send_email.successful_quick_save_mail, args=[profile, amount]).start()
             else:
@@ -187,9 +181,22 @@ class VerifyPaymentView(APIView):
                     trans.status = 'success'
                     saving = update_savings_payment(saving=trans.saving, amount=amount)
 
+                    if trans.saving.type.name.lower() == "quick save":
+                        # send email after payment
+                        # I included this line for user's to receive mail after successful payment
+                        Thread(target=send_email.successful_quick_save_mail, args=[profile, amount]).start()
+
+                    elif trans.saving.type.name.lower() == "auto save":
+                        # send mail for success in auto save transaction
+                        amount = Saving.objects.filter(user=profile).last()
+                        Thread(target=send_email.successful_auto_save_mail, args=[profile, amount]).start()
+
+                    else:
+                        # Thinking to run a Thread for failure in transaction
+                        pass
+
                 trans.response = response
                 trans.save()
-
 
             if payment_for == 'investment':
                 investment_id = response['payload']['data']['metadata'].get('investment_id', None)
@@ -200,16 +207,14 @@ class VerifyPaymentView(APIView):
                 if success is False:
             
                     # Send Failure email to user.
-
                     print("Investment Failure from saving's view")
                     Thread(target=send_email.failed_investment_mail, args=[request, investment_id]).start()
                     
                     return Response(data, status.HTTP_400_BAD_REQUEST)
 
-        # Send Success email to user
-
-        print("Investment Success from saving's view")
-        Thread(target=send_email.successful_investment_mail, args=[request, investment_id]).start()
+                # Send Success email to user
+                print("Investment Success from saving's view")
+                Thread(target=send_email.successful_investment_mail, args=[request, investment_id]).start()
 
                 # return Response(data)
             
@@ -228,14 +233,8 @@ class VerifyPaymentView(APIView):
         else:
 
             # Send Transaction Success Mail
-
             if payment_for == "membership fee":
                 Thread(target=send_email.successful_membership_fee_payment, args=[trans]).start()
-
-            if payment_for == 'savings':
-                amount = Saving.objects.filter(user=profile).last()
-                Thread(target=send_email.successful_auto_save_mail, args=[profile, amount]).start()
-            
 
             data['detail'] = "Transaction successful"
         data['msisdn'] = phone_number

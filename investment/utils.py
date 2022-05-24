@@ -112,7 +112,7 @@ def create_investment(profile, data):
 
     transaction.status = 'success'
     transaction.save()
-    
+
     return success, user_investment
 
 
