@@ -183,7 +183,7 @@ class AddGuarantorView(APIView):
                     })
 
                     # send notification to guarantor
-                    print(guarantor_profile)
+                    # print(guarantor_profile)
                     Thread(target=mail_to_guarantor, args=[request, guarantor_profile]).start()
             except Profile.DoesNotExist:
                 response.append({

@@ -75,7 +75,7 @@ class ApplyForLoanView(APIView):
             return Response({"detail": loan_offer}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not amount:
-            amount = loan_offer
+            amount = loan_offers
 
         # check if amount is not greater than loan offer amount
         if decimal.Decimal(amount) > float(loan_offer):
@@ -182,6 +182,12 @@ class RepayLoanView(APIView):
             data['redirect'] = True
         if success is False:
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Send email to user for loan repayment confirmation
+        loan = get_object_or_404(Loan, id=loan_id, user=request.user.profile)
+        if success and loan.status == 'repaid':
+            Thread(target=loan_clear_off, args=[request, amount]).start()
+            print("Sent email to user loan.views, LINE 191")
 
         return Response(data)
 

@@ -8,6 +8,8 @@ from account.models import UserCard, Guarantor
 from django.db.models import Q
 from modules.paystack import get_paystack_link, paystack_auto_charge, verify_paystack_transaction
 from account.utils import tokenize_user_card
+from threading import Thread
+from account.send_email import loan_clear_off
 
 
 def get_loan_offer(profile):
@@ -193,6 +195,8 @@ def verify_loan_repayment(gateway, reference):
     loan.next_repayment_date = loan.start_date + timezone.timedelta(days=get_loan_repayment_count(loan.duration))
     if loan.amount_repaid >= loan.amount_to_repay:
         loan.status = 'repaid'
+        # Send email to user for loan repayment confirmation
+        Thread(target=loan_clear_off, args=[loan]).start()
     loan.save()
 
     return True, "Loan repayment verified and processed"

@@ -203,7 +203,7 @@ def investment_maturity_mail(request) -> None:
 
 
 def loan_request_processing_mail(request) -> None:
-    #: This body was indented this way intentionally, so as to be well structured when recieved via mail.
+    #: This body was indented this way intentionally, to be well-structured when received via mail.
     body = f"""
 Dear {request.user.first_name},
 
@@ -216,7 +216,7 @@ Email - coopadmin@reincoso.com
 """
 
     recipient = request.user.email
-    subject = "Loan request processing mail"
+    subject = "Reincoso Loan Request"
 
     send_email_using_mailgun(recipient, subject, body)
 
@@ -290,17 +290,20 @@ Email - coopadmin@reincoso.com
     send_email_using_mailgun(recipient, subject, body)
 
 
-def loan_clear_off(request) -> None:
+def loan_clear_off(request, loan) -> None:
+
     body = f"""
-        Dear {request.user.first_name},
-            Congratulations! You have successfully cleared your loan of Nxxxxxx. Your loan balance is N0.00. 
-            You can apply for more loans with us.
-            For any further inquiry please contact us on:
-            Email - coopadmin@reincoso.com
-        """
+Dear {request.user.first_name},
+
+Congratulations! You have successfully cleared your loan of N{loan.amount}. Your loan balance is N0.00. 
+You can apply for more loans with us.
+
+For any further inquiry please contact us on:
+Email - coopadmin@reincoso.com
+"""
 
     recipient = request.user.email
-    subject = "Loan clear off"
+    subject = "Reincoso Loan Repayment"
 
     send_email_using_mailgun(recipient, subject, body)
 

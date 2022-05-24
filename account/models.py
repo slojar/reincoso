@@ -138,7 +138,11 @@ class Withdrawal(models.Model):
 
     def __str__(self):
         return f'{self.requested_by.username} - {self.amount} - {self.status}'
-        # return f'{self.amount} - {self.status}'
+
+    '''
+        suggestion: maybe we get rid of the .username method;
+        solved: a user always signs in with a username.
+    '''
 
 
 
