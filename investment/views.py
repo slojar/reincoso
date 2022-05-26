@@ -116,11 +116,11 @@ class InvestView(APIView):
         success, response = create_investment(profile=request.user.profile, data=request.data)
 
         # Send mail on success and calculate investment balance: which is the sum of all user's investment.
-        all_investment_transaction = UserInvestment.objects.filter(user=request.user.profile)
-        total_amount_invested: int = 0
-        total_amount_invested = sum(
-            [total_amount_invested + amount.amount_invested for amount in all_investment_transaction]
-        )
+        # all_investment_transaction = UserInvestment.objects.filter(user=request.user.profile)
+        # total_amount_invested: int = 0
+        # total_amount_invested = sum(
+        #     [total_amount_invested + amount.amount_invested for amount in all_investment_transaction]
+        # )
 
         '''
             INFO: total_amount_invested(): is the total amount invested, can be used to update the amount_invested
@@ -135,8 +135,11 @@ class InvestView(APIView):
             data['detail'] = response
             return Response(data, status.HTTP_400_BAD_REQUEST)
 
-        Thread(target=send_email.successful_investment_mail, args=[request, investment_transaction,
-                                                                   total_amount_invested]).start()
+        # Inform user that the investment request was successful and it's being reviewed by an admin.
+        Thread(target=send_email.awaiting_investment_approval_mail, args=[request]).start()
+
+        # Inform Admin of the requested investment by this user.
+        Thread(target=send_email.investment_notification_to_admin, args=[request, investment_transaction]).start()
 
         data['detail'] = "Investment created successfully"
         data['data'] = UserInvestmentSerializer(response).data

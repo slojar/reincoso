@@ -51,20 +51,22 @@ def create_investment(profile, data):
     user = profile.user
 
     wallet, new_wallet = Wallet.objects.get_or_create(user=profile)
-    # print(wallet, amount)
     if amount < 1000000:
         return False, "Investment amount cannot be lesser than 1,000,000"
+
     if float(wallet.balance) < float(amount):
         return False, "Insufficient balance for this investment, please top-up your account"
+    # print(wallet, amount, 'insufficient', 'line 63')
 
     try:
-        
         investment = Investment.objects.get(id=investment_id)
         option = InvestmentOption.objects.get(id=option_id, investment=investment)
-        
+
         # duration = InvestmentDuration.objects.get(id=duration_id)
         duration = option.duration
+
     except Exception as ex:
+        print(f"{ex} line 70 utils.py")
         return False, str(ex)
 
     # Do minimum investment check

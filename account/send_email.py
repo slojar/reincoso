@@ -156,11 +156,73 @@ If the problem presides, please contact your bank.
     send_email_using_mailgun(recipient, subject, body)
 
 
+#   DONE
+def awaiting_investment_approval_mail(request):
+    body = f"""
+Dear {request.user.first_name},
+
+Your investment request has been received and is being reviewed by the investment committee. 
+You will be notified as soon as your investment is approved.
+For any further inquiry please contact us on:
+Email - coopadmin@reincoso.com
+    """
+    recipient = request.user.email
+    subject = "Investment with Reincoso"
+    send_email_using_mailgun(recipient=recipient, subject=subject, message=body)
+
+#   DONE
+def investment_notification_to_admin(request, investment_transaction):
+    body = f"""
+Hi Reincoso,
+
+The investment amount of {investment_transaction.amount} in {investment_transaction.user_investment.investment.name} 
+with {investment_transaction.user_investment.percentage}% per annum from {request.user.first_name} is currently waiting 
+to be reviewed and approved. Kindly go through it and process as due.
+"""
+
+    recipient = "coopadmin@reincoso.com"
+    subject = "Reincoso Investment Request"
+    send_email_using_mailgun(recipient=recipient, subject=subject, message=body)
+
+
+# would this be on a cron job ?
+def approved_investment_mail(request):
+    body = """
+Dear xxxx,
+
+Your investment of Nxxxxx on (Real estate/P2P/Agriculture/Fixed income) with X% per annum has been approved.
+Your current investment balance is NXXXX.
+For any further inquiry, please contact us on:
+Email - coopadmin@reincoso.com
+    """
+
+    recipient = request.user.email
+    subject = "Reincoso Investment Request"
+    send_email_using_mailgun(recipient=recipient, subject=subject, message=body)
+
+
+def declined_investment_mail(request):
+    body = f"""
+Dear xxxx,
+
+Your investment of Nxxxxx on (Real estate/P2P/Agriculture/Fixed income) with X% per annum has been declined at this moment.
+For any further inquiry, please contact us on:
+Email - coopadmin@reincoso.com
+"""
+
+    recipient = request.user.email
+    subject = "Reincoso Investment Request"
+    send_email_using_mailgun(recipient=recipient, subject=subject, message=body)
+
+############## END ###############
+
+
 def successful_investment_mail(request, investment_transaction, total_amount_invested) -> None:
     body = f"""
 Dear {request.user.first_name},
 
-You have made an investment of {investment_transaction.amount} on {investment_transaction.user_investment.investment.name} with {investment_transaction.user_investment.percentage}% per annum.
+You have made an investment of {investment_transaction.amount} on {investment_transaction.user_investment.investment.name} 
+with {investment_transaction.user_investment.percentage}% per annum.
 Your current investment balance is N{total_amount_invested}.
 
 For any further inquiry, please contact us on:
