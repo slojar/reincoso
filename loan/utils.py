@@ -32,8 +32,14 @@ def get_loan_offer(profile):
                          "6 months before applying for loan."
         return success, response
 
-    success = True
     balance = profile.wallet.balance
+
+    if balance < 1000000:
+        response = "Sorry, you are unable to get a loan right now. make sure you have saved up to One Million Naira " \
+                   "(N1,000,000) before applying for loan."
+        return success, response
+
+    success = True
     response = round(balance * loan_settings.offer, 2)
     # response = round(savings_transaction.saving.total * loan_settings.offer, 2)
     return success, response

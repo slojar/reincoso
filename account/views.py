@@ -168,23 +168,30 @@ class AddGuarantorView(APIView):
             try:
                 guarantor_profile = Profile.objects.get(phone_number=reformat_phone_number(number))
                 guarantor, created = Guarantor.objects.get_or_create(user=request.user.profile, guarantor=guarantor_profile)
-                if not created:
-                    response.append({
-                        'success': False,
-                        'phone_number': number,
-                        'detail': 'This user is already your guarantor',
-                    })
+                guarantor.confirmed = False
+                guarantor.save()
+                # if not created:
+                #     response.append({
+                #         'success': False,
+                #         'phone_number': number,
+                #         'detail': 'This user is already your guarantor',
+                #     })
+                # if created:
+                #
+                #     response.append({
+                #         'success': True,
+                #         'phone_number': number,
+                #         'detail': 'Guarantor added successfully',
+                #     })
 
-                if created:
-                    response.append({
-                        'success': True,
-                        'phone_number': number,
-                        'detail': 'Guarantor added successfully',
-                    })
+                response.append({
+                    'success': True,
+                    'phone_number': number,
+                    'detail': 'Guarantor added successfully',
+                })
 
-                    # send notification to guarantor
-                    # print(guarantor_profile)
-                    Thread(target=mail_to_guarantor, args=[request, guarantor_profile]).start()
+                # send notification to guarantor
+                Thread(target=mail_to_guarantor, args=[request, guarantor_profile]).start()
             except Profile.DoesNotExist:
                 response.append({
                     'success': False,

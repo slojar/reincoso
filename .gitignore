@@ -14,3 +14,4 @@ __pycache__/
 *.xml
 *.iml
 reincoso.log
+.env.sample
