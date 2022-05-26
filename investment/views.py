@@ -115,13 +115,6 @@ class InvestView(APIView):
         data = dict()
         success, response = create_investment(profile=request.user.profile, data=request.data)
 
-        # Send mail on success and calculate investment balance: which is the sum of all user's investment.
-        # all_investment_transaction = UserInvestment.objects.filter(user=request.user.profile)
-        # total_amount_invested: int = 0
-        # total_amount_invested = sum(
-        #     [total_amount_invested + amount.amount_invested for amount in all_investment_transaction]
-        # )
-
         '''
             INFO: total_amount_invested(): is the total amount invested, can be used to update the amount_invested
             field in the UserInvested model, to hold the total amount invested.

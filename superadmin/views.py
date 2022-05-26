@@ -14,6 +14,7 @@ from .models import AdminNotification
 from .permissions import *
 from .utils import *
 from account.utils import encrypt_text
+
 from modules.paystack import get_banks, initialize_transfer, finalize_transfer
 from threading import Thread
 
@@ -30,7 +31,7 @@ from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import ActivityReportSerializer, WithdrawalSerializer, AdminNotificationSerializer
-
+from account.send_email import approved_investment_mail, declined_investment_mail
 
 class AdminHomepage(APIView):
 
@@ -852,7 +853,15 @@ class AdminUserInvestmentDetailView(generics.RetrieveUpdateAPIView):
         if update_status == "approved":
             user_investment.start_date = timezone.now()
             user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
+            
+            # Send Approval mail to user
+            Thread(target=approved_investment_mail, args=[user_investment]).start()
+        elif update_status == "rejected":
+            # Send rejection mail to user
+            Thread(target=declined_investment_mail, args=[user_investment]).start()
         user_investment.save()
+
+        
         create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
