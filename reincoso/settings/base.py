@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     'settings.apps.SettingsConfig',
     'investment.apps.InvestmentConfig',
     'superadmin.apps.SuperadminConfig',
+
+    #cron 
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -185,3 +188,7 @@ LOGGING = {
     },
 }
 
+
+CRONJOBS = [
+    ('* * * * *', 'investment.cron.check_investment_maturity'),
+]
