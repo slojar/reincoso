@@ -202,6 +202,7 @@ def get_user_analytics(profile):
     investment = dict()
     investment['total'] = UserInvestment.objects.filter(user=profile).count()
     investment['pending'] = UserInvestment.objects.filter(user=profile, status='pending').count()
+
     investment['approved'] = UserInvestment.objects.filter(user=profile, status='approved').count()
     investment['ongoing'] = UserInvestment.objects.filter(user=profile, status='ongoing').count()
     investment['completed'] = UserInvestment.objects.filter(user=profile, status='completed').count()
