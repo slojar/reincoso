@@ -75,7 +75,7 @@ class ApplyForLoanView(APIView):
             return Response({"detail": loan_offer}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not amount:
-            amount = loan_offers
+            amount = loan_offer
 
         # check if amount is not greater than loan offer amount
         if decimal.Decimal(amount) > float(loan_offer):

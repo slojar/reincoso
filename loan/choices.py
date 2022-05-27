@@ -1,6 +1,6 @@
 loan_status_choices = (
     ('pending', 'Pending'), ('processing', 'Processing'), ('approved', 'Approved'), ('unapproved', 'Unapproved'),
-    ('awaiting guarantor feedback', 'Awaiting guarantor\'s feedback'), ('ongoing', 'Ongoing'), ('repaid', 'Repaid'),
+    ('awaiting_guarantor_feedback', 'Awaiting guarantor\'s feedback'), ('ongoing', 'Ongoing'), ('repaid', 'Repaid'),
 )
 
 loan_transaction_type_choices = (

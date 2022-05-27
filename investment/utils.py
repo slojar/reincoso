@@ -145,11 +145,11 @@ def approve_investment(investment_id, payment_gateway, payment_reference):
         user_investment=user_investment, amount=amount, status=status, reference=payment_reference, response=response
     )
 
-    if status == 'success':
-        user_investment.start_date = timezone.now()
-        user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
-        user_investment.status = 'approved'
-        user_investment.save()
+    # if status == 'success':
+    #     user_investment.start_date = timezone.now()
+    #     user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
+    #     user_investment.status = 'approved'
+    #     user_investment.save()
 
     response = "Investment approved"
     return success, response

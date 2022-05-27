@@ -68,16 +68,16 @@ def get_loan_repayment_count(duration):
 def create_loan(request, profile, amount, duration):
     success = False
     repayment_day_of_the_week = request.data.get('repayment_day_of_the_week')
-    repayment_day_of_the_month = request.data.get('repayment_day_f_the_month')
+    repayment_day_of_the_month = request.data.get('repayment_day_of_the_month')
 
     if duration.basis == 'weekly':
-        days_list = [str(day) for day in range(0, 8)]
-        if not (repayment_day_of_the_week and str(repayment_day_of_the_week).lower() in days_list):
+        days_list = [str(day) for day in range(1, 8)]
+        if not (repayment_day_of_the_week and repayment_day_of_the_week in days_list):
             response = f"You must select a repayment day of the week to continue"
             return success, response
 
     if duration.basis != 'weekly':
-        days_list = [str(day) for day in range(0, 32)]
+        days_list = [str(day) for day in range(1, 32)]
         if not (repayment_day_of_the_month and repayment_day_of_the_month in days_list):
             response = f"You must select a repayment day of the month to continue"
             return success, response
