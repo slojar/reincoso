@@ -18,6 +18,6 @@ urlpatterns = [
     path('<str:id>/', views.InvestmentDetailView.as_view()),
     path('<str:id>/options/', views.InvestmentOptionsView.as_view()),
 
-    path('investment-maturity/', investment_maturity_check, name="cron-mail")
+    path('investment-maturity/', investment_maturity_check)
 ]
 
