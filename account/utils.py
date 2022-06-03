@@ -195,13 +195,14 @@ def get_user_analytics(profile):
     loan['processing'] = Loan.objects.filter(user=profile, status='processing').count()
     loan['approved'] = Loan.objects.filter(user=profile, status='approved').count()
     loan['unapproved'] = Loan.objects.filter(user=profile, status='unapproved').count()
-    loan['awaiting guarantor feedback'] = Loan.objects.filter(user=profile, status='awaiting guarantor feedback').count()
+    loan['awaiting_guarantor_feedback'] = Loan.objects.filter(user=profile, status='awaiting_guarantor_feedback').count()
     loan['ongoing'] = Loan.objects.filter(user=profile, status='ongoing').count()
     loan['repaid'] = Loan.objects.filter(user=profile, status='repaid').count()
 
     investment = dict()
     investment['total'] = UserInvestment.objects.filter(user=profile).count()
     investment['pending'] = UserInvestment.objects.filter(user=profile, status='pending').count()
+
     investment['approved'] = UserInvestment.objects.filter(user=profile, status='approved').count()
     investment['ongoing'] = UserInvestment.objects.filter(user=profile, status='ongoing').count()
     investment['completed'] = UserInvestment.objects.filter(user=profile, status='completed').count()

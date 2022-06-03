@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 ('end_date', models.DateTimeField(null=True)),
                 ('last_repayment_date', models.DateTimeField(blank=True, null=True)),
                 ('next_repayment_date', models.DateTimeField(blank=True, null=True)),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('processing', 'Processing'), ('approved', 'Approved'), ('unapproved', 'Unapproved'), ('awaiting guarantor feedback', "Awaiting guarantor's feedback"), ('ongoing', 'Ongoing'), ('repaid', 'Repaid')], default='pending', max_length=50)),
+                ('status', models.CharField(choices=[('pending', 'Pending'), ('processing', 'Processing'), ('approved', 'Approved'), ('unapproved', 'Unapproved'), ('awaiting_guarantor_feedback', "Awaiting guarantor's feedback"), ('ongoing', 'Ongoing'), ('repaid', 'Repaid')], default='pending', max_length=50)),
                 ('created_on', models.DateTimeField(auto_now_add=True)),
                 ('updated_on', models.DateTimeField(auto_now=True)),
             ],

@@ -129,7 +129,6 @@ def get_paystack_link(email, amount, callback_url=None, metadata=None, **kwargs)
         response = json_response
         if json_response.get('message'):
             response = json_response.get('message')
-
     return success, response
 
 

@@ -51,20 +51,22 @@ def create_investment(profile, data):
     user = profile.user
 
     wallet, new_wallet = Wallet.objects.get_or_create(user=profile)
-    # print(wallet, amount)
     if amount < 1000000:
         return False, "Investment amount cannot be lesser than 1,000,000"
+
     if float(wallet.balance) < float(amount):
         return False, "Insufficient balance for this investment, please top-up your account"
+    # print(wallet, amount, 'insufficient', 'line 63')
 
     try:
-        
         investment = Investment.objects.get(id=investment_id)
         option = InvestmentOption.objects.get(id=option_id, investment=investment)
-        
+
         # duration = InvestmentDuration.objects.get(id=duration_id)
         duration = option.duration
+
     except Exception as ex:
+        print(f"{ex} line 70 utils.py")
         return False, str(ex)
 
     # Do minimum investment check
@@ -105,14 +107,14 @@ def create_investment(profile, data):
 
     user = debit_user_account(profile=profile, amount=amount)
 
-    user_investment.start_date = timezone.now()
-    user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
-    user_investment.status = 'approved'
-    user_investment.save()
+    # user_investment.start_date = timezone.now()
+    # user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
+    # user_investment.status = 'approved'
+    # user_investment.save()
 
     transaction.status = 'success'
     transaction.save()
-    
+
     return success, user_investment
 
 
@@ -145,11 +147,11 @@ def approve_investment(investment_id, payment_gateway, payment_reference):
         user_investment=user_investment, amount=amount, status=status, reference=payment_reference, response=response
     )
 
-    if status == 'success':
-        user_investment.start_date = timezone.now()
-        user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
-        user_investment.status = 'approved'
-        user_investment.save()
+    # if status == 'success':
+    #     user_investment.start_date = timezone.now()
+    #     user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
+    #     user_investment.status = 'approved'
+    #     user_investment.save()
 
     response = "Investment approved"
     return success, response

@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from django.utils import timezone
+
 from account.serializers import *
 from account.utils import signup, reformat_phone_number, decrypt_text
 from loan.serializers import *
@@ -12,6 +14,7 @@ from .models import AdminNotification
 from .permissions import *
 from .utils import *
 from account.utils import encrypt_text
+
 from modules.paystack import get_banks, initialize_transfer, finalize_transfer
 from threading import Thread
 
@@ -28,14 +31,14 @@ from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import ActivityReportSerializer, WithdrawalSerializer, AdminNotificationSerializer
-
+from account.send_email import approved_investment_mail, declined_investment_mail
 
 class AdminHomepage(APIView):
 
     def get(self, request):
         data = dict()
         data['total_feedback'] = FeedbackMessage.objects.all().count()
-        data['total_user'] = User.objects.all().count()
+        data['total_user'] = Profile.objects.all().count()
         data['total_investment'] = UserInvestment.objects.all().count()
         data['total_loan'] = Loan.objects.all().count()
         data['active_loan'] = Loan.objects.filter(status='ongoing').count()
@@ -825,13 +828,42 @@ class AdminUserInvestmentView(generics.ListAPIView):
     filter_backends = [SearchFilter, DjangoFilterBackend]
     filter_class = UserInvestmentFilter
     search_fields = ['user__user__first_name', 'user__user__last_name', 'user__user__email', 'investment__name']
-    lookup_field = 'id'
     model = 'UserInvestment'
 
     def list(self, request, *args, **kwargs):
         if not can_view(request.user, self.model):
             return Response({'detail': 'You do not have permission to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         return super().list(request, *args, **kwargs)
+
+
+class AdminUserInvestmentDetailView(generics.RetrieveUpdateAPIView):
+    serializer_class = UserInvestmentSerializer
+    queryset = UserInvestment.objects.all()
+    lookup_field = 'id'
+    model = 'UserInvestment'
+
+    def update(self, request, *args, **kwargs):
+        if not can_change(request.user, self.model):
+            return Response({'detail': 'You do not have permission to perform this action'},
+                            status=status.HTTP_401_UNAUTHORIZED)
+        update_status = request.data.get('status')
+        model_id = self.kwargs.get('id')
+        user_investment = UserInvestment.objects.get(id=model_id)
+        user_investment.status = update_status
+        if update_status == "approved":
+            user_investment.start_date = timezone.now()
+            user_investment.end_date = user_investment.start_date + timezone.timedelta(days=user_investment.number_of_days)
+            
+            # Send Approval mail to user
+            Thread(target=approved_investment_mail, args=[user_investment]).start()
+        elif update_status == "rejected":
+            # Send rejection mail to user
+            Thread(target=declined_investment_mail, args=[user_investment]).start()
+        user_investment.save()
+
+        
+        create_log(request, model=eval(self.model.strip('')), model_id=model_id)
+        return super().update(request, *args, **kwargs)
 
 
 class AdminSavingView(generics.ListAPIView):

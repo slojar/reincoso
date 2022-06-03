@@ -37,6 +37,13 @@ class UserDetailSerializer(serializers.ModelSerializer):
     analytics = serializers.SerializerMethodField()
     group = serializers.SerializerMethodField()
     wallet = serializers.DictField(source='get_wallet', read_only=True)
+    account_no = serializers.SerializerMethodField()
+
+    def get_account_no(self, obj):
+        if obj.account_no:
+            account_no = decrypt_text(obj.account_no)
+            return account_no
+        return None
 
     # def get_recipient_code(self, obj):
     #     code = None
@@ -71,7 +78,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        exclude = ('bvn', 'user', 'account_no')
+        exclude = ('bvn', 'user', 'recipient_code')
         depth = 1
 
 

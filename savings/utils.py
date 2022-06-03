@@ -216,14 +216,5 @@ def create_auto_savings(savings_type, request):
             }
             success, response = get_paystack_link(email=email, amount=amount_to_charge_card, callback_url=callback_url, metadata=metadata)
             return success, response
-        
-    # if created = True, this means this auto_save is created for the first time
-    # which also means the user has opted into the savings plan.
-    
-    # if created and success:
-    #     print(created, "Created for the first time")
-    #     from account.send_email import auto_save_creation_mail
-    #     auto_save_creation_mail(profile_name=request.user.name, duration_name=payment_duration.name)
-    # print(created, "This instance exist")
-    
+
     return success, response
