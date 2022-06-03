@@ -8,7 +8,7 @@ from savings.models import PAYMENT_GATEWAYS
 
 
 basis_type_choices = (
-    ('weekly', 'Weekly'), ('monthly', 'Monthly'), ('yearly', 'Yearly'),
+    ('weekly', 'Weekly'), ('monthly', 'Monthly'), ('quarterly', 'Quarterly'), ('bi_annual', 'Bi-Annual'),
 )
 
 

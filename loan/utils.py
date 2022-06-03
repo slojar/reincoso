@@ -45,17 +45,23 @@ def get_loan_offer(profile):
     return success, response
 
 
-def get_loan_repayment_count(duration):
+def get_loan_repayment_count(loan):
     repayment_day_count = 7
 
-    if duration.basis == 'weekly':
+    year = timezone.now().year
+    month = timezone.now().month
+    next_month = calendar._nextmonth(year=year, month=month)[1]
+    monthly_calculation = calendar.monthrange(year=timezone.now().year, month=next_month)[1]
+
+    if loan.basis == 'weekly':
         repayment_day_count = 7
-    if duration.basis == 'monthly':
-        year = timezone.now().year
-        month = timezone.now().month
-        next_month = calendar._nextmonth(year=year, month=month)[1]
-        repayment_day_count = calendar.monthrange(year=timezone.now().year, month=next_month)[1]
-    if duration.basis == 'yearly':
+    if loan.basis == 'monthly':
+        repayment_day_count = monthly_calculation
+    if loan.basis == 'quarterly':
+        repayment_day_count = monthly_calculation + 60
+    if loan.basis == 'bi_annual':
+        repayment_day_count = monthly_calculation + 150
+    if loan.basis == 'yearly':
         year = timezone.now().year
         if not calendar.isleap(year=year):
             repayment_day_count = 365
@@ -65,18 +71,54 @@ def get_loan_repayment_count(duration):
     return repayment_day_count
 
 
+def calculate_loan_repayment_duration(loan_basis, duration):
+    repayment_duration = 1
+
+    if duration.number_of_days == 30:
+        if loan_basis == 'weekly':
+            repayment_duration = 2
+        if loan_basis == 'monthly':
+            repayment_duration = 1
+    elif duration.number_of_days == 90:
+        if loan_basis == 'weekly':
+            repayment_duration = 10
+        if loan_basis == 'monthly':
+            repayment_duration = 3
+    elif duration.number_of_days == 180:
+        if loan_basis == 'weekly':
+            repayment_duration = 22
+        if loan_basis == 'monthly':
+            repayment_duration = 6
+        if loan_basis == 'quarterly':
+            repayment_duration = 2
+    elif duration.number_of_days == 365 or duration.number_of_days == 366:
+        if loan_basis == 'weekly':
+            repayment_duration = 46
+        if loan_basis == 'monthly':
+            repayment_duration = 12
+        if loan_basis == 'quarterly':
+            repayment_duration = 4
+        if loan_basis == 'bi_annual':
+            repayment_duration = 2
+    else:
+        repayment_duration = 1
+
+    return repayment_duration
+
+
 def create_loan(request, profile, amount, duration):
     success = False
+    loan_basis = request.data.get('loan_basis')
     repayment_day_of_the_week = request.data.get('repayment_day_of_the_week')
     repayment_day_of_the_month = request.data.get('repayment_day_of_the_month')
 
-    if duration.basis == 'weekly':
+    if loan_basis == 'weekly':
         days_list = [str(day) for day in range(1, 8)]
         if not (repayment_day_of_the_week and repayment_day_of_the_week in days_list):
             response = f"You must select a repayment day of the week to continue"
             return success, response
 
-    if duration.basis != 'weekly':
+    if loan_basis != 'weekly':
         days_list = [str(day) for day in range(1, 32)]
         if not (repayment_day_of_the_month and repayment_day_of_the_month in days_list):
             response = f"You must select a repayment day of the month to continue"
@@ -95,8 +137,9 @@ def create_loan(request, profile, amount, duration):
         loan.payment_day = repayment_day_of_the_month
 
     loan.duration = duration
-    loan.basis = duration.basis
-    loan.basis_duration = duration.duration
+    # loan.basis = duration.basis
+    loan.basis = loan_basis
+    loan.basis_duration = calculate_loan_repayment_duration(loan_basis, duration)
     loan.number_of_days = duration.number_of_days
     loan.percentage = duration.percentage
 
@@ -105,9 +148,9 @@ def create_loan(request, profile, amount, duration):
     loan.amount_to_repay_split = loan.amount_to_repay / loan.basis_duration
     loan.start_date = timezone.now()
     loan.end_date = loan.start_date + timezone.timedelta(days=duration.number_of_days)
-    if duration.basis == 'weekly':
+    if loan.basis == 'weekly':
         loan.next_repayment_date = loan.start_date + timezone.timedelta(days=15)
-    loan.next_repayment_date = loan.start_date + timezone.timedelta(days=get_loan_repayment_count(duration))
+    loan.next_repayment_date = loan.start_date + timezone.timedelta(days=get_loan_repayment_count(loan))
     loan.status = "processing"
     loan.save()
 
@@ -198,7 +241,7 @@ def verify_loan_repayment(gateway, reference):
 
     loan.amount_repaid += decimal.Decimal(amount)
     loan.last_repayment_date = timezone.now()
-    loan.next_repayment_date = loan.start_date + timezone.timedelta(days=get_loan_repayment_count(loan.duration))
+    loan.next_repayment_date = loan.start_date + timezone.timedelta(days=get_loan_repayment_count(loan))
     if loan.amount_repaid >= loan.amount_to_repay:
         loan.status = 'repaid'
         # Send email to user for loan repayment confirmation
