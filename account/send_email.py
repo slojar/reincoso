@@ -9,7 +9,6 @@ from loan.models import Loan, LoanTransaction
 from savings.models import Saving
 from .models import Profile, Wallet
 
-
 base_url = settings.EMAIL_API_URL
 api_key = settings.EMAIL_API_KEY
 email_sender = settings.EMAIL_SENDER
@@ -141,7 +140,6 @@ Email - coopadmin@reincoso.com
 
 
 def failed_auto_save_mail(profile, amount) -> None:
-
     body = f"""
 Dear {profile.user.first_name},
 
@@ -170,6 +168,7 @@ Email - coopadmin@reincoso.com
     subject = "Investment with Reincoso"
     send_email_using_mailgun(recipient=recipient, subject=subject, message=body)
 
+
 #   DONE
 def investment_notification_to_admin(request, investment_transaction):
     body = f"""
@@ -183,6 +182,7 @@ to be reviewed and approved. Kindly go through it and process as due.
     recipient = "coopadmin@reincoso.com"
     subject = "Reincoso Investment Request"
     send_email_using_mailgun(recipient=recipient, subject=subject, message=body)
+
 
 #   Done
 def approved_investment_mail(user_investment):
@@ -203,6 +203,7 @@ Email - coopadmin@reincoso.com
     recipient = user_investment.user.user.email
     subject = "Investment with Reincoso"
     send_email_using_mailgun(recipient=recipient, subject=subject, message=body)
+
 
 #   Done
 def declined_investment_mail(user_investment):
@@ -250,7 +251,6 @@ Kindly try again or contact us on coopadmin@reincoso.com. If the problem preside
     send_email_using_mailgun(recipient, subject, body)
 
 
-# pending ...
 def investment_maturity_mail(request) -> None:
     balance = Wallet.objects.get(user=request.user).balance
     body = f"""
@@ -285,23 +285,81 @@ Email - coopadmin@reincoso.com
     send_email_using_mailgun(recipient, subject, body)
 
 
-def mail_to_guarantor(request, guarantor) -> None:
+#######
+
+import json
+
+
+def store_template(body, template_name):
+    response = requests.post(url="https://api.mailgun.net/v3/reincosocoop.com/templates", auth=("api", api_key),
+                             data={'template': body, 'name': template_name,
+                                   'description': "Reincoso Guarantor Request"})
+    return response.text
+
+
+def mail_to_guarantor(request, guarantor):
+    """
+        Info: This function sends mail to guarantor, to accept or decline the request.
+        info: store_template(body, template_name="mail_to_guarantor1.html") this function is responsible for adding
+        a template to mailgun, the official template used for sending the mail to the guarantor is
+        named 'mail_to_guarantor1.html' this can be changed from the store_template() and once changed in this function it
+        should be updated in the data['template'] of this function.
+    """
     profile = Profile.objects.get(user=request.user)
     loan = LoanTransaction.objects.filter(user=profile).last()
 
-    body = f"""
-Dear {guarantor.user.first_name},
+    body = """
+        <div class='entry' style='color:black'>
+                Dear {{ name }},<br><br>
+                
+                You have been selected to guarantee for the loan amount of N{{ loan_amount }} for {{ guarantee_name }} and you will 
+                be held liable if the debts are not repaid. You can Accept or Reject this offer of Guarantorship through this link
+                <a href='{{ request_scheme }}://{{ request_host_name }}/confirm-guarantorship/?guarantor={{ guarantor_phone_number }}&guarantee={{ guarantee_phone_number }}'>Click Here</a>.<br> <br>
+                For any further inquiry please contact us on:
+                Email - coopadmin@reincoso.com
+        </div>
+    """
 
-You have been selected to guarantee for the loan amount of N{loan.amount} for ({request.user.first_name}) and you will be held liable if the debts are not repaid.
-You can accept or reject offer of guarantor-ship by sending Yes to accept / No to reject.
+    subject = "Reincoso Guarantor Request"
+    return requests.post("https://api.mailgun.net/v3/reincosocoop.com/messages", auth=("api", api_key), data={
+        "from": "Reincoso <no-reply@reincosocoop.com>", "to": [guarantor.user.email], "subject": subject,
+        "template": "mail_to_guarantor1.html", "t:variables": json.dumps({"name": guarantor.user.first_name,
+                                                                          "loan_amount": str(loan.amount),
+                                                                          "guarantee_name": request.user.first_name,
+                                                                          "request_scheme": request.scheme,
+                                                                          "request_host_name": request.get_host(),
+                                                                          "guarantor_phone_number": guarantor.phone_number,
+                                                                          "guarantee_phone_number": profile.phone_number})
+    })
+
+
+def guarantor_accept_mail(user, guarantor) -> None:
+    body = f"""
+Dear {user.first_name}, 
+
+{guarantor} has Accepted to be your Guarantor.
+
 For any further inquiry please contact us on:
 Email - coopadmin@reincoso.com
-        """
+"""
+    subject = "Reincoso Guarantor Accepted"
 
-    recipient = guarantor.user.email
-    subject = "Guarantor"
+    send_email_using_mailgun(recipient=user.email, subject=subject, message=body)
 
-    send_email_using_mailgun(recipient, subject, body)
+
+def guarantor_declined_mail(user, guarantor) -> None:
+    body = f"""
+Dear {user.first_name}, 
+    
+{guarantor} has Declined to be your Guarantor.
+
+For any further inquiry please contact us on:
+Email - coopadmin@reincoso.com
+"""
+
+    subject = "Reincoso Guarantor Declined"
+
+    send_email_using_mailgun(recipient=user.email, subject=subject, message=body)
 
 
 def inform_user_of_added_guarantor(request) -> None:
@@ -312,7 +370,7 @@ def inform_user_of_added_guarantor(request) -> None:
     body = f"""
 Dear {request.user.first_name},
 
-You have added {guarantor} as your guarantor(s) for the loan amount of Nloan.amount
+You have added {guarantor} as your guarantor(s) for the loan amount of N{loan.amount}
 For any further inquiry please contact us on:
 Email - coopadmin@reincoso.com
         """
@@ -355,7 +413,6 @@ Email - coopadmin@reincoso.com
 
 
 def loan_clear_off(request, loan) -> None:
-
     body = f"""
 Dear {request.user.first_name},
 
@@ -401,6 +458,3 @@ Kindly go through it and process as due.
     subject = "Withdrawal Request"
 
     send_email_using_mailgun(recipient, subject, body)
-
-
-

@@ -1,5 +1,8 @@
 from decimal import Decimal
 
+from django.shortcuts import render
+from django.contrib import messages
+
 from django.contrib.admin.models import LogEntry
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -128,7 +131,7 @@ class PayMembershipFeeView(APIView):
             # Findings
             # 1. The call_back url here was supposed to be /verify-payment/
             # 2. I noticed that, if i choose the decline option on the paystack option for payment
-                # It doesn't do anything, therefore not allowing me send a Failed Payment Email to user.
+            # It doesn't do anything, therefore not allowing me send a Failed Payment Email to user.
             callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
             # callback_url = f"{request.scheme}://{request.get_host()}/verify-payment/{request.path}"
             # print(callback_url)
@@ -138,7 +141,8 @@ class PayMembershipFeeView(APIView):
         amount = site_settings.membership_fee
 
         # create transaction for membership payment
-        trans, created = Transaction.objects.get_or_create(user=request.user.profile, transaction_type='membership fee', status='pending')
+        trans, created = Transaction.objects.get_or_create(user=request.user.profile, transaction_type='membership fee',
+                                                           status='pending')
         trans.payment_method = gateway
         trans.amount = amount
         trans.save()
@@ -148,7 +152,8 @@ class PayMembershipFeeView(APIView):
             'payment_for': 'membership fee',
         }
         if gateway == 'paystack':
-            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url, metadata=metadata)
+            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url,
+                                                  metadata=metadata)
             if success is True:
                 data['payment_link'] = response
                 data['membership_id'] = profile.member_id
@@ -159,6 +164,74 @@ class PayMembershipFeeView(APIView):
         return Response(data)
 
 
+def confirm_guarantorship(request):
+    """
+    :info: confirmation view for guarantorship
+        This will later call the UpdateGuarantorView view.
+    :param request:
+    :return:
+    """
+    try:
+        confirmed: bool = False
+        response = "Select Yes / No to Accept or Decline Guarantor-ship"
+        if request.method == "GET":
+            guarantor, guarantee = request.GET.get('guarantor'), request.GET.get('guarantee')
+            response = messages.info(request, "Select Yes / No to Accept or Decline Guarantor-ship")
+            if not all([guarantor, guarantee]):
+                response = messages.error(request, "Incorrect/Missing Fields")
+
+            if not (guarantor[0:3] == "234" and guarantee[0:3] == "234"):
+                response = messages.error(request, "Invalid Guarantor/Guarantee Phone Number")
+
+            guarantor_profile = Profile.objects.get(phone_number=guarantor)
+            guarantee_profile = Profile.objects.get(phone_number=guarantee)
+
+            if not Guarantor.objects.filter(user=guarantee_profile, guarantor=guarantor_profile).exists():
+                response = messages.error(request, f"You don't have a request for being a Guarantor to {guarantee}")
+
+            confirmed = Guarantor.objects.get(user=guarantee_profile, guarantor=guarantor_profile).confirmed
+            return render(request, 'account/accept_or_decline.html', {"response": response, "confirmed": confirmed,
+                                                                      "guarantee": guarantee})
+
+        if request.method == "POST":
+            guarantor, guarantee = request.GET.get('guarantor'), request.GET.get('guarantee')
+            if not all([guarantor, guarantee]):
+                response = messages.error(request, "Incorrect/Missing Fields")
+
+            guarantor_profile = Profile.objects.get(phone_number=guarantor)
+            guarantee_profile = Profile.objects.get(phone_number=guarantee)
+
+            user = User.objects.get(username=guarantee)
+
+            if request.POST.get("submit") == "CONFIRM" and request.POST.get("confirm") == 'True':
+                instance = Guarantor.objects.get(user=guarantee_profile, guarantor=guarantor_profile)
+                instance.confirmed = True
+                instance.save()
+                confirmed = True
+                # send mail to guarantee on guarantor's acceptance
+
+                response = messages.success(request, f"You have successfully accepted to become a Guarantor to"
+                                                     f" {guarantee}")
+                Thread(target=guarantor_accept_mail, args=[user, guarantor]).start()
+
+            if request.POST.get("submit") == "CONFIRM" and request.POST.get("confirm") == 'False':
+                instance = Guarantor.objects.get(user=guarantee_profile, guarantor=guarantor_profile)
+                instance.confirmed = False
+                instance.save()
+                confirmed = False
+                response = messages.info(request, f"You have Declined to become a Guarantor to"
+                                                  f" {guarantee}")
+
+                # send mail to guarantee on guarantor's decline
+                Thread(target=guarantor_declined_mail, args=[user, guarantor]).start()
+
+        return render(request, 'account/confirm.html', {"response": response, "confirmed": confirmed})
+
+    except (Exception,) as err:
+        response = messages.error(request, "Something went wrong")
+        return render(request, 'account/accept_or_decline.html', {"response": response})
+
+
 class AddGuarantorView(APIView):
 
     def post(self, request):
@@ -167,7 +240,8 @@ class AddGuarantorView(APIView):
         for number in guarantor:
             try:
                 guarantor_profile = Profile.objects.get(phone_number=reformat_phone_number(number))
-                guarantor, created = Guarantor.objects.get_or_create(user=request.user.profile, guarantor=guarantor_profile)
+                guarantor, created = Guarantor.objects.get_or_create(user=request.user.profile,
+                                                                     guarantor=guarantor_profile)
                 guarantor.confirmed = False
                 guarantor.save()
                 # if not created:
@@ -177,7 +251,6 @@ class AddGuarantorView(APIView):
                 #         'detail': 'This user is already your guarantor',
                 #     })
                 # if created:
-                #
                 #     response.append({
                 #         'success': True,
                 #         'phone_number': number,
@@ -190,7 +263,7 @@ class AddGuarantorView(APIView):
                     'detail': 'Guarantor added successfully',
                 })
 
-                # send notification to guarantor
+                    # send notification to guarantor
                 Thread(target=mail_to_guarantor, args=[request, guarantor_profile]).start()
             except Profile.DoesNotExist:
                 response.append({
@@ -288,8 +361,3 @@ class RequestWithdrawalView(APIView):
         # Email user.
         Thread(target=withdrawal_request_mail_user, args=[request]).start()
         return Response({"detail": "Your withdrawal request is being processed"})
-
-
-
-
-
