@@ -25,7 +25,7 @@ class ApplyForLoanView(APIView):
         offer = dict()
         duration = request.GET.get("duration")
         amount = request.GET.get("amount")
-        loan_basis = request.GET.get("loan_basis")
+        loan_basis = request.GET.get("loan_basis", "weekly")
         success, loan_offer = get_loan_offer(request.user.profile)
         if success is False:
             return Response({"detail": loan_offer}, status=status.HTTP_401_UNAUTHORIZED)
@@ -63,7 +63,7 @@ class ApplyForLoanView(APIView):
                 })
             offer['repayment_split'] = payment_split
             # offer['detail'] = f"You pay {split} for {duration.duration} {duration.basis[:-2]}(s)"
-            offer['detail'] = f"You pay {split} for {repayment_count} {loan_basis}(s)"
+            offer['detail'] = f"You pay {split} for {repayment_count} {loan_basis[:-2]}(s)"
         # print("success on loa")
         return Response(offer)
 
