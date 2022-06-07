@@ -12,12 +12,12 @@
 
     {% if confirmed == True %}
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-          <strong>Accepted</strong>
+          <strong>You have Accepted the request to become a Guarantor to {{ guarantee }}</strong>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {% else %}
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          <strong>Declined</strong>
+          <strong>You have Declined the request to become a Guarantor to {{ guarantee }}</strong>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {% endif %}

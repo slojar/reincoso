@@ -219,13 +219,13 @@ def confirm_guarantorship(request):
                 instance.confirmed = False
                 instance.save()
                 confirmed = False
-                response = messages.info(request, f"You have Declined to become a Guarantor to"
-                                                  f" {guarantee}")
+                response = messages.info(request, f"You have Declined to become a Guarantor to {guarantee}")
 
                 # send mail to guarantee on guarantor's decline
                 Thread(target=guarantor_declined_mail, args=[user, guarantor]).start()
 
-        return render(request, 'account/confirm.html', {"response": response, "confirmed": confirmed})
+        return render(request, 'account/confirm.html', {"response": response, "confirmed": confirmed,
+                                                        "guarantee": guarantee})
 
     except (Exception,) as err:
         response = messages.error(request, "Something went wrong")
