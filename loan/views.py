@@ -130,14 +130,14 @@ class LoanView(ListAPIView):
     def list(self, request, *args, **kwargs):
         data = super(LoanView, self).list(request, *args, **kwargs).data
         profile = request.user.profile
-        user_info = dict()
-        user_info['total_loan'] = Loan.objects.filter(user=profile).count()
+        user_loan_info = dict()
+        user_loan_info['total_loan'] = Loan.objects.filter(user=profile).count()
 
         total = LoanTransaction.objects.filter(user=profile, status='success')
         total = total.aggregate(Sum('amount'))['amount__sum']
-        user_info['total_loan_amount'] = total
+        user_loan_info['total_loan_amount'] = str(total)
 
-        data['user'] = user_info
+        data['loan_analysis'] = user_loan_info
 
         return Response(data)
 
