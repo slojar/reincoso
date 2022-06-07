@@ -8,7 +8,8 @@ from loan.models import Loan, LoanTransaction
 
 from savings.models import Saving
 from .models import Profile, Wallet
-
+import json
+from humanize import intcomma
 
 base_url = settings.EMAIL_API_URL
 api_key = settings.EMAIL_API_KEY
@@ -84,7 +85,7 @@ def successful_quick_save_mail(profile, amount) -> None:
 Dear {profile.user.first_name},   
  
 Thank you for using Reincoso Quick Save option.Your quick save of N{amount} is successful.
-Your current balance is N{balance}.
+Your current balance is N{intcomma(balance, 2)}.
     """
     recipient = profile.user.email
     subject = "Successful Quick Save"
@@ -97,7 +98,7 @@ def failed_quick_save_mail(profile, amount) -> None:
     body = f"""
 Dear {profile.user.first_name},
 
-Your Quick Save option of N{amount} is NOT successful (due to insufficient bank balance or network issues). 
+Your Quick Save option of N{intcomma(amount, 2)} is NOT successful (due to insufficient bank balance or network issues). 
 Kindly try again or contact us on coopadmin@reincoso.com. If the problem presides, please contact your bank
         """
 
@@ -127,8 +128,8 @@ def successful_auto_save_mail(profile, amount) -> None:
     body = f"""
 Dear {profile.user.first_name},
 
-Thank you for using Reincoso Auto Save option. Your Auto save of N{amount.amount} {amount.duration}
-plan is successful. Your current balance is N{balance}.
+Thank you for using Reincoso Auto Save option. Your Auto save of N{intcomma(amount.amount, 2)} {amount.duration}
+plan is successful. Your current balance is N{intcomma(balance, 2)}.
 
 For any further inquiry, please contact us on:
 Email - coopadmin@reincoso.com
@@ -141,11 +142,10 @@ Email - coopadmin@reincoso.com
 
 
 def failed_auto_save_mail(profile, amount) -> None:
-
     body = f"""
 Dear {profile.user.first_name},
 
-Your Auto Save option of N{amount.amount} {amount.duration} plan is NOT successful (due to insufficient bank balance or network issues).
+Your Auto Save option of N{intcomma(amount.amount, 2)} {amount.duration} plan is NOT successful (due to insufficient bank balance or network issues).
 Kindly try again or contact us on coopadmin@reincoso.com. 
 If the problem presides, please contact your bank.
         """
@@ -170,12 +170,13 @@ Email - coopadmin@reincoso.com
     subject = "Investment with Reincoso"
     send_email_using_mailgun(recipient=recipient, subject=subject, message=body)
 
+
 #   DONE
 def investment_notification_to_admin(request, investment_transaction):
     body = f"""
 Hi Reincoso,
 
-The investment amount of {investment_transaction.amount} in {investment_transaction.user_investment.investment.name} 
+The investment amount of {intcomma(investment_transaction.amount, 2)} in {investment_transaction.user_investment.investment.name} 
 with {investment_transaction.user_investment.percentage}% per annum from {request.user.first_name} is currently waiting 
 to be reviewed and approved. Kindly go through it and process as due.
 """
@@ -183,6 +184,7 @@ to be reviewed and approved. Kindly go through it and process as due.
     recipient = "coopadmin@reincoso.com"
     subject = "Reincoso Investment Request"
     send_email_using_mailgun(recipient=recipient, subject=subject, message=body)
+
 
 #   Done
 def approved_investment_mail(user_investment):
@@ -194,8 +196,9 @@ def approved_investment_mail(user_investment):
     body = f"""
 Dear {user_investment.user.user.first_name},
 
-Your investment of N{user_investment.amount_invested} on {user_investment.investment.name} with {user_investment.percentage}% per annum has been approved.
-Your current investment balance is N{total_amount_invested}.
+Your investment of N{intcomma(user_investment.amount_invested, 2)} on {user_investment.investment.name} with {user_investment.percentage}% per annum has been approved.
+Your current investment balance is N{intcomma(total_amount_invested, 2)}.
+
 For any further inquiry, please contact us on:
 Email - coopadmin@reincoso.com
     """
@@ -204,12 +207,15 @@ Email - coopadmin@reincoso.com
     subject = "Investment with Reincoso"
     send_email_using_mailgun(recipient=recipient, subject=subject, message=body)
 
+
 #   Done
 def declined_investment_mail(user_investment):
     body = f"""
 Dear {user_investment.user.user.first_name},
 
-Your investment of N{user_investment.amount_invested} on {user_investment.investment.name} with {user_investment.percentage}% per annum has been declined at this moment.
+Your investment of N{intcomma(user_investment.amount_invested, 2)} on {user_investment.investment.name} with 
+{user_investment.percentage}% per annum has been declined at this moment.
+
 For any further inquiry, please contact us on:
 Email - coopadmin@reincoso.com
 """
@@ -223,9 +229,9 @@ def successful_investment_mail(request, investment_transaction, total_amount_inv
     body = f"""
 Dear {request.user.first_name},
 
-You have made an investment of {investment_transaction.amount} on {investment_transaction.user_investment.investment.name} 
+You have made an investment of {intcomma(investment_transaction.amount, 2)} on {investment_transaction.user_investment.investment.name} 
 with {investment_transaction.user_investment.percentage}% per annum.
-Your current investment balance is N{total_amount_invested}.
+Your current investment balance is N{intcomma(total_amount_invested, 2)}.
 
 For any further inquiry, please contact us on:
 Email - coopadmin@reincoso.com
@@ -240,7 +246,9 @@ def failed_investment_mail(request, investment_transaction) -> None:
     body = f"""
 Dear {request.user.first_name},
 
-Your Investment of N{investment_transaction.amount} on {investment_transaction.user_investment.investment.name} is NOT successful (due to insufficient bank balance or network issues). 
+Your Investment of N{intcomma(investment_transaction.amount, 2)} on {investment_transaction.user_investment.investment.name} 
+is NOT successful (due to insufficient bank balance or network issues). 
+
 Kindly try again or contact us on coopadmin@reincoso.com. If the problem presides, please contact your bank
 """
 
@@ -249,8 +257,7 @@ Kindly try again or contact us on coopadmin@reincoso.com. If the problem preside
 
     send_email_using_mailgun(recipient, subject, body)
 
-
-# pending ...
+# Confirm this page
 def investment_maturity_mail(request) -> None:
     balance = Wallet.objects.get(user=request.user).balance
     body = f"""
@@ -267,7 +274,6 @@ def investment_maturity_mail(request) -> None:
 
 
 def loan_request_processing_mail(request) -> None:
-    #: This body was indented this way intentionally, to be well-structured when received via mail.
     body = f"""
 Dear {request.user.first_name},
 
@@ -285,23 +291,77 @@ Email - coopadmin@reincoso.com
     send_email_using_mailgun(recipient, subject, body)
 
 
-def mail_to_guarantor(request, guarantor) -> None:
+def store_template(body, template_name):
+
+    response = requests.post(url="https://api.mailgun.net/v3/reincosocoop.com/templates", auth=("api", api_key),
+                             data={'template': body, 'name': template_name,
+                                   'description': "Reincoso Guarantor Request"})
+    return response.text
+
+
+def mail_to_guarantor(request, guarantor):
+    """
+        Info: This function sends mail to guarantor, to accept or decline the request.
+        info: store_template(body, template_name="mail_to_guarantor1.html") this function is responsible for adding
+        a template to mailgun, the official template used for sending the mail to the guarantor is
+        named 'mail_to_guarantor1.html' this can be changed from the store_template() and once changed in this function it
+        should be updated in the data['template'] of this function.
+    """
     profile = Profile.objects.get(user=request.user)
     loan = LoanTransaction.objects.filter(user=profile).last()
 
-    body = f"""
-Dear {guarantor.user.first_name},
+    body = """
+        <div class='entry' style='color:black'>
+                Dear {{ name }},<br><br>
+                
+                You have been selected to guarantee for the loan amount of N{{ loan_amount }} for {{ guarantee_name }} and you will 
+                be held liable if the debts are not repaid. You can Accept or Reject this offer of Guarantorship through this link
+                <a href='{{ request_scheme }}://{{ request_host_name }}/confirm-guarantorship/?guarantor={{ guarantor_phone_number }}&guarantee={{ guarantee_phone_number }}'>Click Here</a>.<br> <br>
+                For any further inquiry please contact us on:
+                Email - coopadmin@reincoso.com
+        </div>
+    """
 
-You have been selected to guarantee for the loan amount of N{loan.amount} for ({request.user.first_name}) and you will be held liable if the debts are not repaid.
-You can accept or reject offer of guarantor-ship by sending Yes to accept / No to reject.
+    subject = "Reincoso Guarantor Request"
+    return requests.post("https://api.mailgun.net/v3/reincosocoop.com/messages", auth=("api", api_key), data={
+        "from": "Reincoso <no-reply@reincosocoop.com>", "to": [guarantor.user.email], "subject": subject,
+        "template": "mail_to_guarantor1.html", "t:variables": json.dumps({"name": guarantor.user.first_name,
+                                                                          "loan_amount": str(intcomma(loan.amount, 2)),
+                                                                          "guarantee_name": request.user.first_name,
+                                                                          "request_scheme": request.scheme,
+                                                                          "request_host_name": request.get_host(),
+                                                                          "guarantor_phone_number": guarantor.phone_number,
+                                                                          "guarantee_phone_number": profile.phone_number})
+    })
+
+
+def guarantor_accept_mail(user, guarantor) -> None:
+    body = f"""
+Dear {user.first_name}, 
+
+{guarantor} has Accepted to be your Guarantor.
+
 For any further inquiry please contact us on:
 Email - coopadmin@reincoso.com
-        """
+"""
+    subject = "Reincoso Guarantor Accepted"
 
-    recipient = guarantor.user.email
-    subject = "Guarantor"
+    send_email_using_mailgun(recipient=user.email, subject=subject, message=body)
 
-    send_email_using_mailgun(recipient, subject, body)
+
+def guarantor_declined_mail(user, guarantor) -> None:
+    body = f"""
+Dear {user.first_name}, 
+    
+{guarantor} has Declined to be your Guarantor.
+
+For any further inquiry please contact us on:
+Email - coopadmin@reincoso.com
+"""
+
+    subject = "Reincoso Guarantor Declined"
+
+    send_email_using_mailgun(recipient=user.email, subject=subject, message=body)
 
 
 def inform_user_of_added_guarantor(request) -> None:
@@ -312,7 +372,7 @@ def inform_user_of_added_guarantor(request) -> None:
     body = f"""
 Dear {request.user.first_name},
 
-You have added {guarantor} as your guarantor(s) for the loan amount of Nloan.amount
+You have added {guarantor} as your guarantor(s) for the loan amount of N{intcomma(loan.amount, 2)}
 For any further inquiry please contact us on:
 Email - coopadmin@reincoso.com
         """
@@ -327,7 +387,7 @@ def admin_loan_processing_status_mail(request) -> None:
     body = f"""
 Dear Reincoso,
 
-The loan amount of N{request.data.get("amount")} from {request.user.first_name} is currently waiting to be reviewed and approved. 
+The loan amount of N{intcomma(request.data.get("amount"), 2)} from {request.user.first_name} is currently waiting to be reviewed and approved. 
 Kindly go through it and process as due.
         """
 
@@ -336,7 +396,7 @@ Kindly go through it and process as due.
 
     send_email_using_mailgun(recipient, subject, body)
 
-
+# This hasn't been implemented
 def user_loan_processing_status_mail(request) -> None:
     body = f"""
 Dear {request.user.first_name},
@@ -355,11 +415,10 @@ Email - coopadmin@reincoso.com
 
 
 def loan_clear_off(request, loan) -> None:
-
     body = f"""
 Dear {request.user.first_name},
 
-Congratulations! You have successfully cleared your loan of N{loan.amount}. Your loan balance is N0.00. 
+Congratulations! You have successfully cleared your loan of N{intcomma(loan.amount)}. Your loan balance is N0.00. 
 You can apply for more loans with us.
 
 For any further inquiry please contact us on:
@@ -375,10 +434,12 @@ Email - coopadmin@reincoso.com
 def withdrawal_request_mail_user(request) -> None:
     body = f"""
         Dear {request.user.first_name},
-            Your application to make a withdrawal of N{request.data.get("amount")} has been received and is being reviewed by the committee.
-            You will be credited shortly.
-            For any further inquiry please contact us on:
-            Email - coopadmin@reincoso.com
+        
+        Your application to make a withdrawal of N{intcomma(request.data.get("amount"))} has been received and is being reviewed by the committee.
+        You will be credited shortly.
+        
+        For any further inquiry please contact us on:
+        Email - coopadmin@reincoso.com
         """
 
     recipient = request.user.email
@@ -391,16 +452,11 @@ def withdrawal_request_mail_admin(request, content) -> None:
     body = f"""
 Hi Reincoso,
 
-A withdrawal request of N{request.data.get("amount")} from {request.user.first_name} is currently
-waiting to be approved and disbursed.
-Kindly go through it and process as due.
-        
-    """
+A withdrawal request of N{intcomma(request.data.get("amount"), 2)} from {request.user.first_name} is currently
+waiting to be approved and disbursed. Kindly go through it and process as due.
+"""
 
     recipient = settings.ADMIN_EMAIL
     subject = "Withdrawal Request"
 
     send_email_using_mailgun(recipient, subject, body)
-
-
-
