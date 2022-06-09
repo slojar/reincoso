@@ -124,7 +124,7 @@ class PayMembershipFeeView(APIView):
         print("started payment")
         data = dict()
         site_settings = general_settings()
-        gateway = request.data.get('gateway')
+        gateway = request.data.get('gateway', 'paystack')
         callback_url = request.data.get('callback_url')
 
         if not callback_url:

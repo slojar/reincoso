@@ -74,7 +74,7 @@ def create_instant_savings(savings_type, request):
     success = False
     response = ""
     amount = request.data.get('amount')
-    gateway = request.data.get('gateway')
+    gateway = request.data.get('gateway', 'paystack')
     payment_duration_id = request.data.get('payment_duration_id')
     card_id = request.data.get('card_id')
 
@@ -166,7 +166,7 @@ def create_auto_savings(savings_type, request):
     response = ""
     amount = request.data.get('amount')
     payment_day = request.data.get('payment_day')
-    gateway = request.data.get('gateway')
+    gateway = request.data.get('gateway', 'paystack')
     payment_duration = request.data.get('payment_duration_id')
     card_id = request.data.get('card_id')
 
