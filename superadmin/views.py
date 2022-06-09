@@ -998,7 +998,7 @@ class AdminNotificationView(APIView, CustomPagination):
 
 class InvestmentWithdrawalView(generics.ListCreateAPIView):
     permission_classes = [IsAdminUser]
-    serializer_class = UserDetailSerializer
+    serializer_class = InvestmentWithdrawalSerializer
     pagination_class = CustomPagination
     queryset = InvestmentWithdrawal.objects.all().order_by('-id')
     lookup_field = 'id'
