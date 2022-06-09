@@ -51,6 +51,10 @@ urlpatterns = [
     path('withdrawal/', AdminWithdrawalView.as_view(), name='admin-withdrawal'),
     path('withdrawal/<int:withdrawal_id>/', AdminWithdrawalView.as_view(), name='admin-withdrawal-detail'),
 
+    path('investment-withdrawal/', InvestmentWithdrawalView.as_view(), name='investment-withdrawal'),
+    path('investment-withdrawal/<int:id>/', InvestmentWithdrawalView.as_view(), name='investment-withdrawal-detail'),
+    path('update-investment-withdrawal/<int:pk>/', UpdateInvestmentWithdrawalView.as_view(),
+         name='update-investment-withdrawal'),
 
     # path('transfer/', TransferFundView.as_view(), name='transfer-fund'),
     # path('transfer/<str:transaction_ref>/', TransferFundView.as_view(), name='transfer-fund'),
