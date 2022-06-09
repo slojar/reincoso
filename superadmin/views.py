@@ -10,7 +10,7 @@ from savings.serializers import *
 from investment.serializers import *
 from settings.serializers import *
 from .filters import *
-from .models import AdminNotification
+from .models import AdminNotification, InvestmentWithdrawal
 from .permissions import *
 from .utils import *
 from account.utils import encrypt_text
@@ -30,7 +30,8 @@ from django.contrib.auth.models import Group
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .serializers import ActivityReportSerializer, WithdrawalSerializer, AdminNotificationSerializer
+from .serializers import ActivityReportSerializer, WithdrawalSerializer, AdminNotificationSerializer, \
+    InvestmentWithdrawalSerializer
 from account.send_email import approved_investment_mail, declined_investment_mail
 
 class AdminHomepage(APIView):
@@ -861,7 +862,6 @@ class AdminUserInvestmentDetailView(generics.RetrieveUpdateAPIView):
             Thread(target=declined_investment_mail, args=[user_investment]).start()
         user_investment.save()
 
-        
         create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
@@ -995,6 +995,39 @@ class AdminNotificationView(APIView, CustomPagination):
 
         return Response({"detail": "Message read"})
 
+
+class InvestmentWithdrawalView(generics.ListCreateAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = UserDetailSerializer
+    pagination_class = CustomPagination
+    queryset = InvestmentWithdrawal.objects.all().order_by('-id')
+    lookup_field = 'id'
+
+
+class UpdateInvestmentWithdrawalView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def put(self, request, pk):
+        status_option = request.data.get("status")
+        try:
+            withdrawal_request = InvestmentWithdrawal.objects.get(id=pk)
+            if withdrawal_request.status != "pending":
+                return Response({"detail": "This withdrawal request cannot be edited"})
+
+            withdrawal_request.amount_requested = request.data.get("amount")
+            withdrawal_request.status = status_option
+            withdrawal_request.narration = request.data.get("narration")
+            withdrawal_request.save()
+
+            investment_instance = withdrawal_request.investment
+
+            if withdrawal_request.status == "approved":
+                investment_instance.amount_invested -= withdrawal_request.amount_requested
+                investment_instance.return_on_invested -= withdrawal_request.amount_requested
+
+
+        except Exception as err:
+            return Response({"detail": f"{err}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 

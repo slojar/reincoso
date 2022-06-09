@@ -147,6 +147,8 @@ class VerifyPaymentView(APIView):
         success = False
         response = dict()
 
+        print(request)
+
         if gateway == 'paystack':
             success, response = verify_paystack_transaction(reference)
             data['detail'] = response
