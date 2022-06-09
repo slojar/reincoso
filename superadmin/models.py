@@ -22,7 +22,7 @@ class AdminNotification(models.Model):
 
 
 class InvestmentWithdrawal(models.Model):
-    investment = models.ForeignKey(UserInvestment, on_delete=models.CASCADE)
+    investment = models.ForeignKey(UserInvestment, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(max_length=100, choices=INVESTMENT_WITHDRAWAL_CHOICES, default='pending')
     amount_requested = models.DecimalField(decimal_places=2, max_digits=20, default=0)
     narration = models.TextField(null=True, blank=True)

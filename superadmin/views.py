@@ -1003,6 +1003,26 @@ class InvestmentWithdrawalView(generics.ListCreateAPIView):
     queryset = InvestmentWithdrawal.objects.all().order_by('-id')
     lookup_field = 'id'
 
+    def create(self, request, *args, **kwargs):
+        user_investment_id = request.data.get("investment")
+        amount_requested = request.data.get("amount_requested")
+
+        user_investment = UserInvestment.objects.get(id=user_investment_id)
+
+        if InvestmentWithdrawal.objects.filter(investment=user_investment, status="pending").exists():
+            return Response({"detail": "A withdrawal request is pending for this investment"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if amount_requested > user_investment.return_on_invested:
+            return Response({"detail": "Requested amount cannot be greater than available amount"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        return Response(serializer.data)
+
 
 class UpdateInvestmentWithdrawalView(APIView):
     permission_classes = [IsAdminUser]
@@ -1014,7 +1034,6 @@ class UpdateInvestmentWithdrawalView(APIView):
             if withdrawal_request.status != "pending":
                 return Response({"detail": "This withdrawal request cannot be edited"})
 
-            withdrawal_request.amount_requested = request.data.get("amount")
             withdrawal_request.status = status_option
             withdrawal_request.narration = request.data.get("narration")
             withdrawal_request.save()
