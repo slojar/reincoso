@@ -1024,8 +1024,16 @@ class InvestmentWithdrawalView(generics.ListCreateAPIView):
         return Response(serializer.data)
 
 
-class UpdateInvestmentWithdrawalView(APIView):
+class InvestmentWithdrawalDetailView(APIView):
     permission_classes = [IsAdminUser]
+
+    def get(self, request, pk):
+        try:
+            data = InvestmentWithdrawalSerializer(InvestmentWithdrawal.objects.get(id=pk)).data
+            return Response(data)
+
+        except Exception as err:
+            return Response({"detail": f"{err}"}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk):
         status_option = request.data.get("status")
@@ -1035,7 +1043,6 @@ class UpdateInvestmentWithdrawalView(APIView):
                 return Response({"detail": "This withdrawal request cannot be edited"})
 
             withdrawal_request.status = status_option
-            withdrawal_request.narration = request.data.get("narration")
             withdrawal_request.save()
 
             investment_instance = withdrawal_request.investment
