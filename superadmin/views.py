@@ -1026,6 +1026,8 @@ class UpdateInvestmentWithdrawalView(APIView):
                 investment_instance.return_on_invested -= withdrawal_request.amount_requested
 
 
+
+
         except Exception as err:
             return Response({"detail": f"{err}"}, status=status.HTTP_400_BAD_REQUEST)
 

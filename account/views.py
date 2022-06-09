@@ -127,6 +127,8 @@ class PayMembershipFeeView(APIView):
         gateway = request.data.get('gateway', 'paystack')
         callback_url = request.data.get('callback_url')
 
+        print(request.data)
+
         if not callback_url:
             # Findings
             # 1. The call_back url here was supposed to be /verify-payment/
