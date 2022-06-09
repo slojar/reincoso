@@ -141,7 +141,7 @@ class VerifyPaymentView(APIView):
 
     def get(self, request):
         data = dict()
-        gateway = request.GET.get('gateway')
+        gateway = request.GET.get('gateway', 'paystack')
         reference = request.GET.get('reference')
         phone_number = None
         success = False
