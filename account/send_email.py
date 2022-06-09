@@ -40,10 +40,13 @@ def send_welcome_email_to_user(profile):
 Dear {profile.user.first_name},
 
 Reincoso Cooperative Society welcomes you! 
+
 We're thrilled to have you among us. We consider ourselves fortunate that you picked us and I'd want to express 
-our gratitude on behalf of the whole organization. In the meanwhile, please visit our website (www.reincosocoop.com) 
+our gratitude on behalf of the whole organization.
+
+In the meanwhile, please visit our website (www.reincosocoop.com) 
 to learn more about our products and services.
-    '''
+'''
     recipient = profile.user.email
     subject = "Welcome to REINCOSO"
 
