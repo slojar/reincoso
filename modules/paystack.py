@@ -93,7 +93,7 @@ def paystack_auto_charge(authorization_code, email, amount, **kwargs):
 
 def get_paystack_link(email, amount, callback_url=None, metadata=None, **kwargs):
     # metadata = kwargs.get('metadata')
-    callback_url = kwargs.get('callback_url')
+    callback_url = callback_url
     # callback_url = callback_url + f"&gateway=paystack"
     currency = kwargs.get('currency')
     url = settings.PAYSTACK_BASE_URL + "/transaction/initialize"
