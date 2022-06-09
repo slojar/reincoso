@@ -1023,10 +1023,12 @@ class UpdateInvestmentWithdrawalView(APIView):
 
             if withdrawal_request.status == "approved":
                 investment_instance.amount_invested -= withdrawal_request.amount_requested
-                investment_instance.return_on_invested -= withdrawal_request.amount_requested
+                # new_roi mean New Return on Investment
+                new_roi = (investment_instance.amount_invested * investment_instance.percentage) / 100
+                investment_instance.return_on_invested = investment_instance.amount_invested + new_roi
+                investment_instance.save()
 
-
-
+            return Response({"detail": "Successfully updated Investment Withdrawal "})
 
         except Exception as err:
             return Response({"detail": f"{err}"}, status=status.HTTP_400_BAD_REQUEST)

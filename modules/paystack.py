@@ -117,8 +117,6 @@ def get_paystack_link(email, amount, callback_url=None, metadata=None, **kwargs)
     response = requests.post(url, headers=headers, data=payload)
     json_response = response.json()
 
-    print("Payload to PAYSTACK", payload)
-
     log.info(f"url: {url}")
     log.info(f"headers: {headers}")
     log.info(f"payloads: {payload}")
