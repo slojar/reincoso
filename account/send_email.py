@@ -84,7 +84,7 @@ def successful_quick_save_mail(profile, amount) -> None:
     body = f"""
 Dear {profile.user.first_name},   
  
-Thank you for using Reincoso Quick Save option.Your quick save of N{amount} is successful.
+Thank you for using Reincoso Quick Save option.Your quick save of N{intcomma(amount, 2)} is successful.
 Your current balance is N{intcomma(balance, 2)}.
     """
     recipient = profile.user.email
@@ -375,7 +375,7 @@ Dear {request.user.first_name},
 You have added {guarantor} as your guarantor(s) for the loan amount of N{intcomma(loan.amount, 2)}
 For any further inquiry please contact us on:
 Email - coopadmin@reincoso.com
-        """
+"""
 
     recipient = request.user.email
     subject = "Guarantor Added"
