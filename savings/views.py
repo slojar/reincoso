@@ -147,12 +147,8 @@ class VerifyPaymentView(APIView):
         success = False
         response = dict()
 
-        print("GATEWAY", gateway)
-
         if not gateway or gateway is None or gateway == 'null':
             gateway = 'paystack'
-
-        print("NEW GATEWAY", gateway)
 
         if gateway == 'paystack':
             success, response = verify_paystack_transaction(reference)

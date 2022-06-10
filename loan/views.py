@@ -116,7 +116,7 @@ class ApplyForLoanView(APIView):
 class LoanDurationView(ListAPIView):
     permission_classes = []
     serializer_class = LoanDurationSerializer
-    queryset = LoanDuration.objects.all()
+    queryset = LoanDuration.objects.all().order_by('id')
 
 
 class LoanView(ListAPIView):

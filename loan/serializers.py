@@ -20,9 +20,15 @@ class LoanSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     duration = LoanDurationSerializer(read_only=True)
     transactions = serializers.SerializerMethodField()
+    next_repayment_date = serializers.SerializerMethodField()
     amount_left_to_repay = serializers.DecimalField(source='get_amount_left_to_repay', max_digits=20, decimal_places=2,
                                                     read_only=True)
     repaid = serializers.SerializerMethodField()
+
+    def get_next_repayment_date(self, obj):
+        if obj.next_repayment_date:
+            return str(obj.next_repayment_date)[:10]
+        return None
 
     def get_user(self, obj):
         user = dict()
