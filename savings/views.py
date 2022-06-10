@@ -149,7 +149,7 @@ class VerifyPaymentView(APIView):
 
         print("GATEWAY", gateway)
 
-        if not gateway or gateway is None:
+        if not gateway or gateway is None or gateway == 'null':
             gateway = 'paystack'
 
         print("NEW GATEWAY", gateway)
