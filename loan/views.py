@@ -25,6 +25,7 @@ class ApplyForLoanView(APIView):
         offer = dict()
         duration = request.GET.get("duration")
         amount = request.GET.get("amount")
+        loan_basis = request.GET.get("loan_basis", "weekly")
         success, loan_offer = get_loan_offer(request.user.profile)
         if success is False:
             return Response({"detail": loan_offer}, status=status.HTTP_401_UNAUTHORIZED)
@@ -44,19 +45,25 @@ class ApplyForLoanView(APIView):
                 return Response({"detail": "Invalid duration selected"}, status=status.HTTP_404_NOT_FOUND)
 
             offer['duration_title'] = duration.title
-            offer['payment_basis'] = duration.basis
-            offer['payment_duration'] = duration.duration
+            # offer['payment_basis'] = duration.basis
+            offer['payment_basis'] = loan_basis
+            # offer['payment_duration'] = duration.duration
+            repayment_count = calculate_loan_repayment_duration(loan_basis, duration)
+            offer['payment_duration'] = repayment_count
             offer['percentage'] = duration.percentage
             offer['total_percentage'] = total_percentage = (amount * duration.percentage) / 100
             offer['total_repayment'] = total_repayment = amount + total_percentage
-            split = round(total_repayment / duration.duration, 2)
+            # split = round(total_repayment / duration.duration, 2)
+            split = round(total_repayment / repayment_count, 2)
             payment_split = list()
-            for payment_duration in range(duration.duration):
+            # for payment_duration in range(duration.duration):
+            for payment_duration in range(repayment_count):
                 payment_split.append({
                     'amount': split
                 })
             offer['repayment_split'] = payment_split
-            offer['detail'] = f"You pay {split} for {duration.duration} {duration.basis[:-2]}(s)"
+            # offer['detail'] = f"You pay {split} for {duration.duration} {duration.basis[:-2]}(s)"
+            offer['detail'] = f"You pay {split} for {repayment_count} {loan_basis[:-2]}(s)"
         # print("success on loa")
         return Response(offer)
 
@@ -109,7 +116,7 @@ class ApplyForLoanView(APIView):
 class LoanDurationView(ListAPIView):
     permission_classes = []
     serializer_class = LoanDurationSerializer
-    queryset = LoanDuration.objects.all()
+    queryset = LoanDuration.objects.all().order_by('id')
 
 
 class LoanView(ListAPIView):
@@ -123,14 +130,14 @@ class LoanView(ListAPIView):
     def list(self, request, *args, **kwargs):
         data = super(LoanView, self).list(request, *args, **kwargs).data
         profile = request.user.profile
-        user_info = dict()
-        user_info['total_loan'] = Loan.objects.filter(user=profile).count()
+        user_loan_info = dict()
+        user_loan_info['total_loan'] = Loan.objects.filter(user=profile).count()
 
         total = LoanTransaction.objects.filter(user=profile, status='success')
         total = total.aggregate(Sum('amount'))['amount__sum']
-        user_info['total_loan_amount'] = total
+        user_loan_info['total_loan_amount'] = str(total)
 
-        data['user'] = user_info
+        data['loan_analysis'] = user_loan_info
 
         return Response(data)
 
