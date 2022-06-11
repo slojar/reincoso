@@ -120,7 +120,7 @@ class SavingsView(APIView):
 
             else:
                 Thread(target=send_email.failed_auto_save_mail, args=[profile, saving_amount]).start()
-                print("SavingsView - successful_auto_save_mail() ---------- line 123  ")
+                print("SavingsView - failed_auto_save_mail() ---------- line 123  ")
 
         if savings_type.slug == 'instant':
             success, response = create_instant_savings(savings_type=savings_type, request=request)
@@ -128,10 +128,10 @@ class SavingsView(APIView):
             # Send email depending on what create_instant_savings() function returns
             if success:
                 Thread(target=send_email.successful_quick_save_mail, args=[profile, amount]).start()
-                print("SavingsView - successful_quick_save_mail() ---------- line 128  ")
+                print("SavingsView - successful_quick_save_mail() ---------- line 132 ")
             else:
                 Thread(target=send_email.failed_quick_save_mail, args=[profile, amount]).start()
-                print("SavingsView - failed_quick_save_mail() ---------- line 131  ")
+                print("SavingsView - failed_quick_save_mail() ---------- line 134  ")
 
         data['detail'] = response
         data['payment_link'] = response
