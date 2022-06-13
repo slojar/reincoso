@@ -15,6 +15,7 @@ urlpatterns = [
     path('user-detail/', UserDetailView.as_view(), name='user-detail'),
     path('add-guarantor/', AddGuarantorView.as_view(), name='add-guarantor'),
     path('update-guarantor/', UpdateGuarantorView.as_view(), name='update-guarantor'),
+    path('confirm-guarantorship/', confirm_guarantorship, name='confirm-guarantorship'),
     path('verify-payment/', VerifyPaymentView.as_view(), name='verify-payment'),
     path('bank/', GetBankView.as_view(), name='get-banks'),
     path('request-withdrawal/', RequestWithdrawalView.as_view(), name='request-withdrawal'),

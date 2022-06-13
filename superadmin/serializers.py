@@ -1,7 +1,7 @@
 from django.contrib.admin.models import LogEntry
 from rest_framework import serializers
 from account.models import Withdrawal
-from superadmin.models import AdminNotification
+from superadmin.models import AdminNotification, InvestmentWithdrawal
 
 
 class ActivityReportSerializer(serializers.ModelSerializer):
@@ -64,3 +64,10 @@ class AdminNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminNotification
         exclude = []
+
+
+class InvestmentWithdrawalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvestmentWithdrawal
+        exclude = []
+
