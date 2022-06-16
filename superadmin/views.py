@@ -996,12 +996,11 @@ class AdminNotificationView(APIView, CustomPagination):
         return Response({"detail": "Message read"})
 
 
-class InvestmentWithdrawalView(generics.ListCreateAPIView):
+class InvestmentWithdrawalView(generics.CreateAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = InvestmentWithdrawalSerializer
     pagination_class = CustomPagination
     queryset = InvestmentWithdrawal.objects.all().order_by('-id')
-    lookup_field = 'id'
 
     def create(self, request, *args, **kwargs):
         user_investment_id = request.data.get("investment")
