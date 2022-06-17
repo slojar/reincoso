@@ -239,6 +239,7 @@ class AddGuarantorView(APIView):
 
     def post(self, request):
         guarantor = request.data.get('guarantor')
+        amount = request.data.get('amount')
         response = []
         for number in guarantor:
             try:
@@ -267,7 +268,7 @@ class AddGuarantorView(APIView):
                 })
 
                     # send notification to guarantor
-                Thread(target=mail_to_guarantor, args=[request, guarantor_profile]).start()
+                Thread(target=mail_to_guarantor, args=[request, guarantor_profile, amount]).start()
             except Profile.DoesNotExist:
                 response.append({
                     'success': False,

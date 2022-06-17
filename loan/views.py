@@ -10,6 +10,7 @@ from rest_framework import status
 from django.utils import timezone
 from django.utils.timezone import timedelta
 from django.contrib.sites.models import Site
+from django.conf import settings
 from .models import *
 from .paginations import CustomPagination
 from .serializers import *
@@ -18,6 +19,8 @@ from django.db.models import Q, Sum
 from modules.paystack import verify_paystack_transaction
 from account.utils import tokenize_user_card
 
+from humanize import intcomma
+
 
 class ApplyForLoanView(APIView):
 
@@ -25,9 +28,9 @@ class ApplyForLoanView(APIView):
         offer = dict()
         duration = request.GET.get("duration")
         amount = request.GET.get("amount")
-        loan_basis = request.GET.get("loan_basis", "weekly")
+        loan_basis = request.GET.get("repayment_frequency", "weekly")
 
-        print("PAYLOAD TO GET OFFER: ", request.data)
+        print("PAYLOAD TO GET OFFER: ", request.GET)
 
         loan_basis = str(loan_basis).lower()
 
@@ -67,8 +70,9 @@ class ApplyForLoanView(APIView):
                     'amount': split
                 })
             offer['repayment_split'] = payment_split
-            # offer['detail'] = f"You pay {split} for {duration.duration} {duration.basis[:-2]}(s)"
-            offer['detail'] = f"You pay {split} for {repayment_count} {loan_basis[:-2]}(s)"
+            # offer['detail'] = f"You pay {split} for {repayment_count} {loan_basis[:-2]}(s)"
+            naira_unicode = settings.NAIRA_UNICODE
+            offer['detail'] = f"You pay {naira_unicode}{intcomma(split, 2)} for {repayment_count} {loan_basis[:-2]}(s)"
         # print("success on loa")
         return Response(offer)
 

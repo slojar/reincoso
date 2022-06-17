@@ -96,7 +96,7 @@ class SavingsView(APIView):
 
     def post(self, request):
         ###
-        print(request.data);
+        print(request.data)
         ###
         success = False
         response = ""
