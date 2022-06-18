@@ -80,6 +80,9 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+NAIRA_UNICODE = u"\u20A6"
+
+
 # Activate Django-Heroku.
 django_heroku.settings(locals())
 

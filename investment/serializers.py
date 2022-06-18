@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from superadmin.models import InvestmentWithdrawal
 
 from .models import *
 
@@ -58,6 +59,7 @@ class UserInvestmentSerializer(serializers.ModelSerializer):
     option = serializers.CharField(source='option.name', read_only=True)
     duration = serializers.CharField(source='duration.title', read_only=True)
     user = serializers.SerializerMethodField()
+    withdrawals = serializers.SerializerMethodField()
 
     def get_user(self, obj):
         user = {
@@ -67,6 +69,20 @@ class UserInvestmentSerializer(serializers.ModelSerializer):
             'phone_number': obj.user.phone_number,
         }
         return user
+
+    def get_withdrawals(self, obj):
+        if InvestmentWithdrawal.objects.filter(investment=obj).exists():
+            queryset = InvestmentWithdrawal.objects.filter(investment=obj)
+            data = [{
+                'id': instance.id,
+                'amount_requested': instance.amount_requested,
+                'narration': instance.narration,
+                'status': instance.status,
+                'created_on': instance.created_on,
+                'updated_on': instance.updated_on
+            } for instance in queryset]
+            return data
+        return None
         # from account.serializers import UserDetailSerializer
         # return UserDetailSerializer(obj.user).data
 

@@ -10,6 +10,7 @@ from rest_framework import status
 from django.utils import timezone
 from django.utils.timezone import timedelta
 from django.contrib.sites.models import Site
+from django.conf import settings
 from .models import *
 from .paginations import CustomPagination
 from .serializers import *
@@ -18,6 +19,8 @@ from django.db.models import Q, Sum
 from modules.paystack import verify_paystack_transaction
 from account.utils import tokenize_user_card
 
+from humanize import intcomma
+
 
 class ApplyForLoanView(APIView):
 
@@ -25,7 +28,12 @@ class ApplyForLoanView(APIView):
         offer = dict()
         duration = request.GET.get("duration")
         amount = request.GET.get("amount")
-        loan_basis = request.GET.get("loan_basis", "weekly")
+        loan_basis = request.GET.get("repayment_frequency", "weekly")
+
+        print("PAYLOAD TO GET OFFER: ", request.GET)
+
+        loan_basis = str(loan_basis).lower()
+
         success, loan_offer = get_loan_offer(request.user.profile)
         if success is False:
             return Response({"detail": loan_offer}, status=status.HTTP_401_UNAUTHORIZED)
@@ -62,8 +70,9 @@ class ApplyForLoanView(APIView):
                     'amount': split
                 })
             offer['repayment_split'] = payment_split
-            # offer['detail'] = f"You pay {split} for {duration.duration} {duration.basis[:-2]}(s)"
-            offer['detail'] = f"You pay {split} for {repayment_count} {loan_basis[:-2]}(s)"
+            # offer['detail'] = f"You pay {split} for {repayment_count} {loan_basis[:-2]}(s)"
+            naira_unicode = settings.NAIRA_UNICODE
+            offer['detail'] = f"You pay {naira_unicode}{intcomma(split, 2)} for {repayment_count} {loan_basis[:-2]}(s)"
         # print("success on loa")
         return Response(offer)
 
@@ -71,6 +80,12 @@ class ApplyForLoanView(APIView):
         data = dict()
         amount = request.data.get('amount')
         duration_id = request.data.get('duration')
+
+        print("PAYLOAD TO APPLY: ", request.data)
+
+        if amount < 1000000:
+            return Response({"detail": "Requested amount cannot be less than One Million Naira (N1,000,000)"},
+                            status=status.HTTP_404_NOT_FOUND)
 
         try:
             duration = LoanDuration.objects.get(pk=duration_id)

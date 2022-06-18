@@ -32,7 +32,7 @@ def process_savings_payment_with_card(saving, card, amount, **kwargs):
     gateway = card.gateway
 
     # charge user little amount so as to verify and tokenize card
-    do_test_charge = kwargs.get('do_test_charge', True)
+    do_test_charge = kwargs.get('do_test_charge', False)
 
     amount_to_charge_card = amount
     if do_test_charge:
@@ -203,7 +203,8 @@ def create_auto_savings(savings_type, request):
             # callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
             return False, f"callback_url is required"
 
-        amount_to_charge_card = settings.PAYSTACK_TEST_CHARGE
+        # amount_to_charge_card = settings.PAYSTACK_TEST_CHARGE
+        amount_to_charge_card = amount
 
         # Create saving transaction
         transaction = create_savings_transaction(saving=saving, amount=amount_to_charge_card, gateway=gateway)

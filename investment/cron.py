@@ -4,8 +4,9 @@ from account.models import Profile
 from .models import Investment, UserInvestment
 from django.utils import timezone
 from account.send_email import send_email_using_mailgun
+from django.conf import settings
 
-naira_unicode = u"\u20A6"
+naira_unicode = settings.NAIRA_UNICODE
 
 
 def investment_maturity_check() -> None:
