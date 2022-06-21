@@ -182,10 +182,10 @@ def can_get_loan(profile):
         return success, response, requirement
 
     # Check if user meets guarantors requirement
-    if Guarantor.objects.filter(user=profile, confirmed=True).exclude(guarantor=profile).count() < loan_settings.number_of_guarantor:
-        response = f"You must have {loan_settings.number_of_guarantor} guarantor(s) before you can apply for loan"
-        requirement = 'add_guarantor'
-        return success, response, requirement
+    # if Guarantor.objects.filter(user=profile, confirmed=True).exclude(guarantor=profile).count() < loan_settings.number_of_guarantor:
+    #     response = f"You must have {loan_settings.number_of_guarantor} guarantor(s) before you can apply for loan"
+    #     requirement = 'add_guarantor'
+    #     return success, response, requirement
 
     # check if user still have a pending loan
     query = Q(user=profile)

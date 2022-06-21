@@ -374,7 +374,7 @@ Email - coopadmin@reincoso.com
 def inform_user_of_added_guarantor(request) -> None:
 
     amount = request.data.get("amount")
-    guarantor = ", ".join(list(request.data.get("guarantor")))
+    guarantor = ", ".join(list(request.data.get("requestNumber")))
     body = f"""
 Dear {request.user.first_name},
 
