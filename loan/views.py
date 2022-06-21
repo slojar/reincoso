@@ -83,6 +83,7 @@ class ApplyForLoanView(APIView):
         duration_id = request.data.get('duration')
 
         print("PAYLOAD TO APPLY: ", request.data)
+        print("Authorization: ", self.request.auth)
 
         if amount < 1000000:
             return Response({"detail": "Requested amount cannot be less than One Million Naira (N1,000,000)"},
