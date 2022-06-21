@@ -244,7 +244,7 @@ class AddGuarantorView(APIView):
         response = []
         for number in guarantor:
             try:
-                guarantor_profile = Profile.objects.get(phone_number=reformat_phone_number(number))
+                guarantor_profile = Profile.objects.get(phone_number=reformat_phone_number(str(number).strip()))
                 guarantor, created = Guarantor.objects.get_or_create(user=request.user.profile,
                                                                      guarantor=guarantor_profile)
                 guarantor.confirmed = False
