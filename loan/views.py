@@ -31,6 +31,7 @@ class ApplyForLoanView(APIView):
         loan_basis = request.GET.get("repayment_frequency", "weekly")
 
         print("PAYLOAD TO GET OFFER: ", request.GET)
+        print("Authorization: ", self.request.auth)
 
         loan_basis = str(loan_basis).lower()
 
