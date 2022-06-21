@@ -240,6 +240,7 @@ class AddGuarantorView(APIView):
     def post(self, request):
         guarantor = request.data.get('guarantor')
         amount = request.data.get('amount')
+        print("Add Guarantor - Payload: ", request.data)
         response = []
         for number in guarantor:
             try:
