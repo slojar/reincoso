@@ -95,9 +95,6 @@ class SavingsView(APIView):
         return Response(data)
 
     def post(self, request):
-        ###
-        print(request.data);
-        ###
         success = False
         response = ""
         data = dict()
@@ -105,6 +102,7 @@ class SavingsView(APIView):
         amount = request.data.get("amount")
 
         try:
+            # if savings_type == "1":
             savings_type = SavingsType.objects.get(id=savings_type)
         except Exception as ex:
             data['detail'] = f"{ex}"
