@@ -317,7 +317,7 @@ class GetBankView(ListAPIView):
     serializer_class = BankSerializer
 
     def get_queryset(self):
-        queryset = Bank.objects.all()
+        queryset = Bank.objects.all().order_by('id')
         name = self.request.GET.get('name')
         if name:
             queryset = Bank.objects.filter(name__icontains=name)
