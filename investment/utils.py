@@ -66,7 +66,6 @@ def create_investment(profile, data):
         duration = option.duration
 
     except Exception as ex:
-        print(f"{ex} line 70 utils.py")
         return False, str(ex)
 
     # Do minimum investment check

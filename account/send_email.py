@@ -15,7 +15,7 @@ base_url = settings.EMAIL_API_URL
 api_key = settings.EMAIL_API_KEY
 email_sender = settings.EMAIL_SENDER
 
-naira_unicode = u"\u20A6"
+naira_unicode = settings.NAIRA_UNICODE
 
 
 def log_request(*args):
@@ -306,7 +306,7 @@ Email - coopadmin@reincoso.com
     send_email_using_mailgun(recipient, subject, body)
 
 
-def mail_to_guarantor(request, guarantor):
+def mail_to_guarantor(request, guarantor, amount):
     """
         Info: This function sends mail to guarantor, to accept or decline the request.
         info: store_template(body, template_name="mail_to_guarantor1.html") this function is responsible for adding
@@ -315,7 +315,7 @@ def mail_to_guarantor(request, guarantor):
         should be updated in the data['template'] of this function.
     """
     profile = Profile.objects.get(user=request.user)
-    loan = LoanTransaction.objects.filter(user=profile).last()
+    # loan = LoanTransaction.objects.filter(user=profile).last()
 
     body = """
         <div class='entry' style='color:black'>
@@ -333,7 +333,7 @@ def mail_to_guarantor(request, guarantor):
     return requests.post("https://api.mailgun.net/v3/reincosocoop.com/messages", auth=("api", api_key), data={
         "from": "Reincoso <no-reply@reincosocoop.com>", "to": [guarantor.user.email], "subject": subject,
         "template": "mail_to_guarantor1.html", "t:variables": json.dumps({"name": guarantor.user.first_name,
-                                                                          "loan_amount": f"{naira_unicode}{intcomma(loan.amount, 2)}",
+                                                                          "loan_amount": f"{naira_unicode}{intcomma(amount, 2)}",
                                                                           "guarantee_name": request.user.first_name,
                                                                           "request_scheme": request.scheme,
                                                                           "request_host_name": request.get_host(),
@@ -372,14 +372,13 @@ Email - coopadmin@reincoso.com
 
 
 def inform_user_of_added_guarantor(request) -> None:
-    profile = Profile.objects.get(user=request.user)
 
-    loan = LoanTransaction.objects.filter(user=profile).last()
-    guarantor = ", ".join(list(request.data.get("guarantor")))
+    amount = request.data.get("amount")
+    guarantor = ", ".join(list(request.data.get("requestNumber")))
     body = f"""
 Dear {request.user.first_name},
 
-You have added {guarantor} as your guarantor(s) for the loan amount of {naira_unicode}{intcomma(loan.amount, 2)}
+You have added {guarantor} as your guarantor(s) for the loan amount of {naira_unicode}{intcomma(amount, 2)}
 For any further inquiry please contact us on:
 Email - coopadmin@reincoso.com
 """
@@ -405,22 +404,41 @@ Kindly go through it and process as due.
     send_email_using_mailgun(recipient, subject, body)
 
 
-# This hasn't been implemented
-def user_loan_processing_status_mail(request) -> None:
+# Done
+def user_loan_processing_status_approved(request, loan_instance) -> None:
     body = f"""
-Dear {request.user.first_name},
+Dear {loan_instance.user.user.first_name},
 
-Your loan of {naira_unicode}xxxxx has been approved/rejected and the funds will be deposited into the account you gave shortly. 
+Your loan of {naira_unicode}{loan_instance.amount} has been {request.data.get('status')} and the funds will be deposited into the account you gave shortly. 
 Please read the terms and conditions that were emailed to you.
-If rejected- Sorry, you do not match the criteria for a loan at this time, either save more or contact us.
+
 For any further inquiry please contact us on:
 Email - coopadmin@reincoso.com
         """
 
-    recipient = request.user.email
+    recipient = loan_instance.user.user.email
     subject = "Loan processing status"
-
     send_email_using_mailgun(recipient, subject, body)
+
+#Done
+def user_loan_processing_status_unapproved(request, loan_instance) -> None:
+    body = f"""
+Dear {loan_instance.user.user.first_name},
+
+Sorry, Your loan of {naira_unicode}{loan_instance.amount} has been Rejected as you do not match the criteria for a loan at this time, either save more or contact us.
+
+Please read the terms and conditions that were emailed to you.
+
+For any further inquiry please contact us on:
+Email - coopadmin@reincoso.com
+"""
+
+    recipient = loan_instance.user.user.email
+    subject = "Loan processing status"
+    send_email_using_mailgun(recipient, subject, body)
+
+
+
 
 
 def loan_clear_off(request, loan) -> None:

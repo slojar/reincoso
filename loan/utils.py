@@ -108,19 +108,21 @@ def calculate_loan_repayment_duration(loan_basis, duration):
 
 def create_loan(request, profile, amount, duration):
     success = False
-    loan_basis = request.data.get('loan_basis')
-    repayment_day_of_the_week = request.data.get('repayment_day_of_the_week')
-    repayment_day_of_the_month = request.data.get('repayment_day_of_the_month')
+    loan_basis = request.data.get('repayment_frequency')
+    repayment_day = request.data.get('repayment_day')
+    # repayment_day_of_the_month = request.data.get('repayment_day_of_the_month')
+
+    loan_basis = str(loan_basis).lower()
 
     if loan_basis == 'weekly':
-        days_list = [str(day) for day in range(1, 8)]
-        if not (repayment_day_of_the_week and repayment_day_of_the_week in days_list):
+        days_list = [day for day in range(1, 8)]
+        if not (repayment_day and repayment_day in days_list):
             response = f"You must select a repayment day of the week to continue"
             return success, response
 
     if loan_basis != 'weekly':
-        days_list = [str(day) for day in range(1, 32)]
-        if not (repayment_day_of_the_month and repayment_day_of_the_month in days_list):
+        days_list = [day for day in range(1, 32)]
+        if not (repayment_day and repayment_day in days_list):
             response = f"You must select a repayment day of the month to continue"
             return success, response
 
@@ -131,10 +133,10 @@ def create_loan(request, profile, amount, duration):
     loan = Loan.objects.create(user=profile)
     loan.amount = amount
 
-    if repayment_day_of_the_week:
-        loan.day_of_the_week = repayment_day_of_the_week
-    if repayment_day_of_the_month:
-        loan.payment_day = repayment_day_of_the_month
+    if loan_basis == 'weekly':
+        loan.day_of_the_week = str(repayment_day)
+    else:
+        loan.payment_day = str(repayment_day)
 
     loan.duration = duration
     # loan.basis = duration.basis
@@ -180,10 +182,10 @@ def can_get_loan(profile):
         return success, response, requirement
 
     # Check if user meets guarantors requirement
-    if Guarantor.objects.filter(user=profile, confirmed=True).exclude(guarantor=profile).count() < loan_settings.number_of_guarantor:
-        response = f"You must have {loan_settings.number_of_guarantor} guarantor(s) before you can apply for loan"
-        requirement = 'add_guarantor'
-        return success, response, requirement
+    # if Guarantor.objects.filter(user=profile, confirmed=True).exclude(guarantor=profile).count() < loan_settings.number_of_guarantor:
+    #     response = f"You must have {loan_settings.number_of_guarantor} guarantor(s) before you can apply for loan"
+    #     requirement = 'add_guarantor'
+    #     return success, response, requirement
 
     # check if user still have a pending loan
     query = Q(user=profile)

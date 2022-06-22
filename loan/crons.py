@@ -31,8 +31,6 @@ def loan_repayment_cron():
             repay = this_month == month_to_pay and this_date == date_to_pay and this_time >= time_to_pay
 
             if repay is True:
-                print("Auto debit user card")
-
                 profile = loan.user
                 amount = loan.amount_to_repay_split
 

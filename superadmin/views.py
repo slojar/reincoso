@@ -32,7 +32,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import ActivityReportSerializer, WithdrawalSerializer, AdminNotificationSerializer, \
     InvestmentWithdrawalSerializer
-from account.send_email import approved_investment_mail, declined_investment_mail
+from account.send_email import approved_investment_mail, declined_investment_mail, user_loan_processing_status_approved, user_loan_processing_status_unapproved
 
 class AdminHomepage(APIView):
 
@@ -787,6 +787,10 @@ class AdminLoanDetailView(generics.RetrieveUpdateAPIView):
         model_id = 0
         for i in self.get_queryset():
             model_id = i.id
+            if request.data.get("status").lower() == "approved":
+                Thread(target=user_loan_processing_status_approved, args=[request, i]).start()
+            elif request.data.get("status").lower() == "unapproved":
+                Thread(target=user_loan_processing_status_unapproved, args=[request, i]).start()
         create_log(request, model=eval(self.model.strip('')), model_id=model_id)
         return super().update(request, *args, **kwargs)
 
@@ -996,12 +1000,11 @@ class AdminNotificationView(APIView, CustomPagination):
         return Response({"detail": "Message read"})
 
 
-class InvestmentWithdrawalView(generics.ListCreateAPIView):
+class InvestmentWithdrawalView(generics.CreateAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = InvestmentWithdrawalSerializer
     pagination_class = CustomPagination
     queryset = InvestmentWithdrawal.objects.all().order_by('-id')
-    lookup_field = 'id'
 
     def create(self, request, *args, **kwargs):
         user_investment_id = request.data.get("investment")

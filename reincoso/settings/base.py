@@ -188,6 +188,7 @@ LOGGING = {
     },
 }
 
+NAIRA_UNICODE = u"\u20A6"
 
 CRONJOBS = [
     ('* * * * *', 'investment.cron.check_investment_maturity'),

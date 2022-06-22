@@ -35,7 +35,6 @@ class Homepage(APIView):
 
     def get(self, request):
         log.info("Homepage")
-        print("Homepage")
         return HttpResponse('<h1>Reincoso Homepage!!!</h1>')
 
 
@@ -121,7 +120,6 @@ class FeedbackMessageDetailView(RetrieveAPIView):
 class PayMembershipFeeView(APIView):
 
     def post(self, request):
-        print("started payment")
         data = dict()
         site_settings = general_settings()
         gateway = request.data.get('gateway', 'paystack')
@@ -238,11 +236,12 @@ def confirm_guarantorship(request):
 class AddGuarantorView(APIView):
 
     def post(self, request):
-        guarantor = request.data.get('guarantor')
+        guarantor = request.data.get('requestNumber')
+        amount = request.data.get('amount')
         response = []
         for number in guarantor:
             try:
-                guarantor_profile = Profile.objects.get(phone_number=reformat_phone_number(number))
+                guarantor_profile = Profile.objects.get(phone_number=reformat_phone_number(str(number).strip()))
                 guarantor, created = Guarantor.objects.get_or_create(user=request.user.profile,
                                                                      guarantor=guarantor_profile)
                 guarantor.confirmed = False
@@ -266,8 +265,8 @@ class AddGuarantorView(APIView):
                     'detail': 'Guarantor added successfully',
                 })
 
-                    # send notification to guarantor
-                Thread(target=mail_to_guarantor, args=[request, guarantor_profile]).start()
+                # send notification to guarantor
+                Thread(target=mail_to_guarantor, args=[request, guarantor_profile, amount]).start()
             except Profile.DoesNotExist:
                 response.append({
                     'success': False,
@@ -320,7 +319,6 @@ class GetBankView(ListAPIView):
     def get_queryset(self):
         queryset = Bank.objects.all()
         name = self.request.GET.get('name')
-        print(name)
         if name:
             queryset = Bank.objects.filter(name__icontains=name)
         return queryset
