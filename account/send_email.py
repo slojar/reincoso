@@ -404,22 +404,41 @@ Kindly go through it and process as due.
     send_email_using_mailgun(recipient, subject, body)
 
 
-# This hasn't been implemented
-def user_loan_processing_status_mail(request) -> None:
+# Done
+def user_loan_processing_status_approved(request, loan_instance) -> None:
     body = f"""
-Dear {request.user.first_name},
+Dear {loan_instance.user.user.first_name},
 
-Your loan of {naira_unicode}xxxxx has been approved/rejected and the funds will be deposited into the account you gave shortly. 
+Your loan of {naira_unicode}{loan_instance.amount} has been {request.data.get('status')} and the funds will be deposited into the account you gave shortly. 
 Please read the terms and conditions that were emailed to you.
-If rejected- Sorry, you do not match the criteria for a loan at this time, either save more or contact us.
+
 For any further inquiry please contact us on:
 Email - coopadmin@reincoso.com
         """
 
-    recipient = request.user.email
+    recipient = loan_instance.user.user.email
     subject = "Loan processing status"
-
     send_email_using_mailgun(recipient, subject, body)
+
+#Done
+def user_loan_processing_status_unapproved(request, loan_instance) -> None:
+    body = f"""
+Dear {loan_instance.user.user.first_name},
+
+Sorry, Your loan of {naira_unicode}{loan_instance.amount} has been Rejected as you do not match the criteria for a loan at this time, either save more or contact us.
+
+Please read the terms and conditions that were emailed to you.
+
+For any further inquiry please contact us on:
+Email - coopadmin@reincoso.com
+"""
+
+    recipient = loan_instance.user.user.email
+    subject = "Loan processing status"
+    send_email_using_mailgun(recipient, subject, body)
+
+
+
 
 
 def loan_clear_off(request, loan) -> None:

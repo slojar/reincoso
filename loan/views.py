@@ -30,9 +30,6 @@ class ApplyForLoanView(APIView):
         amount = request.GET.get("amount")
         loan_basis = request.GET.get("repayment_frequency", "weekly")
 
-        print("PAYLOAD TO GET OFFER: ", request.GET)
-        print("Authorization: ", self.request.auth)
-
         loan_basis = str(loan_basis).lower()
 
         success, loan_offer = get_loan_offer(request.user.profile)
@@ -81,9 +78,6 @@ class ApplyForLoanView(APIView):
         data = dict()
         amount = request.data.get('amount')
         duration_id = request.data.get('duration')
-
-        print("PAYLOAD TO APPLY: ", request.data)
-        print("Authorization: ", self.request.auth)
 
         if amount < 1000000:
             return Response({"detail": "Requested amount cannot be less than One Million Naira (N1,000,000)"},
@@ -211,8 +205,6 @@ class RepayLoanView(APIView):
         loan = get_object_or_404(Loan, id=loan_id, user=request.user.profile)
         if success and loan.status == 'repaid':
             Thread(target=loan_clear_off, args=[request, amount]).start()
-            print("Sent email to user loan.views, LINE 191")
-
         return Response(data)
 
 

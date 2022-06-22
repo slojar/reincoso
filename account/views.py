@@ -35,7 +35,6 @@ class Homepage(APIView):
 
     def get(self, request):
         log.info("Homepage")
-        print("Homepage")
         return HttpResponse('<h1>Reincoso Homepage!!!</h1>')
 
 
@@ -121,7 +120,6 @@ class FeedbackMessageDetailView(RetrieveAPIView):
 class PayMembershipFeeView(APIView):
 
     def post(self, request):
-        print("started payment")
         data = dict()
         site_settings = general_settings()
         gateway = request.data.get('gateway', 'paystack')
@@ -240,7 +238,6 @@ class AddGuarantorView(APIView):
     def post(self, request):
         guarantor = request.data.get('requestNumber')
         amount = request.data.get('amount')
-        print("Add Guarantor - Payload: ", request.data)
         response = []
         for number in guarantor:
             try:
@@ -322,7 +319,6 @@ class GetBankView(ListAPIView):
     def get_queryset(self):
         queryset = Bank.objects.all()
         name = self.request.GET.get('name')
-        print(name)
         if name:
             queryset = Bank.objects.filter(name__icontains=name)
         return queryset
