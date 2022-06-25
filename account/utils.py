@@ -183,7 +183,8 @@ def get_user_analytics(profile):
 
     savings = dict()
     total_savings = SavingTransaction.objects.filter(user=profile, status='success')
-    savings['total_savings_amount'] = total_savings.aggregate(Sum('amount'))['amount__sum']
+    # savings['total_savings_amount'] = total_savings.aggregate(Sum('amount'))['amount__sum']
+    savings['total_savings_amount'] = Wallet.objects.get(user=profile).balance
     savings['current_saving'] = SavingSerializer(Saving.objects.filter(user=profile).last()).data
 
     loan = dict()
