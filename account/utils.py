@@ -137,6 +137,8 @@ def signup(request):
     profile.gender = gender
     profile.save()
 
+    wallet, _ = Wallet.objects.get_or_create(user=profile)
+
     Thread(target=create_recipient_code, args=[profile, account_no]).start()
     Thread(target=send_welcome_email_to_user, args=[profile]).start()
     success = True
@@ -180,6 +182,7 @@ def tokenize_user_card(data, gateway=None):
 
 def get_user_analytics(profile):
     data = dict()
+    wallet, _ = Wallet.objects.get_or_create(user=profile)
 
     savings = dict()
     total_savings = SavingTransaction.objects.filter(user=profile, status='success')
