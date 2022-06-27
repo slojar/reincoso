@@ -216,7 +216,7 @@ def get_user_analytics(profile):
 
     query = Q(status='approved') | Q(status='ongoing') | Q(status='completed')
     total_money_invested = UserInvestment.objects.filter(user=profile).filter(query)
-    investment['total_money_invested'] = total_money_invested.aggregate(Sum('amount_invested'))['amount_invested__sum']
+    investment['total_money_invested'] = total_money_invested.aggregate(Sum('amount_invested'))['amount_invested__sum'] or 0
 
     query = Q(status='ongoing')
     total_money_expected = UserInvestment.objects.filter(user=profile).filter(query)
