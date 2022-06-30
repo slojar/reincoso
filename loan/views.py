@@ -120,7 +120,9 @@ class ApplyForLoanView(APIView):
 
         # Mail to Admin
         Thread(target=send_email.admin_loan_processing_status_mail, args=[request]).start()
-        
+
+        log_request(request.data, data)
+
         return Response(data)
 
 

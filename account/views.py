@@ -338,16 +338,16 @@ class RequestWithdrawalView(APIView):
             return Response({"detail": "You have a pending withdrawal, please contact admin"},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        log.info(f"WITHDRAWAL_REQUEST_PAYLOADS: {request.data}")
+        new_amount = str(amount).replace(",", "")
 
         user_wallet_balance = user.profile.wallet.balance
 
-        if Decimal(amount) > user_wallet_balance:
+        if Decimal(new_amount) > user_wallet_balance:
             return Response({"detail": "Amount cannot be greater than your total balance"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         withdrawal = Withdrawal.objects.create(requested_by=user)
-        withdrawal.amount = Decimal(amount)
+        withdrawal.amount = Decimal(new_amount)
         withdrawal.description = description
         withdrawal.save()
 
