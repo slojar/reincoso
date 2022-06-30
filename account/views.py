@@ -331,14 +331,14 @@ class RequestWithdrawalView(APIView):
         description = request.data.get('reason', '')
         user = request.user
 
-        print("WITHDRAWAL_REQUEST_PAYLOADS: ", request.data)
-
         if not amount:
             return Response({"detail": "Amount is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         if Withdrawal.objects.filter(requested_by=user, status='pending').exists():
             return Response({"detail": "You have a pending withdrawal, please contact admin"},
                             status=status.HTTP_400_BAD_REQUEST)
+
+        log.info(f"WITHDRAWAL_REQUEST_PAYLOADS: {request.data}")
 
         user_wallet_balance = user.profile.wallet.balance
 
