@@ -331,6 +331,8 @@ class RequestWithdrawalView(APIView):
         description = request.data.get('reason', '')
         user = request.user
 
+        print("WITHDRAWAL_REQUEST_PAYLOADS: ", request.data)
+
         if not amount:
             return Response({"detail": "Amount is required"}, status=status.HTTP_400_BAD_REQUEST)
 
