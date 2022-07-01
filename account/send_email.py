@@ -47,14 +47,12 @@ def send_email_using_mailgun(recipient, subject, message):
 
 def send_welcome_email_to_user(profile):
     body = f'''
-Dear {profile.user.first_name},
+Dear {profile.user.first_name},, 
 
-Reincoso Cooperative Society welcomes you! 
+We're so happy you decided to join us. Here at REINCOSO COOPERATIVE SOCIETY, we think of ourselves and our members as 
+one big family and that means helping you get the financial freedom you deserve.
 
-We're thrilled to have you among us. We consider ourselves fortunate that you picked us and I'd want to express 
-our gratitude on behalf of the whole organization.
-
-In the meanwhile, please visit our website (www.reincosocoop.com) 
+Please visit our website (www.reincosocoop.com)
 to learn more about our products and services.
 '''
     recipient = profile.user.email
