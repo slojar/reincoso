@@ -943,7 +943,7 @@ class AdminWithdrawalView(APIView, CustomPagination):
         try:
             if withdrawal_id:
                 return Response(WithdrawalSerializer(Withdrawal.objects.get(id=withdrawal_id)).data)
-            withdrawal = self.paginate_queryset(Withdrawal.objects.all(), request)
+            withdrawal = self.paginate_queryset(Withdrawal.objects.all().order_by('-id'), request)
             data = WithdrawalSerializer(withdrawal, many=True).data
             data = self.get_paginated_response(data).data
             return Response(data)

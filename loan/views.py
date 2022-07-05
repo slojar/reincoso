@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from account import send_email
+from account.send_email import log_request
 from savings.models import Saving, SavingTransaction
 from rest_framework import status
 from django.utils import timezone
@@ -25,6 +26,12 @@ from humanize import intcomma
 class ApplyForLoanView(APIView):
 
     def get(self, request):
+        user = request.user
+        user_profile = Profile.objects.get(user=user)
+
+        if user_profile.paid_membership_fee is False:
+            return Response({"detail": "Please pay membership fee before requesting for loan"},
+                            status=status.HTTP_400_BAD_REQUEST)
         offer = dict()
         duration = request.GET.get("duration")
         amount = request.GET.get("amount")
@@ -75,6 +82,13 @@ class ApplyForLoanView(APIView):
         return Response(offer)
 
     def post(self, request):
+        user = request.user
+        user_profile = Profile.objects.get(user=user)
+
+        if user_profile.paid_membership_fee is False:
+            return Response({"detail": "Please pay membership fee before requesting for loan"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         data = dict()
         amount = request.data.get('amount')
         duration_id = request.data.get('duration')

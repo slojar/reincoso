@@ -327,9 +327,15 @@ class GetBankView(ListAPIView):
 class RequestWithdrawalView(APIView):
 
     def post(self, request):
+        user = request.user
+        user_profile = Profile.objects.get(user=user)
+
+        if user_profile.paid_membership_fee is False:
+            return Response({"detail": "Please pay membership fee before requesting for withdrawal"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         amount = request.data.get('amount', '')
         description = request.data.get('reason', '')
-        user = request.user
 
         if not amount:
             return Response({"detail": "Amount is required"}, status=status.HTTP_400_BAD_REQUEST)
