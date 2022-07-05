@@ -46,19 +46,23 @@ def send_email_using_mailgun(recipient, subject, message):
 
 
 def send_welcome_email_to_user(profile):
-    body = f'''
-Dear {profile.user.first_name},, 
+    body = """
+<div class='entry' style='color:black'>
+        Dear {{ name }},<br><br>
 
-We're so happy you decided to join us. Here at REINCOSO COOPERATIVE SOCIETY, we think of ourselves and our members as 
-one big family and that means helping you get the financial freedom you deserve.
-
-Please visit our website (www.reincosocoop.com)
-to learn more about our products and services.
-'''
-    recipient = profile.user.email
+        We're so happy you decided to join us. Here at REINCOSO COOPERATIVE SOCIETY, we think of ourselves and our members as 
+        one big family and that means helping you get the financial freedom you deserve.
+        
+        Please visit our website <a href='https://www.reincosocoop.com'>www.reincosocoop.com</a>
+        to learn more about our products and services.
+</div>
+    """
     subject = "Welcome to REINCOSO"
-
-    send_email_using_mailgun(recipient, subject, body)
+    return requests.post("https://api.mailgun.net/v3/reincosocoop.com/messages", auth=("api", api_key), data={
+        "from": "Reincoso <no-reply@reincosocoop.com>", "to": [profile.user.email], "subject": subject,
+        "template": "welcome.html", "t:variables": json.dumps({"name": profile.user.first_name})
+    })
+    # send_email_using_mailgun(recipient, subject, body)
 
 
 def successful_membership_fee_payment(trans) -> None:
