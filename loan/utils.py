@@ -166,19 +166,19 @@ def can_get_loan(profile):
     # check if user paid member fee
     if profile.paid_membership_fee is False:
         response = 'You have not paid the one-time membership fee, please pay'
-        requirement = 'pay_membership_fee'
+        requirement = 'payMembership'
         return success, response, requirement
 
     # check if user account is active
     if profile.status != 'active':
         response = f'Your account is {profile.status}, please contact admin'
-        requirement = 'activate_account'
+        requirement = 'activateAccount'
         return success, response, requirement
 
     # Check if user have valid card
     if not UserCard.objects.filter(user=profile).exists():
         response = 'No valid card in your account, please add a card to qualify for loan'
-        requirement = 'add_card'
+        requirement = 'addCard'
         return success, response, requirement
 
     # Check if user meets guarantors requirement

@@ -26,16 +26,18 @@ from humanize import intcomma
 class ApplyForLoanView(APIView):
 
     def get(self, request):
-        user = request.user
-        user_profile = Profile.objects.get(user=user)
 
-        if user_profile.paid_membership_fee is False:
-            return Response({"detail": "Please pay membership fee before requesting for loan"},
-                            status=status.HTTP_400_BAD_REQUEST)
         offer = dict()
         duration = request.GET.get("duration")
         amount = request.GET.get("amount")
         loan_basis = request.GET.get("repayment_frequency", "weekly")
+
+        data = dict()
+        success, response, requirement = can_get_loan(request.user.profile)
+        if not success:
+            data['detail'] = response
+            data['code'] = requirement
+            return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
         loan_basis = str(loan_basis).lower()
 
@@ -82,12 +84,6 @@ class ApplyForLoanView(APIView):
         return Response(offer)
 
     def post(self, request):
-        user = request.user
-        user_profile = Profile.objects.get(user=user)
-
-        if user_profile.paid_membership_fee is False:
-            return Response({"detail": "Please pay membership fee before requesting for loan"},
-                            status=status.HTTP_400_BAD_REQUEST)
 
         data = dict()
         amount = request.data.get('amount')
