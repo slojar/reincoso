@@ -33,11 +33,12 @@ class ApplyForLoanView(APIView):
         loan_basis = request.GET.get("repayment_frequency", "weekly")
 
         data = dict()
-        success, response, requirement = can_get_loan(request.user.profile)
+        success, response, requirement, response_code = can_get_loan(request.user.profile)
         if not success:
             data['detail'] = response
-            data['code'] = requirement
-            return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+            data['reason'] = requirement
+            data['code'] = response_code
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
         loan_basis = str(loan_basis).lower()
 
@@ -110,12 +111,12 @@ class ApplyForLoanView(APIView):
             data['detail'] = f"You cannot get loan more than the offered amount of {loan_offer}"
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
-        success, response, requirement = can_get_loan(request.user.profile)
+        success, response, requirement, response_code = can_get_loan(request.user.profile)
         if not success:
-            if not success:
-                data['detail'] = response
-                data['code'] = requirement
-                return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+            data['detail'] = response
+            data['reason'] = requirement
+            data['code'] = response_code
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
         profile = request.user.profile
         success, response = create_loan(request, profile, amount, duration)

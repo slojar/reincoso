@@ -167,19 +167,22 @@ def can_get_loan(profile):
     if profile.paid_membership_fee is False:
         response = 'You have not paid the one-time membership fee, please pay'
         requirement = 'payMembership'
-        return success, response, requirement
+        response_code = "91"
+        return success, response, requirement, response_code
 
     # check if user account is active
     if profile.status != 'active':
         response = f'Your account is {profile.status}, please contact admin'
         requirement = 'activateAccount'
-        return success, response, requirement
+        response_code = "92"
+        return success, response, requirement, response_code
 
     # Check if user have valid card
     if not UserCard.objects.filter(user=profile).exists():
         response = 'No valid card in your account, please add a card to qualify for loan'
         requirement = 'addCard'
-        return success, response, requirement
+        response_code = "93"
+        return success, response, requirement, response_code
 
     # Check if user meets guarantors requirement
     # if Guarantor.objects.filter(user=profile, confirmed=True).exclude(guarantor=profile).count() < loan_settings.number_of_guarantor:
@@ -192,13 +195,15 @@ def can_get_loan(profile):
     exclude = Q(status='unapproved') | Q(status='repaid')
     if Loan.objects.filter(query).exclude(exclude).exists():
         response = f"You cannot apply for a loan at the moment because you still have a loan running on your account."
-        requirement = 'active_loan'
-        return success, response, requirement
+        requirement = 'pendingLoan'
+        response_code = "94"
+        return success, response, requirement, response_code
 
     success = True
     response = "Eligible for loan"
     requirement = 'fulfilled'
-    return success, response, requirement
+    response_code = "00"
+    return success, response, requirement, response_code
 
 
 def verify_loan_repayment(gateway, reference):
