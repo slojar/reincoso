@@ -57,6 +57,9 @@ class ApplyForLoanView(APIView):
 
         if not duration:
             offer['durations'] = LoanDurationSerializer(LoanDuration.objects.all(), many=True).data
+            offer['detail'] = "You are eligible for a loan"
+            offer['reason'] = "Eligible"
+            offer['code'] = "00"
 
         if duration:
             try:
