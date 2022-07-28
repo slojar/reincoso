@@ -42,9 +42,13 @@ class ApplyForLoanView(APIView):
 
         loan_basis = str(loan_basis).lower()
 
-        success, loan_offer = get_loan_offer(request.user.profile)
+        success, loan_offer, required, err_code = get_loan_offer(request.user.profile)
         if success is False:
-            return Response({"detail": loan_offer}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({
+                "detail": loan_offer,
+                "reason": required,
+                "code": err_code
+            }, status=status.HTTP_401_UNAUTHORIZED)
 
         if amount:
             loan_offer = decimal.Decimal(amount)
@@ -81,6 +85,9 @@ class ApplyForLoanView(APIView):
             # offer['detail'] = f"You pay {split} for {repayment_count} {loan_basis[:-2]}(s)"
             naira_unicode = settings.NAIRA_UNICODE
             offer['detail'] = f"You pay {naira_unicode}{intcomma(split, 2)} for {repayment_count} {loan_basis[:-2]}(s)"
+            offer['reason'] = "Eligible"
+            offer['code'] = "00"
+
         # print("success on loa")
         return Response(offer)
 

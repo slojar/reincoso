@@ -21,7 +21,9 @@ def get_loan_offer(profile):
     if not savings_transaction:
         response = "Sorry, you are unable to get a loan right now. make sure you have saved for at least " \
                          "6 months before applying for loan."
-        return success, response
+        requirement = 'sixMonth'
+        response_code = "95"
+        return success, response, requirement, response_code
 
     first_savings_date = savings_transaction.created_on
     last_six_month = timezone.now() - timezone.timedelta(days=loan_settings.eligibility_days)
@@ -30,19 +32,23 @@ def get_loan_offer(profile):
     if not eligible:
         response = "Sorry, you are unable to get a loan right now. make sure you have saved for at least " \
                          "6 months before applying for loan."
-        return success, response
+        requirement = 'sixMonth'
+        response_code = "95"
+        return success, response, requirement, response_code
 
     balance = profile.wallet.balance
 
     if balance < 1000000:
         response = "Sorry, you are unable to get a loan right now. make sure you have saved up to One Million Naira " \
                    "(N1,000,000) before applying for loan."
-        return success, response
+        requirement = 'lowSaving'
+        response_code = "96"
+        return success, response, requirement, response_code
 
     success = True
     response = round(balance * loan_settings.offer, 2)
     # response = round(savings_transaction.saving.total * loan_settings.offer, 2)
-    return success, response
+    return success, response, "Eligible", "00"
 
 
 def get_loan_repayment_count(loan):
