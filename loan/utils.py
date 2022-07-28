@@ -201,7 +201,7 @@ def can_get_loan(profile):
 
     success = True
     response = "Eligible for loan"
-    requirement = 'fulfilled'
+    requirement = 'Eligible'
     response_code = "00"
     return success, response, requirement, response_code
 

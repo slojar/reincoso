@@ -46,14 +46,13 @@ class ApplyForLoanView(APIView):
         if success is False:
             return Response({"detail": loan_offer}, status=status.HTTP_401_UNAUTHORIZED)
 
-        loan_offer_amount = 0
         if amount:
-            loan_offer_amount = decimal.Decimal(amount)
+            loan_offer = decimal.Decimal(amount)
 
-        data['offered_amount'] = amount = loan_offer_amount
+        offer['offered_amount'] = amount = loan_offer
 
         if not duration:
-            data['durations'] = LoanDurationSerializer(LoanDuration.objects.all(), many=True).data
+            offer['durations'] = LoanDurationSerializer(LoanDuration.objects.all(), many=True).data
 
         if duration:
             try:
@@ -61,15 +60,15 @@ class ApplyForLoanView(APIView):
             except LoanDuration.DoesNotExist:
                 return Response({"detail": "Invalid duration selected"}, status=status.HTTP_404_NOT_FOUND)
 
-            data['duration_title'] = duration.title
+            offer['duration_title'] = duration.title
             # offer['payment_basis'] = duration.basis
-            data['payment_basis'] = loan_basis
+            offer['payment_basis'] = loan_basis
             # offer['payment_duration'] = duration.duration
             repayment_count = calculate_loan_repayment_duration(loan_basis, duration)
-            data['payment_duration'] = repayment_count
-            data['percentage'] = duration.percentage
-            data['total_percentage'] = total_percentage = (amount * duration.percentage) / 100
-            data['total_repayment'] = total_repayment = amount + total_percentage
+            offer['payment_duration'] = repayment_count
+            offer['percentage'] = duration.percentage
+            offer['total_percentage'] = total_percentage = (amount * duration.percentage) / 100
+            offer['total_repayment'] = total_repayment = amount + total_percentage
             # split = round(total_repayment / duration.duration, 2)
             split = round(total_repayment / repayment_count, 2)
             payment_split = list()
@@ -78,12 +77,12 @@ class ApplyForLoanView(APIView):
                 payment_split.append({
                     'amount': split
                 })
-            data['repayment_split'] = payment_split
+            offer['repayment_split'] = payment_split
             # offer['detail'] = f"You pay {split} for {repayment_count} {loan_basis[:-2]}(s)"
             naira_unicode = settings.NAIRA_UNICODE
-            data['detail'] = f"You pay {naira_unicode}{intcomma(split, 2)} for {repayment_count} {loan_basis[:-2]}(s)"
+            offer['detail'] = f"You pay {naira_unicode}{intcomma(split, 2)} for {repayment_count} {loan_basis[:-2]}(s)"
         # print("success on loa")
-        return Response(data)
+        return Response(offer)
 
     def post(self, request):
 
