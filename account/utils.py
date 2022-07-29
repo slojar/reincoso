@@ -193,7 +193,7 @@ def get_user_analytics(profile):
     loan = dict()
     loan_transactions = LoanTransaction.objects.filter(user=profile, status='success')
     res = loan_transactions.aggregate(Sum('amount'))['amount__sum']
-    if not res:
+    if res is None:
         loan['loan_transaction_amount'] = 0.0
     loan['loan_transaction_amount'] = res
     loan['current_loans'] = LoanSerializer(Loan.objects.filter(user=profile, status='ongoing'), many=True).data
