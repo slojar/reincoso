@@ -171,7 +171,7 @@ def can_get_loan(profile):
 
     # check if user paid member fee
     if profile.paid_membership_fee is False:
-        response = 'You have not paid the one-time membership fee, please pay'
+        response = 'You have not paid the one-time membership fee. Please click the link to pay'
         requirement = 'payMembership'
         response_code = "91"
         return success, response, requirement, response_code
