@@ -13,9 +13,11 @@ from investment.models import UserInvestment
 from investment.serializers import UserInvestmentSerializer
 from loan.models import LoanTransaction, Loan
 from loan.serializers import LoanSerializer
-from modules.paystack import validate_account_no, create_recipient_code
+from modules.paystack import validate_account_no, create_recipient_code, get_paystack_link
 from savings.models import SavingTransaction, Saving
 from savings.serializers import SavingSerializer
+from settings.utils import general_settings
+from transaction.models import Transaction
 from .models import *
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
@@ -231,6 +233,54 @@ def get_user_analytics(profile):
     data['loan'] = loan
 
     return data
+
+
+def pay_membership(request):
+    data = dict()
+    site_settings = general_settings()
+    gateway = request.data.get('gateway', 'paystack')
+    callback_url = request.data.get('callback_url')
+
+    if not gateway or gateway is None or gateway == 'null':
+        gateway = 'paystack'
+
+    if not callback_url:
+        # Findings
+        # 1. The call_back url here was supposed to be /verify-payment/
+        # 2. I noticed that, if i choose the decline option on the paystack option for payment
+        # It doesn't do anything, therefore not allowing me send a Failed Payment Email to user.
+        # callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
+        # callback_url = f"{request.scheme}://{request.get_host()}/verify-payment/{request.path}"
+        # callback_url = f"{request.scheme}://{request.get_host()}/verify-payment/"
+        callback_url = "http://194.99.21.192:8585/reincoso/verifypayment"
+
+    email = request.user.email
+    profile = request.user.profile
+    amount = site_settings.membership_fee
+
+    # create transaction for membership payment
+    trans, created = Transaction.objects.get_or_create(user=request.user.profile, transaction_type='membership fee',
+                                                       status='pending')
+    trans.payment_method = gateway
+    trans.amount = amount
+    trans.save()
+
+    metadata = {
+        'transaction_id': trans.id,
+        'payment_for': 'membership fee',
+    }
+    if gateway == 'paystack':
+        success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url,
+                                              metadata=metadata)
+        if success is True:
+            data['payment_link'] = response
+            data['membership_id'] = profile.member_id
+            # profile.paid_membership_fee = True
+            profile.save()
+        else:
+            data['detail'] = response
+    return data
+
 
 
 

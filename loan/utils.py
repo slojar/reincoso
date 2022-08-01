@@ -7,7 +7,7 @@ from settings.models import LoanSetting
 from account.models import UserCard, Guarantor
 from django.db.models import Q
 from modules.paystack import get_paystack_link, paystack_auto_charge, verify_paystack_transaction
-from account.utils import tokenize_user_card
+from account.utils import tokenize_user_card, pay_membership
 from threading import Thread
 from account.send_email import loan_clear_off
 
@@ -165,13 +165,17 @@ def create_loan(request, profile, amount, duration):
     return success, response
 
 
-def can_get_loan(profile):
+def can_get_loan(request):
+    profile = request.user.profile
     success = False
     loan_settings = LoanSetting.objects.get(site=Site.objects.get_current())
 
     # check if user paid member fee
     if profile.paid_membership_fee is False:
-        response = 'You have not paid the one-time membership fee. Please click the link to pay'
+        link = pay_membership(request)
+        payment_link = link["payment_link"]
+        response = f"You can not proceed because you have not paid the one-time membership fee. " \
+                   f"Please click the link to pay {payment_link}"
         requirement = 'payMembership'
         response_code = "91"
         return success, response, requirement, response_code

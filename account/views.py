@@ -120,48 +120,7 @@ class FeedbackMessageDetailView(RetrieveAPIView):
 class PayMembershipFeeView(APIView):
 
     def post(self, request):
-        data = dict()
-        site_settings = general_settings()
-        gateway = request.data.get('gateway', 'paystack')
-        callback_url = request.data.get('callback_url')
-
-        if not gateway or gateway is None or gateway == 'null':
-            gateway = 'paystack'
-
-        if not callback_url:
-            # Findings
-            # 1. The call_back url here was supposed to be /verify-payment/
-            # 2. I noticed that, if i choose the decline option on the paystack option for payment
-            # It doesn't do anything, therefore not allowing me send a Failed Payment Email to user.
-            callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
-            # callback_url = f"{request.scheme}://{request.get_host()}/verify-payment/{request.path}"
-            # print(callback_url)
-
-        email = request.user.email
-        profile = request.user.profile
-        amount = site_settings.membership_fee
-
-        # create transaction for membership payment
-        trans, created = Transaction.objects.get_or_create(user=request.user.profile, transaction_type='membership fee',
-                                                           status='pending')
-        trans.payment_method = gateway
-        trans.amount = amount
-        trans.save()
-
-        metadata = {
-            'transaction_id': trans.id,
-            'payment_for': 'membership fee',
-        }
-        if gateway == 'paystack':
-            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url,
-                                                  metadata=metadata)
-            if success is True:
-                data['payment_link'] = response
-                data['membership_id'] = profile.member_id
-                # profile.paid_membership_fee = True
-                profile.save()
-            else:
-                data['detail'] = response
+        data = pay_membership(request)
         return Response(data)
 
 
