@@ -36,6 +36,7 @@ EMAIL_API_URL = env('EMAIL_API_URL')
 EMAIL_API_KEY = env('EMAIL_API_KEY')
 EMAIL_SENDER = env('EMAIL_SENDER')
 
+CALLBACK_URL = env("CALLBACK_URL")
 
 #CORS_ALLOWED_ORIGINS = [
 #    "http://reincosocoop.com"

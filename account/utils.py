@@ -252,7 +252,7 @@ def pay_membership(request):
         # callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
         # callback_url = f"{request.scheme}://{request.get_host()}/verify-payment/{request.path}"
         # callback_url = f"{request.scheme}://{request.get_host()}/verify-payment/"
-        callback_url = "http://194.99.21.192:8585/reincoso/verifypayment"
+        callback_url = settings.CALLBACK_URL
 
     email = request.user.email
     profile = request.user.profile
