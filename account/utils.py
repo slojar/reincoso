@@ -193,7 +193,8 @@ def get_user_analytics(profile):
     savings['current_saving'] = SavingSerializer(Saving.objects.filter(user=profile).last()).data
 
     loan = dict()
-    loan_transactions = LoanTransaction.objects.filter(user=profile, status='success')
+    # loan_transactions = LoanTransaction.objects.filter(user=profile, status='success')
+    loan_transactions = Loan.objects.filter(user=profile, status='approved')
 
     loan['loan_transaction_amount'] = loan_transactions.aggregate(Sum('amount'))['amount__sum'] or 0
     loan['current_loans'] = LoanSerializer(Loan.objects.filter(user=profile, status='ongoing'), many=True).data
