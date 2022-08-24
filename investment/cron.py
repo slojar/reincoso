@@ -25,5 +25,10 @@ def investment_maturity_check() -> None:
             send_email_using_mailgun(recipient=investment.user.user.email, subject=subject, message=body)
 
 
+def update_investment_yield():
+    investments = UserInvestment.objects.filter(status="ongoing", end_date__lt=timezone.datetime.now())
+
+    print(investments)
+    ...
 def execute_investment_maturity_check():
     Thread(target=investment_maturity_check).start()
