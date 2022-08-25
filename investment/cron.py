@@ -13,7 +13,7 @@ from django.conf import settings
 naira_unicode = settings.NAIRA_UNICODE
 
 
-def investment_maturity_check() -> None:
+def investment_maturity_check():
     matured = UserInvestment.objects.filter(status="approved", end_date__date=timezone.now().date())
     subject: str = "Investment with Reincoso"
 
@@ -27,6 +27,8 @@ def investment_maturity_check() -> None:
     Email - coopadmin@reincoso.com
     """
             send_email_using_mailgun(recipient=investment.user.user.email, subject=subject, message=body)
+
+    return True
 
 
 def update_investment_yield():

@@ -164,15 +164,13 @@ class InvestPaymentView(APIView):
         return Response(data)
 
 
-@csrf_exempt
-def investment_maturity_cron_view(request):
+def investment_maturity_cron_view():
     Thread(target=investment_maturity_check).start()
-    return JsonResponse({"detail", "Investment Maturity Cron Ran Successfully"})
+    return Response({"detail", "Investment Maturity Cron Ran Successfully"})
 
 
-@csrf_exempt
-def investment_yield_cron_view(request):
+def investment_yield_cron_view():
     Thread(target=update_investment_yield).start()
-    return JsonResponse({"detail", "Investment Increment Cron Ran Successfully"})
+    return Response({"detail", "Investment Increment Cron Ran Successfully"})
 
 
