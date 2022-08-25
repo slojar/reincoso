@@ -164,13 +164,20 @@ class InvestPaymentView(APIView):
         return Response(data)
 
 
-def investment_maturity_cron_view():
-    Thread(target=investment_maturity_check).start()
-    return Response({"detail", "Investment Maturity Cron Ran Successfully"})
+class InvestmentMaturityCronView(APIView):
+    permission_classes = []
+
+    def get(self, request):
+        Thread(target=investment_maturity_check).start()
+        return Response({"detail": "Investment Maturity Cron Ran Successfully"})
 
 
-def investment_yield_cron_view():
-    Thread(target=update_investment_yield).start()
-    return Response({"detail", "Investment Increment Cron Ran Successfully"})
+class InvestmentYieldCronView(APIView):
+    permission_classes = []
+
+    def get(self, request):
+        Thread(target=update_investment_yield).start()
+        return Response({"detail": "Investment Increment Cron Ran Successfully"})
+
 
 
