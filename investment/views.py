@@ -5,6 +5,7 @@ from threading import Thread
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
@@ -163,11 +164,13 @@ class InvestPaymentView(APIView):
         return Response(data)
 
 
+@csrf_exempt
 def investment_maturity_cron_view(request):
     Thread(target=investment_maturity_check).start()
     return JsonResponse({"detail", "Investment Maturity Cron Ran Successfully"})
 
 
+@csrf_exempt
 def investment_yield_cron_view(request):
     Thread(target=update_investment_yield).start()
     return JsonResponse({"detail", "Investment Increment Cron Ran Successfully"})
