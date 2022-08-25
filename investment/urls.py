@@ -19,7 +19,7 @@ urlpatterns = [
     path('<str:id>/options/', views.InvestmentOptionsView.as_view()),
 
     # CRONJOB
-    path('investment-maturity/', investment_maturity_cron_view),
-    path('investment-maturity/', investment_yield_cron_view),
+    path('maturity-check-cron/', investment_maturity_cron_view),
+    path('interest-cron/', investment_yield_cron_view),
 ]
 
