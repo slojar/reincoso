@@ -3,6 +3,7 @@ import logging
 from threading import Thread
 
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -12,6 +13,7 @@ from rest_framework import generics
 from account.send_email import failed_investment_mail, successful_investment_mail
 
 from loan.paginations import CustomPagination
+from .cron import investment_maturity_check, update_investment_yield
 from .models import *
 from .serializers import *
 from .utils import *
@@ -159,3 +161,15 @@ class InvestPaymentView(APIView):
             data['data'] = UserInvestmentSerializer(UserInvestment.objects.get(id=investment_id, user=user)).data
 
         return Response(data)
+
+
+def investment_maturity_cron_view(request):
+    Thread(target=investment_maturity_check).start()
+    return JsonResponse({"detail", "Investment Maturity Cron Ran Successfully"})
+
+
+def investment_yield_cron_view(request):
+    Thread(target=update_investment_yield).start()
+    return JsonResponse({"detail", "Investment Increment Cron Ran Successfully"})
+
+

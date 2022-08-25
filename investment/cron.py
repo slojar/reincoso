@@ -1,6 +1,10 @@
 from ast import arg
 from threading import Thread
+
+from django.db.models import Sum
+
 from account.models import Profile
+from superadmin.models import InvestmentWithdrawal
 from .models import Investment, UserInvestment
 from django.utils import timezone
 from account.send_email import send_email_using_mailgun
@@ -26,9 +30,21 @@ def investment_maturity_check() -> None:
 
 
 def update_investment_yield():
-    investments = UserInvestment.objects.filter(status="ongoing", end_date__lt=timezone.datetime.now())
+    investments = UserInvestment.objects.filter(status="approved", end_date__lte=timezone.datetime.now())
 
-    print(investments)
-    ...
-def execute_investment_maturity_check():
-    Thread(target=investment_maturity_check).start()
+    for investment in investments:
+        withdrawal = InvestmentWithdrawal.objects.filter(investment=investment, status="disbursed")
+        withdrawn_amount = withdrawal.aggregate(Sum('amount_requested'))['amount_requested__sum'] or 0
+        roi = investment.return_on_invested
+        amount_invested = investment.amount_invested
+
+        profit = roi - amount_invested
+        if withdrawn_amount > 0:
+            profit = (roi - amount_invested) - withdrawn_amount
+        profit_split = profit / 12
+        investment.amount_yield += profit_split
+        investment.save()
+
+    return True
+
+
