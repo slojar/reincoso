@@ -32,7 +32,7 @@ def investment_maturity_check():
 
 
 def update_investment_yield():
-    investments = UserInvestment.objects.filter(status="approved", end_date__lte=timezone.datetime.now())
+    investments = UserInvestment.objects.filter(status="approved", end_date__gte=timezone.datetime.now())
 
     for investment in investments:
         withdrawal = InvestmentWithdrawal.objects.filter(investment=investment, status="disbursed")
