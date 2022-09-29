@@ -35,7 +35,6 @@ class Homepage(APIView):
 
     def get(self, request):
         log.info("Homepage")
-        print("Homepage")
         return HttpResponse('<h1>Reincoso Homepage!!!</h1>')
 
 
@@ -121,49 +120,7 @@ class FeedbackMessageDetailView(RetrieveAPIView):
 class PayMembershipFeeView(APIView):
 
     def post(self, request):
-        print("started payment")
-        data = dict()
-        site_settings = general_settings()
-        gateway = request.data.get('gateway', 'paystack')
-        callback_url = request.data.get('callback_url')
-
-        if not gateway or gateway is None or gateway == 'null':
-            gateway = 'paystack'
-
-        if not callback_url:
-            # Findings
-            # 1. The call_back url here was supposed to be /verify-payment/
-            # 2. I noticed that, if i choose the decline option on the paystack option for payment
-            # It doesn't do anything, therefore not allowing me send a Failed Payment Email to user.
-            callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
-            # callback_url = f"{request.scheme}://{request.get_host()}/verify-payment/{request.path}"
-            # print(callback_url)
-
-        email = request.user.email
-        profile = request.user.profile
-        amount = site_settings.membership_fee
-
-        # create transaction for membership payment
-        trans, created = Transaction.objects.get_or_create(user=request.user.profile, transaction_type='membership fee',
-                                                           status='pending')
-        trans.payment_method = gateway
-        trans.amount = amount
-        trans.save()
-
-        metadata = {
-            'transaction_id': trans.id,
-            'payment_for': 'membership fee',
-        }
-        if gateway == 'paystack':
-            success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url,
-                                                  metadata=metadata)
-            if success is True:
-                data['payment_link'] = response
-                data['membership_id'] = profile.member_id
-                # profile.paid_membership_fee = True
-                profile.save()
-            else:
-                data['detail'] = response
+        data = pay_membership(request)
         return Response(data)
 
 
@@ -238,12 +195,12 @@ def confirm_guarantorship(request):
 class AddGuarantorView(APIView):
 
     def post(self, request):
-        guarantor = request.data.get('guarantor')
+        guarantor = request.data.get('requestNumber')
         amount = request.data.get('amount')
         response = []
         for number in guarantor:
             try:
-                guarantor_profile = Profile.objects.get(phone_number=reformat_phone_number(number))
+                guarantor_profile = Profile.objects.get(phone_number=reformat_phone_number(str(number).strip()))
                 guarantor, created = Guarantor.objects.get_or_create(user=request.user.profile,
                                                                      guarantor=guarantor_profile)
                 guarantor.confirmed = False
@@ -267,7 +224,7 @@ class AddGuarantorView(APIView):
                     'detail': 'Guarantor added successfully',
                 })
 
-                    # send notification to guarantor
+                # send notification to guarantor
                 Thread(target=mail_to_guarantor, args=[request, guarantor_profile, amount]).start()
             except Profile.DoesNotExist:
                 response.append({
@@ -319,9 +276,8 @@ class GetBankView(ListAPIView):
     serializer_class = BankSerializer
 
     def get_queryset(self):
-        queryset = Bank.objects.all()
+        queryset = Bank.objects.all().order_by('id')
         name = self.request.GET.get('name')
-        print(name)
         if name:
             queryset = Bank.objects.filter(name__icontains=name)
         return queryset
@@ -330,9 +286,10 @@ class GetBankView(ListAPIView):
 class RequestWithdrawalView(APIView):
 
     def post(self, request):
+        user = request.user
+
         amount = request.data.get('amount', '')
         description = request.data.get('reason', '')
-        user = request.user
 
         if not amount:
             return Response({"detail": "Amount is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -341,14 +298,16 @@ class RequestWithdrawalView(APIView):
             return Response({"detail": "You have a pending withdrawal, please contact admin"},
                             status=status.HTTP_400_BAD_REQUEST)
 
+        new_amount = str(amount).replace(",", "")
+
         user_wallet_balance = user.profile.wallet.balance
 
-        if Decimal(amount) > user_wallet_balance:
+        if Decimal(new_amount) > user_wallet_balance:
             return Response({"detail": "Amount cannot be greater than your total balance"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         withdrawal = Withdrawal.objects.create(requested_by=user)
-        withdrawal.amount = Decimal(amount)
+        withdrawal.amount = Decimal(new_amount)
         withdrawal.description = description
         withdrawal.save()
 

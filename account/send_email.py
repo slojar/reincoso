@@ -46,21 +46,23 @@ def send_email_using_mailgun(recipient, subject, message):
 
 
 def send_welcome_email_to_user(profile):
-    body = f'''
-Dear {profile.user.first_name},
+    body = """
+<div class='entry' style='color:black'>
+        Dear {{ name }},<br><br>
 
-Reincoso Cooperative Society welcomes you! 
-
-We're thrilled to have you among us. We consider ourselves fortunate that you picked us and I'd want to express 
-our gratitude on behalf of the whole organization.
-
-In the meanwhile, please visit our website (www.reincosocoop.com) 
-to learn more about our products and services.
-'''
-    recipient = profile.user.email
+        We're so happy you decided to join us. Here at REINCOSO COOPERATIVE SOCIETY, we think of ourselves and our members as 
+        one big family and that means helping you get the financial freedom you deserve.
+        
+        Please visit our website <a href='https://www.reincosocoop.com'>www.reincosocoop.com</a>
+        to learn more about our products and services.
+</div>
+    """
     subject = "Welcome to REINCOSO"
-
-    send_email_using_mailgun(recipient, subject, body)
+    return requests.post("https://api.mailgun.net/v3/reincosocoop.com/messages", auth=("api", api_key), data={
+        "from": "Reincoso <no-reply@reincosocoop.com>", "to": [profile.user.email], "subject": subject,
+        "template": "welcome.html", "t:variables": json.dumps({"name": profile.user.first_name})
+    })
+    # send_email_using_mailgun(recipient, subject, body)
 
 
 def successful_membership_fee_payment(trans) -> None:
@@ -374,7 +376,7 @@ Email - coopadmin@reincoso.com
 def inform_user_of_added_guarantor(request) -> None:
 
     amount = request.data.get("amount")
-    guarantor = ", ".join(list(request.data.get("guarantor")))
+    guarantor = ", ".join(list(request.data.get("requestNumber")))
     body = f"""
 Dear {request.user.first_name},
 
@@ -404,22 +406,41 @@ Kindly go through it and process as due.
     send_email_using_mailgun(recipient, subject, body)
 
 
-# This hasn't been implemented
-def user_loan_processing_status_mail(request) -> None:
+# Done
+def user_loan_processing_status_approved(request, loan_instance) -> None:
     body = f"""
-Dear {request.user.first_name},
+Dear {loan_instance.user.user.first_name},
 
-Your loan of {naira_unicode}xxxxx has been approved/rejected and the funds will be deposited into the account you gave shortly. 
+Your loan of {naira_unicode}{loan_instance.amount} has been {request.data.get('status')} and the funds will be deposited into the account you gave shortly. 
 Please read the terms and conditions that were emailed to you.
-If rejected- Sorry, you do not match the criteria for a loan at this time, either save more or contact us.
+
 For any further inquiry please contact us on:
 Email - coopadmin@reincoso.com
         """
 
-    recipient = request.user.email
+    recipient = loan_instance.user.user.email
     subject = "Loan processing status"
-
     send_email_using_mailgun(recipient, subject, body)
+
+#Done
+def user_loan_processing_status_unapproved(request, loan_instance) -> None:
+    body = f"""
+Dear {loan_instance.user.user.first_name},
+
+Sorry, Your loan of {naira_unicode}{loan_instance.amount} has been Rejected as you do not match the criteria for a loan at this time, either save more or contact us.
+
+Please read the terms and conditions that were emailed to you.
+
+For any further inquiry please contact us on:
+Email - coopadmin@reincoso.com
+"""
+
+    recipient = loan_instance.user.user.email
+    subject = "Loan processing status"
+    send_email_using_mailgun(recipient, subject, body)
+
+
+
 
 
 def loan_clear_off(request, loan) -> None:

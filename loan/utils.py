@@ -7,7 +7,7 @@ from settings.models import LoanSetting
 from account.models import UserCard, Guarantor
 from django.db.models import Q
 from modules.paystack import get_paystack_link, paystack_auto_charge, verify_paystack_transaction
-from account.utils import tokenize_user_card
+from account.utils import tokenize_user_card, pay_membership
 from threading import Thread
 from account.send_email import loan_clear_off
 
@@ -21,7 +21,9 @@ def get_loan_offer(profile):
     if not savings_transaction:
         response = "Sorry, you are unable to get a loan right now. make sure you have saved for at least " \
                          "6 months before applying for loan."
-        return success, response
+        requirement = 'sixMonth'
+        response_code = "95"
+        return success, response, requirement, response_code
 
     first_savings_date = savings_transaction.created_on
     last_six_month = timezone.now() - timezone.timedelta(days=loan_settings.eligibility_days)
@@ -30,19 +32,23 @@ def get_loan_offer(profile):
     if not eligible:
         response = "Sorry, you are unable to get a loan right now. make sure you have saved for at least " \
                          "6 months before applying for loan."
-        return success, response
+        requirement = 'sixMonth'
+        response_code = "95"
+        return success, response, requirement, response_code
 
     balance = profile.wallet.balance
 
     if balance < 1000000:
         response = "Sorry, you are unable to get a loan right now. make sure you have saved up to One Million Naira " \
                    "(N1,000,000) before applying for loan."
-        return success, response
+        requirement = 'lowSaving'
+        response_code = "96"
+        return success, response, requirement, response_code
 
     success = True
     response = round(balance * loan_settings.offer, 2)
     # response = round(savings_transaction.saving.total * loan_settings.offer, 2)
-    return success, response
+    return success, response, "Eligible", "00"
 
 
 def get_loan_repayment_count(loan):
@@ -159,46 +165,55 @@ def create_loan(request, profile, amount, duration):
     return success, response
 
 
-def can_get_loan(profile):
+def can_get_loan(request):
+    profile = request.user.profile
     success = False
     loan_settings = LoanSetting.objects.get(site=Site.objects.get_current())
 
     # check if user paid member fee
     if profile.paid_membership_fee is False:
-        response = 'You have not paid the one-time membership fee, please pay'
-        requirement = 'pay_membership_fee'
-        return success, response, requirement
+        link = pay_membership(request)
+        payment_link = link["payment_link"]
+        response = f"You can not proceed because you have not paid the one-time membership fee. " \
+                   f"Please click the link to pay {payment_link}"
+        requirement = 'payMembership'
+        response_code = "91"
+        return success, response, requirement, response_code
 
     # check if user account is active
     if profile.status != 'active':
         response = f'Your account is {profile.status}, please contact admin'
-        requirement = 'activate_account'
-        return success, response, requirement
+        requirement = 'activateAccount'
+        response_code = "92"
+        return success, response, requirement, response_code
 
     # Check if user have valid card
     if not UserCard.objects.filter(user=profile).exists():
         response = 'No valid card in your account, please add a card to qualify for loan'
-        requirement = 'add_card'
-        return success, response, requirement
+        requirement = 'addCard'
+        response_code = "93"
+        return success, response, requirement, response_code
 
     # Check if user meets guarantors requirement
-    if Guarantor.objects.filter(user=profile, confirmed=True).exclude(guarantor=profile).count() < loan_settings.number_of_guarantor:
-        response = f"You must have {loan_settings.number_of_guarantor} guarantor(s) before you can apply for loan"
-        requirement = 'add_guarantor'
-        return success, response, requirement
+    # if Guarantor.objects.filter(user=profile, confirmed=True).exclude(guarantor=profile).count() < loan_settings.number_of_guarantor:
+    #     response = f"You must have {loan_settings.number_of_guarantor} guarantor(s) before you can apply for loan"
+    #     requirement = 'add_guarantor'
+    #     return success, response, requirement
 
     # check if user still have a pending loan
     query = Q(user=profile)
     exclude = Q(status='unapproved') | Q(status='repaid')
     if Loan.objects.filter(query).exclude(exclude).exists():
         response = f"You cannot apply for a loan at the moment because you still have a loan running on your account."
-        requirement = 'active_loan'
-        return success, response, requirement
+        requirement = 'pendingLoan'
+        response_code = "94"
+        return success, response, requirement, response_code
 
     success = True
     response = "Eligible for loan"
-    requirement = 'fulfilled'
-    return success, response, requirement
+    requirement = 'Eligible'
+    response_code = "00"
+    return success, response, requirement, response_code
 
 
 def verify_loan_repayment(gateway, reference):

@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from account import send_email
+from account.send_email import log_request
 from savings.models import Saving, SavingTransaction
 from rest_framework import status
 from django.utils import timezone
@@ -25,18 +26,29 @@ from humanize import intcomma
 class ApplyForLoanView(APIView):
 
     def get(self, request):
+
         offer = dict()
         duration = request.GET.get("duration")
         amount = request.GET.get("amount")
         loan_basis = request.GET.get("repayment_frequency", "weekly")
 
-        print("PAYLOAD TO GET OFFER: ", request.GET)
+        data = dict()
+        success, response, requirement, response_code = can_get_loan(request)
+        if not success:
+            data['detail'] = response
+            data['reason'] = requirement
+            data['code'] = response_code
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
         loan_basis = str(loan_basis).lower()
 
-        success, loan_offer = get_loan_offer(request.user.profile)
+        success, loan_offer, required, err_code = get_loan_offer(request.user.profile)
         if success is False:
-            return Response({"detail": loan_offer}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({
+                "detail": loan_offer,
+                "reason": required,
+                "code": err_code
+            }, status=status.HTTP_401_UNAUTHORIZED)
 
         if amount:
             loan_offer = decimal.Decimal(amount)
@@ -45,6 +57,9 @@ class ApplyForLoanView(APIView):
 
         if not duration:
             offer['durations'] = LoanDurationSerializer(LoanDuration.objects.all(), many=True).data
+            offer['detail'] = "You are eligible for a loan"
+            offer['reason'] = "Eligible"
+            offer['code'] = "00"
 
         if duration:
             try:
@@ -73,15 +88,17 @@ class ApplyForLoanView(APIView):
             # offer['detail'] = f"You pay {split} for {repayment_count} {loan_basis[:-2]}(s)"
             naira_unicode = settings.NAIRA_UNICODE
             offer['detail'] = f"You pay {naira_unicode}{intcomma(split, 2)} for {repayment_count} {loan_basis[:-2]}(s)"
+            offer['reason'] = "Eligible"
+            offer['code'] = "00"
+
         # print("success on loa")
         return Response(offer)
 
     def post(self, request):
+
         data = dict()
         amount = request.data.get('amount')
         duration_id = request.data.get('duration')
-
-        print("PAYLOAD TO APPLY: ", request.data)
 
         if amount < 1000000:
             return Response({"detail": "Requested amount cannot be less than One Million Naira (N1,000,000)"},
@@ -104,12 +121,12 @@ class ApplyForLoanView(APIView):
             data['detail'] = f"You cannot get loan more than the offered amount of {loan_offer}"
             return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
-        success, response, requirement = can_get_loan(request.user.profile)
+        success, response, requirement, response_code = can_get_loan(request)
         if not success:
-            if not success:
-                data['detail'] = response
-                data['code'] = requirement
-                return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+            data['detail'] = response
+            data['reason'] = requirement
+            data['code'] = response_code
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
         profile = request.user.profile
         success, response = create_loan(request, profile, amount, duration)
@@ -124,7 +141,9 @@ class ApplyForLoanView(APIView):
 
         # Mail to Admin
         Thread(target=send_email.admin_loan_processing_status_mail, args=[request]).start()
-        
+
+        log_request(request.data, data)
+
         return Response(data)
 
 
@@ -209,8 +228,6 @@ class RepayLoanView(APIView):
         loan = get_object_or_404(Loan, id=loan_id, user=request.user.profile)
         if success and loan.status == 'repaid':
             Thread(target=loan_clear_off, args=[request, amount]).start()
-            print("Sent email to user loan.views, LINE 191")
-
         return Response(data)
 
 

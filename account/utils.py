@@ -13,9 +13,11 @@ from investment.models import UserInvestment
 from investment.serializers import UserInvestmentSerializer
 from loan.models import LoanTransaction, Loan
 from loan.serializers import LoanSerializer
-from modules.paystack import validate_account_no, create_recipient_code
+from modules.paystack import validate_account_no, create_recipient_code, get_paystack_link
 from savings.models import SavingTransaction, Saving
 from savings.serializers import SavingSerializer
+from settings.utils import general_settings
+from transaction.models import Transaction
 from .models import *
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
@@ -137,6 +139,8 @@ def signup(request):
     profile.gender = gender
     profile.save()
 
+    wallet, _ = Wallet.objects.get_or_create(user=profile)
+
     Thread(target=create_recipient_code, args=[profile, account_no]).start()
     Thread(target=send_welcome_email_to_user, args=[profile]).start()
     success = True
@@ -180,15 +184,21 @@ def tokenize_user_card(data, gateway=None):
 
 def get_user_analytics(profile):
     data = dict()
+    wallet, _ = Wallet.objects.get_or_create(user=profile)
 
     savings = dict()
     total_savings = SavingTransaction.objects.filter(user=profile, status='success')
-    savings['total_savings_amount'] = total_savings.aggregate(Sum('amount'))['amount__sum']
+    # savings['total_savings_amount'] = total_savings.aggregate(Sum('amount'))['amount__sum']
+    savings['total_savings_amount'] = Wallet.objects.get(user=profile).balance
     savings['current_saving'] = SavingSerializer(Saving.objects.filter(user=profile).last()).data
 
     loan = dict()
-    loan_transactions = LoanTransaction.objects.filter(user=profile, status='success')
-    loan['loan_transaction_amount'] = loan_transactions.aggregate(Sum('amount'))['amount__sum']
+    # loan_transactions = LoanTransaction.objects.filter(user=profile, status='success')
+    loan_transactions = Loan.objects.filter(user=profile, status='approved')
+
+    loan['loan_transaction_amount'] = loan_transactions.aggregate(
+        Sum('amount_left_to_repay')
+    )['amount_left_to_repay__sum'] or 0
     loan['current_loans'] = LoanSerializer(Loan.objects.filter(user=profile, status='ongoing'), many=True).data
     loan['total'] = Loan.objects.filter(user=profile).count()
     loan['pending'] = Loan.objects.filter(user=profile, status='pending').count()
@@ -212,7 +222,11 @@ def get_user_analytics(profile):
 
     query = Q(status='approved') | Q(status='ongoing') | Q(status='completed')
     total_money_invested = UserInvestment.objects.filter(user=profile).filter(query)
-    investment['total_money_invested'] = total_money_invested.aggregate(Sum('amount_invested'))['amount_invested__sum']
+
+    all_invested = total_money_invested.aggregate(Sum('amount_invested'))['amount_invested__sum'] or 0
+    all_yield = total_money_invested.aggregate(Sum('amount_yield'))['amount_yield__sum'] or 0
+
+    investment['total_money_invested'] = all_invested + all_yield
 
     query = Q(status='ongoing')
     total_money_expected = UserInvestment.objects.filter(user=profile).filter(query)
@@ -226,6 +240,54 @@ def get_user_analytics(profile):
     data['loan'] = loan
 
     return data
+
+
+def pay_membership(request):
+    data = dict()
+    site_settings = general_settings()
+    gateway = request.data.get('gateway', 'paystack')
+    callback_url = request.data.get('callback_url')
+
+    if not gateway or gateway is None or gateway == 'null':
+        gateway = 'paystack'
+
+    if not callback_url:
+        # Findings
+        # 1. The call_back url here was supposed to be /verify-payment/
+        # 2. I noticed that, if i choose the decline option on the paystack option for payment
+        # It doesn't do anything, therefore not allowing me send a Failed Payment Email to user.
+        # callback_url = f"{request.scheme}://{request.get_host()}{request.path}"
+        # callback_url = f"{request.scheme}://{request.get_host()}/verify-payment/{request.path}"
+        # callback_url = f"{request.scheme}://{request.get_host()}/verify-payment/"
+        callback_url = settings.CALLBACK_URL
+
+    email = request.user.email
+    profile = request.user.profile
+    amount = site_settings.membership_fee
+
+    # create transaction for membership payment
+    trans, created = Transaction.objects.get_or_create(user=request.user.profile, transaction_type='membership fee',
+                                                       status='pending')
+    trans.payment_method = gateway
+    trans.amount = amount
+    trans.save()
+
+    metadata = {
+        'transaction_id': trans.id,
+        'payment_for': 'membership fee',
+    }
+    if gateway == 'paystack':
+        success, response = get_paystack_link(email=email, amount=amount, callback_url=callback_url,
+                                              metadata=metadata)
+        if success is True:
+            data['payment_link'] = response
+            data['membership_id'] = profile.member_id
+            # profile.paid_membership_fee = True
+            profile.save()
+        else:
+            data['detail'] = response
+    return data
+
 
 
 

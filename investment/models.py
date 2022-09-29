@@ -97,6 +97,7 @@ class UserInvestment(models.Model):
     amount_invested = models.DecimalField(decimal_places=2, max_digits=20, default=0)
     percentage = models.DecimalField(decimal_places=2, max_digits=20, default=0)
     return_on_invested = models.DecimalField(decimal_places=2, max_digits=20, default=0)
+    amount_yield = models.DecimalField(decimal_places=2, max_digits=20, default=0)
     number_of_month = models.IntegerField(default=1)
     number_of_days = models.IntegerField(default=1)
     start_date = models.DateTimeField(null=True)

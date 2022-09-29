@@ -2,46 +2,42 @@ import django_heroku
 from .base import *
 from decouple import config
 import logging
+import environ
 
+env = environ.Env()
+environ.Env.read_env(os.path.join('.env'))
 
-# SECRET_KEY = 'reincoso'
-SECRET_KEY = 'b0e0f111-6bd2-4d10-5z24-9r462j273ge6-do-user-dfgrjiu000642'
+SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = True
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = []
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / config('DB_NAME', 'db.sqlite3'),
-#     },
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'd2g9vc9qhqk11p',
-        'USER': 'oufhmuryqtsroa',
-        'PASSWORD': '5ab865b7eeb173c123d306829d55c362c1cf18c60013d8fde5e727c89b4ff0d4',
-        'HOST': 'ec2-54-217-15-9.eu-west-1.compute.amazonaws.com',
-        'PORT': '5432',
+        'NAME': "d2g9vc9qhqk11p",
+        'USER': "oufhmuryqtsroa",
+        'PASSWORD': "5ab865b7eeb173c123d306829d55c362c1cf18c60013d8fde5e727c89b4ff0d4",
+        'HOST': "ec2-54-217-15-9.eu-west-1.compute.amazonaws.com",
+        'PORT': "5432",
     }
 }
 
-
-PAYSTACK_BASE_URL = 'https://api.paystack.co'
-PAYSTACK_SECRET_KEY = 'sk_test_9b3d455a84aa3da9bf0a7610a80529dc524c377d'
-PAYSTACK_PUBLIC_KEY = 'pk_test_db348e565111ebfbc63e12ca0ad9f73d8eb93a98'
-PAYSTACK_REF = "COSO"
-PAYSTACK_TEST_CHARGE = 10
+# PAYSTACK CREDENTIALS
+PAYSTACK_BASE_URL = env('PAYSTACK_BASE_URL')
+PAYSTACK_SECRET_KEY = env('PAYSTACK_SECRET_KEY')
+PAYSTACK_PUBLIC_KEY = env('PAYSTACK_PUBLIC_KEY')
+PAYSTACK_REF = env('PAYSTACK_REF')
+PAYSTACK_TEST_CHARGE = env('PAYSTACK_TEST_CHARGE')
 
 # SENDING EMAIL CREDENTIALS
-EMAIL_API_URL = "https://api.mailgun.net/v3/reincosocoop.com/messages"
-EMAIL_API_KEY = "0fc607b5f9c416383d7143401f1308c9-38029a9d-18a8e2d0"
-EMAIL_SENDER = "Reincoso <no-reply@reincosocoop.com>"
+EMAIL_API_URL = env('EMAIL_API_URL')
+EMAIL_API_KEY = env('EMAIL_API_KEY')
+EMAIL_SENDER = env('EMAIL_SENDER')
 
+CALLBACK_URL = env("CALLBACK_URL")
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
@@ -79,9 +75,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
-
-NAIRA_UNICODE = u"\u20A6"
-
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())

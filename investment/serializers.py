@@ -58,8 +58,12 @@ class UserInvestmentSerializer(serializers.ModelSerializer):
     investment = serializers.CharField(source='investment.name', read_only=True)
     option = serializers.CharField(source='option.name', read_only=True)
     duration = serializers.CharField(source='duration.title', read_only=True)
+    current_balance = serializers.SerializerMethodField()
     user = serializers.SerializerMethodField()
     withdrawals = serializers.SerializerMethodField()
+
+    def get_current_balance(self, obj):
+        return obj.amount_invested + obj.amount_yield
 
     def get_user(self, obj):
         user = {

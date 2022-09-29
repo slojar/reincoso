@@ -1,9 +1,13 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
-from .cron import investment_maturity_check
+# from .views import investment_maturity_cron_view, investment_yield_cron_view
 
 urlpatterns = [
+    # CRONJOB
+    path('maturity-check-cron/', views.InvestmentMaturityCronView.as_view(), name="maturity-cron"),
+    path('interest-cron/', views.InvestmentYieldCronView.as_view(), name="increment-cron"),
+
     path('investment-types/', views.InvestmentTypesView.as_view()),
     path('investment-types/<str:id>/', views.InvestmentTypesDetailView.as_view()),
     path('apply/', views.InvestView.as_view()),
@@ -18,6 +22,5 @@ urlpatterns = [
     path('<str:id>/', views.InvestmentDetailView.as_view()),
     path('<str:id>/options/', views.InvestmentOptionsView.as_view()),
 
-    path('investment-maturity/', investment_maturity_check)
 ]
 
